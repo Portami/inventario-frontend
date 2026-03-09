@@ -70,4 +70,21 @@ export default [
             },
         },
     },
+    {
+        files: ['src/tests/**/*.ts', 'src/tests/**/*.tsx'],
+        languageOptions: {
+            globals: {
+                ...globals.browser,
+                ...globals.node,
+                describe: 'readonly',
+                it: 'readonly',
+                expect: 'readonly',
+                beforeAll: 'readonly',
+                beforeEach: 'readonly',
+                afterAll: 'readonly',
+                afterEach: 'readonly',
+                vi: 'readonly',
+            },
+        },
+    },
 ];

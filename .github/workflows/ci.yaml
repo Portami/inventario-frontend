@@ -37,3 +37,10 @@ jobs:
         with:
           name: dist
           path: dist
+
+      - name: Upload coverage artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage
