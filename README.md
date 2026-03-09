@@ -1,5 +1,7 @@
 # Frontend
 
+[![CI](https://github.com/Portami/frontend/actions/workflows/ci.yaml/badge.svg)](https://github.com/Portami/frontend/actions/workflows/ci.yaml)
+
 This project is built with **React**, **TypeScript**, and **Vite**.
 
 Before contributing, please read the project guidelines.
@@ -23,8 +25,11 @@ Install dependencies:
 ```bash
 npm install
 ```
-Copy the `.env.example` file to `.env` and fill in any required environment variables. **NEVER** commit your `.env` file to version control.
-The .env file is used to store environment-specific variables, such as API keys or database connection strings. It should not be committed to version control to prevent sensitive information from being exposed.
+
+Copy the `.env.example` file to `.env` and fill in any required environment variables. **NEVER** commit your `.env` file
+to version control.
+The .env file is used to store environment-specific variables, such as API keys or database connection strings. It
+should not be committed to version control to prevent sensitive information from being exposed.
 
 # General Workflow
 
