@@ -13,7 +13,8 @@
         "check:spellcheck": "cspell \"src/**/*\" --cache",
         "format:check": "prettier --check .",
         "format": "prettier --write .",
-        "check:all": "npm run check:eslint && npm run check:stylelint && npm run check:spellcheck && npm run format:check"
+        "check:all": "npm run check:eslint && npm run check:stylelint && npm run check:spellcheck && npm run format:check",
+        "check:ci": "npm run check:all && npm run build"
     },
     "dependencies": {
         "@emotion/react": "~11.14.0",
