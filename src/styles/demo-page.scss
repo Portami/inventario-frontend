@@ -1,0 +1,32 @@
+.demo-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.demo-header {
+    padding: 24px;
+    text-align: center;
+}
+
+.demo-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.demo-box {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 32px;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.demo-footer {
+    padding: 16px;
+    text-align: center;
+}

@@ -1,0 +1,37 @@
+{
+  "language": "en,de",
+  "useGitignore": true,
+  "files": [
+    "src/**/*.{ts,tsx,js,jsx,scss,css,md}"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "package.json",
+    "composer.json"
+  ],
+  "import": [
+    "@cspell/dict-de-ch/cspell-ext.json"
+  ],
+  "dictionaries": [
+    "aws",
+    "css",
+    "en_US",
+    "filetypes",
+    "git",
+    "html",
+    "html-symbol-entities",
+    "node",
+    "npm",
+    "softwareTerms",
+    "typescript"
+  ],
+  "words": [
+    "mui",
+    "vite",
+    "scss",
+    "tsx",
+    "TTFB"
+  ]
+}
