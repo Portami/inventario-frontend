@@ -18,7 +18,7 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/inventario-frontend
+  IMAGE_NAME: portami/inventario-frontend
 
 jobs:
   ci:
