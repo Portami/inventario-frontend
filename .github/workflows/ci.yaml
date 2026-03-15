@@ -105,11 +105,20 @@ jobs:
     if: github.ref == 'refs/heads/develop' && false
 
     steps:
-      - name: Checkout infrastructure repo
-        uses: actions/checkout@v5
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@v1
         with:
-          repository: your-org/inventario-infrastructure
-          token: ${{ secrets.INFRA_PAT }}
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: Portami
+          repositories: inventario-infrastructure
+          
+      - name: Checkout infrastructure repo
+        uses: actions/checkout@v4
+        with:
+          repository: Portami/inventario-infrastructure
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Update staging frontend tag
         uses: mikefarah/yq@master
@@ -134,7 +143,7 @@ jobs:
       - name: Checkout infrastructure repo
         uses: actions/checkout@v5
         with:
-          repository: your-org/inventario-infrastructure
+          repository: Portami/inventario-infrastructure
           token: ${{ secrets.INFRA_PAT }}
 
       - name: Update prod frontend tag
