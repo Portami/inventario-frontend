@@ -11,6 +11,6 @@ describe('Demo', () => {
     it('renders the button', () => {
         render(<Demo />);
 
-        expect(screen.getByRole('button', {name: /test button/i})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /Fetch Text/i})).toBeInTheDocument();
     });
 });

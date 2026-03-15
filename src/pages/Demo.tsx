@@ -1,6 +1,6 @@
-import { Box, Button, Typography } from '@mui/material';
-import { useState } from 'react';
-import { fetchHelloWorld } from '@/services/backend';
+import {fetchHelloWorld} from '@/services/backend';
+import {Box, Button, Typography} from '@mui/material';
+import {useState} from 'react';
 
 export default function Demo() {
     const [text, setText] = useState<string>(''); // State to hold the text
@@ -10,7 +10,7 @@ export default function Demo() {
             const fetchedText = await fetchHelloWorld();
             setText(fetchedText);
         } catch (error) {
-            setText('Failed to fetch text from API');
+            setText('Failed to fetch text from API' + (error instanceof Error ? `: ${error.message}` : ''));
         }
     };
 
@@ -28,7 +28,7 @@ export default function Demo() {
                         Fetch Text
                     </Button>
 
-                    <Typography variant="body1" sx={{ marginTop: 2 }}>
+                    <Typography variant="body1" sx={{marginTop: 2}}>
                         {text || 'Click the button to fetch text from the backend.'}
                     </Typography>
                 </Box>

@@ -20,7 +20,7 @@
         "prettier/prettier": [
             true,
             {
-                "endOfLine": "lf",
+                "endOfLine": "crlf",
                 "printWidth": 160,
                 "singleAttributePerLine": false,
                 "singleQuote": true

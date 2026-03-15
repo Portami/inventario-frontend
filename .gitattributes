@@ -1,0 +1,13 @@
+# Ensure all files use CRLF line endings
+* text=auto eol=crlf
+
+# Explicitly enforce CRLF for specific file types
+*.ts text eol=crlf
+*.tsx text eol=crlf
+*.js text eol=crlf
+*.jsx text eol=crlf
+*.json text eol=crlf
+*.scss text eol=crlf
+*.css text eol=crlf
+*.html text eol=crlf
+*.md text eol=crlf

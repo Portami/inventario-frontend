@@ -11,7 +11,7 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort';
 
 export default [
     {
-        ignores: ['src/types/theme.d.ts', 'src/index.js'],
+        ignores: ['src/types/theme.d.ts', 'src/index.js', 'dist/'],
     },
     js.configs.recommended,
     {
