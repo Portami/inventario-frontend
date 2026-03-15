@@ -1,22 +1,39 @@
-name: CI
+name: Frontend CI/CD
 
 on:
   push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: frontend-cicd-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/inventario-frontend
 
 jobs:
   ci:
     runs-on: ubuntu-latest
 
+    outputs:
+      image-tag: ${{ steps.vars.outputs.sha_short }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -37,6 +54,7 @@ jobs:
         with:
           name: dist
           path: dist
+          if-no-files-found: ignore
 
       - name: Upload coverage artifact
         if: success()
@@ -44,3 +62,110 @@ jobs:
         with:
           name: coverage
           path: coverage
+          if-no-files-found: ignore
+
+  build-and-push:
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image-tag: ${{ needs.ci.outputs.image-tag }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.ci.outputs.image-tag }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  update-staging:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: portami
+          repositories: inventario-infrastructure
+
+      - name: Checkout infrastructure repo
+        uses: actions/checkout@v4
+        with:
+          repository: portami/inventario-infrastructure
+          token: ${{ steps.app-token.outputs.token }}
+          ref: develop
+
+      - name: Update staging frontend tag
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e '.frontend.image.tag = "${{ needs.build-and-push.outputs.image-tag }}"' -i operations/staging-values.yaml
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add operations/staging-values.yaml
+          git commit -m "chore(staging): frontend → ${{ needs.build-and-push.outputs.image-tag }}" || echo "No changes to commit"
+          git push
+
+  update-prod:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: portami
+          repositories: inventario-infrastructure
+
+      - name: Checkout infrastructure repo
+        uses: actions/checkout@v5
+        with:
+          repository: portami/inventario-infrastructure
+          token: ${{ steps.app-token.outputs.token }}
+          ref: main
+
+      - name: Update prod frontend tag
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e '.frontend.image.tag = "${{ needs.build-and-push.outputs.image-tag }}"' -i operations/production-values.yaml
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add operations/production-values.yaml
+          git commit -m "chore(prod): frontend → ${{ needs.build-and-push.outputs.image-tag }}" || echo "No changes to commit"
+          git push
