@@ -67,7 +67,7 @@ jobs:
   build-and-push:
     needs: ci
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && false
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     permissions:
       contents: read
       packages: write
@@ -102,7 +102,7 @@ jobs:
   update-staging:
     needs: build-and-push
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' && false
+    if: github.ref == 'refs/heads/develop'
 
     steps:
       - name: Generate token
@@ -113,48 +113,59 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: portami
           repositories: inventario-infrastructure
-          
+
       - name: Checkout infrastructure repo
         uses: actions/checkout@v4
         with:
           repository: portami/inventario-infrastructure
           token: ${{ steps.app-token.outputs.token }}
+          ref: develop
 
       - name: Update staging frontend tag
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.frontend.image.tag = "${{ needs.build-and-push.outputs.image-tag }}"' -i environments/staging/values.yaml
+          cmd: yq e '.frontend.image.tag = "${{ needs.build-and-push.outputs.image-tag }}"' -i operations/staging-values.yaml
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add environments/staging/values.yaml
+          git add operations/staging-values.yaml
           git commit -m "chore(staging): frontend → ${{ needs.build-and-push.outputs.image-tag }}" || echo "No changes to commit"
           git push
 
   update-prod:
     needs: build-and-push
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && false
+    if: github.ref == 'refs/heads/main'
     environment: production
 
     steps:
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: portami
+          repositories: inventario-infrastructure
+
       - name: Checkout infrastructure repo
         uses: actions/checkout@v5
         with:
           repository: portami/inventario-infrastructure
-          token: ${{ secrets.INFRA_PAT }}
+          token: ${{ steps.app-token.outputs.token }}
+          ref: main
 
       - name: Update prod frontend tag
         uses: mikefarah/yq@master
         with:
-          cmd: yq e '.frontend.image.tag = "${{ needs.build-and-push.outputs.image-tag }}"' -i environments/prod/values.yaml
+          cmd: yq e '.frontend.image.tag = "${{ needs.build-and-push.outputs.image-tag }}"' -i operations/production-values.yaml
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add environments/prod/values.yaml
+          git add operations/production-values.yaml
           git commit -m "chore(prod): frontend → ${{ needs.build-and-push.outputs.image-tag }}" || echo "No changes to commit"
           git push
