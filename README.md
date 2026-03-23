@@ -21,7 +21,7 @@ Before contributing, please read the project guidelines.
 
 # SonarQube
 
-Sonar analysis is executed through `.github/workflows/sonar.yml`, which calls the reusable workflow in
+Sonar analysis runs inside `.github/workflows/ci.yaml` through the reusable workflow
 `.github/workflows/reusable-sonar.yml`.
 
 Configure these repository settings before running the workflow:

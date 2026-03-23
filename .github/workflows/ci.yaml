@@ -64,6 +64,13 @@ jobs:
           path: coverage
           if-no-files-found: ignore
 
+  sonar:
+    needs: ci
+    uses: ./.github/workflows/reusable-sonar.yml
+    secrets: inherit
+    with:
+      sonar-version: ${{ needs.ci.outputs.image-tag }}-SNAPSHOT
+
   build-and-push:
     needs: ci
     runs-on: ubuntu-latest
