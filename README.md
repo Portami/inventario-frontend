@@ -1,8 +1,7 @@
 # Frontend
 
 [![CI](https://github.com/Portami/frontend/actions/workflows/ci.yaml/badge.svg)](https://github.com/Portami/frontend/actions/workflows/ci.yaml)
-[![Quality Gate Status](https://sonarqube.pm4.init-lab.ch/api/project_badges/measure?project=inventario-frontend&metric=alert_status)](https://sonarqube.pm4.init-lab.ch/dashboard?id=inventario-frontend)
-
+[![Quality Gate Status](https://sonarqube.pm4.init-lab.ch/api/project_badges/measure?project=inventario-frontend&metric=alert_status&token=sqb_7dd514c621fd92f93e621131137af3ac172a0307)](https://sonarqube.pm4.init-lab.ch/dashboard?id=inventario-frontend)
 This project is built with **React**, **TypeScript**, and **Vite**.
 
 Before contributing, please read the project guidelines.
