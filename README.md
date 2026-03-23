@@ -1,6 +1,7 @@
 # Frontend
 
 [![CI](https://github.com/Portami/frontend/actions/workflows/ci.yaml/badge.svg)](https://github.com/Portami/frontend/actions/workflows/ci.yaml)
+[![Quality Gate Status](https://sonarqube.pm4.init-lab.ch/api/project_badges/measure?project=inventario-frontend&metric=alert_status)](https://sonarqube.pm4.init-lab.ch/dashboard?id=inventario-frontend)
 
 This project is built with **React**, **TypeScript**, and **Vite**.
 
@@ -15,6 +16,20 @@ Before contributing, please read the project guidelines.
 
 - [Dependency Management](./docs/dependency-management.md)  
   Explains npm rules, versioning (`~`), semantic versions (`x.x.x`), and package management guidelines.
+
+---
+
+# SonarQube
+
+Sonar analysis is executed through `.github/workflows/sonar.yml`, which calls the reusable workflow in
+`.github/workflows/reusable-sonar.yml`.
+
+Configure these repository settings before running the workflow:
+
+- GitHub secret: `SONAR_TOKEN`
+- GitHub variable: `SONAR_HOST_URL` (for example `https://sonarqube.pm4.init-lab.ch`)
+
+For local SonarLint connected mode, this project includes `.sonarlint/connectMode.json` with the frontend project key.
 
 ---
 
