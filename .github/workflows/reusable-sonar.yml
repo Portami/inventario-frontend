@@ -43,4 +43,6 @@ jobs:
         with:
           args: >
             -Dsonar.projectVersion=${{ inputs.sonar-version }}
+            -Dsonar.qualitygate.wait=true
+            -Dsonar.qualitygate.timeout=300
 
