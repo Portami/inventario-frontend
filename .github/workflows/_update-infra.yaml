@@ -1,0 +1,55 @@
+name: Reusable – Update Infra
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: '"staging" or "production"'
+      tag:
+        required: true
+        type: string
+    secrets:
+      APP_ID:
+        required: true
+      APP_PRIVATE_KEY:
+        required: true
+
+jobs:
+  update-infra:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve environment config
+        id: config
+        run: |
+          echo "values_file=operations/${{ inputs.environment }}-values.yaml" >> $GITHUB_OUTPUT
+
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: portami
+          repositories: inventario-infrastructure
+
+      - name: Checkout infrastructure repo
+        uses: actions/checkout@v5
+        with:
+          repository: portami/inventario-infrastructure
+          token: ${{ steps.app-token.outputs.token }}
+          ref: main
+
+      - name: Update frontend image tag
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq e '.frontend.image.tag = "${{ inputs.tag }}"' -i ${{ steps.config.outputs.values_file }}
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ${{ steps.config.outputs.values_file }}
+          git commit -m "chore(${{ inputs.environment }}): frontend → ${{ inputs.tag }}"
+          git push

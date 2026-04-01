@@ -1,0 +1,28 @@
+name: Release creation flow
+on:
+  release:
+    types: [published]
+
+jobs:
+  sonar:
+    uses: ./.github/workflows/_sonar.yaml
+    secrets: inherit
+    with:
+      sonar-version: ${{ github.event.release.tag_name }}
+
+  build-push:
+    needs: sonar
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/_build-push.yaml
+    with:
+      tag: ${{ github.event.release.tag_name }}
+
+  update-infra:
+    needs: build-push
+    uses: ./.github/workflows/_update-infra.yaml
+    secrets: inherit
+    with:
+      environment: production
+      tag: ${{ github.event.release.tag_name }}

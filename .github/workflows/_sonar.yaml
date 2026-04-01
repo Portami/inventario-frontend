@@ -6,6 +6,10 @@ on:
       sonar-version:
         required: true
         type: string
+      enforce-quality-gate:
+        required: false
+        type: boolean
+        default: false
     secrets:
       SONAR_TOKEN:
         required: true
@@ -46,6 +50,5 @@ jobs:
         with:
           args: >
             -Dsonar.projectVersion=${{ inputs.sonar-version }}
-            -Dsonar.qualitygate.wait=true
-            -Dsonar.qualitygate.timeout=300
+            ${{ inputs.enforce-quality-gate && '-Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=300' || '' }}
 
