@@ -4,7 +4,11 @@ on:
     types: [published]
 
 jobs:
+  validate:
+    uses: ./.github/workflows/_validate.yaml
+
   sonar:
+    needs: validate
     uses: ./.github/workflows/_sonar.yaml
     secrets: inherit
     with:
