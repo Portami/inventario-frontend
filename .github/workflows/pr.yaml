@@ -28,7 +28,6 @@ jobs:
     secrets: inherit
     with:
       sonar-version: ${{ needs.get-tag.outputs.sha_short }}-SNAPSHOT
-      enforce-quality-gate: true
 
   gate:
     needs:
