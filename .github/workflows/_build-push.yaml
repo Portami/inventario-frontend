@@ -10,6 +10,10 @@ on:
         description: The tag the image was pushed with
         value: ${{ jobs.build-push.outputs.image-tag }}
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: portami/inventario-frontend
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -38,8 +42,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.ci.outputs.image-tag }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
