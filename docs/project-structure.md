@@ -1,5 +1,25 @@
 # Project Structure
 
+---
+
+## `src/assets`
+
+Shared assets belong here.
+
+Examples:
+
+- Images
+- Icons
+- Fonts
+- Static files
+
+Use this folder when:
+
+- an asset is used in multiple places
+- an asset is important enough to centralize
+
+---
+
 ## `src/components`
 
 Reusable UI building blocks belong here.
