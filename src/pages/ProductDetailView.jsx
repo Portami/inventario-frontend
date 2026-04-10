@@ -1,7 +1,7 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
-import InventoryIcon from '@mui/icons-material/Inventory';
 import HistoryIcon from '@mui/icons-material/History';
+import InventoryIcon from '@mui/icons-material/Inventory';
 import {
     Box,
     Button,
@@ -148,7 +148,7 @@ export default function ProductDetailView() {
 
                                 <Divider sx={{ mb: 4 }} />
 
-                                {/* Spezifikationen (Die Filter aus deinem Figma-Design) */}
+                                {/* Spezifikationen (Filter) */}
                                 <Typography variant="h3" gutterBottom sx={{ mb: 2 }}>
                                     Spezifikationen
                                 </Typography>
