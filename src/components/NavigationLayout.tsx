@@ -1,3 +1,4 @@
+import logo from '@/assets/logo.svg';
 import AddIcon from '@mui/icons-material/Add';
 import ContentPasteOutlinedIcon from '@mui/icons-material/ContentPasteOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -8,7 +9,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import {AppBar, Box, Button, Container, Drawer, IconButton, List, ListItem, Toolbar, Typography} from '@mui/material';
 import {NavLink, Outlet} from 'react-router';
-import logo from '@/assets/logo.svg';
 
 const navigationWidth = 240;
 
@@ -42,12 +42,17 @@ export default function NavigationLayout() {
                 </Typography>
                 <List component={'nav'}>
                     <ListItem disableGutters>
-                        <Button component={NavLink} to={'/rollen'} startIcon={<Inventory2OutlinedIcon />} sx={{justifyContent: 'flex-start', width: '100%'}} >
+                        <Button component={NavLink} to={'/rollen'} startIcon={<Inventory2OutlinedIcon />} sx={{justifyContent: 'flex-start', width: '100%'}}>
                             Rollen
                         </Button>
                     </ListItem>
                     <ListItem disableGutters>
-                        <Button component={NavLink} to={'/inventar'} startIcon={<ContentPasteOutlinedIcon />} sx={{justifyContent: 'flex-start', width: '100%'}}>
+                        <Button
+                            component={NavLink}
+                            to={'/inventar'}
+                            startIcon={<ContentPasteOutlinedIcon />}
+                            sx={{justifyContent: 'flex-start', width: '100%'}}
+                        >
                             Inventar
                         </Button>
                     </ListItem>
@@ -57,7 +62,12 @@ export default function NavigationLayout() {
                         </Button>
                     </ListItem>
                     <ListItem disableGutters>
-                        <Button component={NavLink} to={'/shopping'} startIcon={<ShoppingCartOutlinedIcon />} sx={{justifyContent: 'flex-start', width: '100%'}}>
+                        <Button
+                            component={NavLink}
+                            to={'/shopping'}
+                            startIcon={<ShoppingCartOutlinedIcon />}
+                            sx={{justifyContent: 'flex-start', width: '100%'}}
+                        >
                             Shopping
                         </Button>
                     </ListItem>
