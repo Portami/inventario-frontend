@@ -165,7 +165,7 @@ export default function ProductDetailView() {
                                     ))}
                                 </Grid>
 
-                                {/* Aktionen / Buttons */}
+                                {/* Aktionen /Buttons*/}
                                 <Box sx={{ display: 'flex', gap: 2, mt: 'auto' }}>
                                     <Button
                                         variant="contained"
