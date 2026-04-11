@@ -1,0 +1,60 @@
+name: Pull request workflow
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  get-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      sha_short: ${{ steps.short-commit-hash.outputs.short }}
+    steps:
+      - name: Get short commit hash
+        id: short-commit-hash
+        uses: prompt/actions-commit-hash@v3
+        with:
+          commit: '${{ github.sha }}'
+
+  validate:
+    needs: get-tag
+    uses: ./.github/workflows/_validate.yaml
+
+  sonar:
+    needs:
+      - get-tag
+      - validate
+    uses: ./.github/workflows/_sonar.yaml
+    secrets: inherit
+    with:
+      sonar-version: ${{ needs.get-tag.outputs.sha_short }}-SNAPSHOT
+
+  gate:
+    needs:
+      - get-tag
+      - validate
+    runs-on: ubuntu-latest
+    environment: staging-approval
+    steps:
+      - run: echo "Approved"
+
+  build-push:
+    needs:
+      - get-tag
+      - gate
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/_build-push.yaml
+    with:
+      tag: ${{ needs.get-tag.outputs.sha_short }}
+
+  update-infra:
+    needs:
+      - get-tag
+      - build-push
+    uses: ./.github/workflows/_update-infra.yaml
+    secrets: inherit
+    with:
+      environment: staging
+      tag: ${{ needs.get-tag.outputs.sha_short }}
