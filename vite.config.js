@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig({
     plugins: [react()],
+    assetsInclude: ['**/*.svg'],
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './src'),
