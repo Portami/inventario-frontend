@@ -9,7 +9,11 @@ type ProductListProps = {
 };
 
 export default function ProductList({deletingIds, onDelete, products}: ProductListProps) {
-    if (!products.length) {
+    if (!Array.isArray(products)) {
+        return <Typography color="error">Error: Failed to load products (Backend might be blocking the request).</Typography>;
+    }
+
+    if (products.length === 0) {
         return <Typography>No products yet. Add your first product.</Typography>;
     }
 
