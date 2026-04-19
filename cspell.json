@@ -36,9 +36,13 @@
     "bwipjs",
     "datamatrix",
     "inventar",
+    "Handgefertigte",
+    "TTFB",
+    "inventar",
     "mui",
     "scss",
     "tsx",
-    "vite"
+    "vite",
+    "wasserabweisend"
   ]
 }

@@ -4,6 +4,7 @@ import theme from './theme';
 import NavigationLayout from '@/components/NavigationLayout.tsx';
 import InventoryPage from '@/pages/InventoryPage.tsx';
 import LabelGeneratorPage from '@/pages/LabelGeneratorPage.tsx';
+import ProductDetailView from '@/pages/ProductDetailView.tsx';
 import RollDetail from '@/pages/RollDetail.tsx';
 import RollPage from '@/pages/RollPage.tsx';
 import ScanPage from '@/pages/ScanPage.tsx';
@@ -27,6 +28,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                     <Route path="/inventory" element={<InventoryPage />} />
                     <Route path="/storage" element={<StoragePage />} />
                     <Route path="/shopping" element={<ShoppingPage />} />
+                    <Route path="/product/:id" element={<ProductDetailView />} />
                 </Route>
                 <Route path="/roll/:id" element={<RollDetail />} />
                 <Route path="/scrap/:id" element={<ScrapDetail />} />
