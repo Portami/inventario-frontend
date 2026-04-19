@@ -12,7 +12,7 @@ export type ProductDetail = {
     attributes: ProductAttribute[];
 };
 
-export type Currency = 'CHF' ;
+export type Currency = 'CHF';
 
 export type GetProductDetailResponse = {
     data: ProductDetail;
@@ -26,5 +26,5 @@ export type ProductSpecificationsProps = {
 
 export const PRODUCT_STATUS = {
     IN_STOCK: 'IN_STOCK',
-    OUT_OF_STOCK: 'OUT_OF_STOCK'
+    OUT_OF_STOCK: 'OUT_OF_STOCK',
 } as const;

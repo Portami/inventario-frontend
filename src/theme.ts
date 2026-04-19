@@ -32,11 +32,11 @@ const theme = createTheme({
     },
     typography: {
         fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-        h1: { fontSize: '2.5rem', fontWeight: 800, color: '#7D55C7' }, // accent-purple
-        h2: { fontSize: '2rem', fontWeight: 700, color: '#23254f' }, // dark blue
-        h3: { fontSize: '1.5rem', fontWeight: 600, color: '#23254f' }, // dark blue
-        h4: { fontSize: '1.25rem', fontWeight: 600, color: '#505D68' }, // light grey
-        body1: { fontSize: '1rem', color: '#505D68', lineHeight: 1.6 }, // light grey
+        h1: {fontSize: '2.5rem', fontWeight: 800, color: '#7D55C7'}, // accent-purple
+        h2: {fontSize: '2rem', fontWeight: 700, color: '#23254f'}, // dark blue
+        h3: {fontSize: '1.5rem', fontWeight: 600, color: '#23254f'}, // dark blue
+        h4: {fontSize: '1.25rem', fontWeight: 600, color: '#505D68'}, // light grey
+        body1: {fontSize: '1rem', color: '#505D68', lineHeight: 1.6}, // light grey
     },
     shape: {
         borderRadius: 12,
