@@ -53,12 +53,14 @@ export default function ProductDetailView() {
                 </Box>
 
                 <Grid container spacing={6}>
-                    {/* left side: product image (placeholder) */}
-                    <Grid size={{ xs: 12, md: 6 }}>
+                    {/* product image (placeholder) */}
+                    <Grid size={{ xs: 12, md: 12 }}>
                         <Paper
                             elevation={0}
                             sx={{
                                 width: '100%',
+                                maxWidth: '300px',
+                                mx: 'left',
                                 aspectRatio: '1 / 1',
                                 backgroundColor: 'divider', // secondary-light-grey
                                 display: 'flex',
@@ -75,7 +77,7 @@ export default function ProductDetailView() {
                         </Paper>
                     </Grid>
 
-                    {/* right side: product details */}
+                    {/* product details */}
                     <Grid size={{ xs: 12, md: 6 }}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 
