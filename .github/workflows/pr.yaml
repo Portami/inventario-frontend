@@ -3,9 +3,21 @@ on:
   pull_request:
     branches:
       - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - labeled
+      - unlabeled
+
+permissions:
+  contents: read
+  packages: read
 
 jobs:
   get-tag:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     outputs:
       sha_short: ${{ steps.short-commit-hash.outputs.short }}
@@ -29,19 +41,11 @@ jobs:
     with:
       sonar-version: ${{ needs.get-tag.outputs.sha_short }}-SNAPSHOT
 
-  gate:
+  build-push:
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'deploy') }}
     needs:
       - get-tag
       - validate
-    runs-on: ubuntu-latest
-    environment: staging-approval
-    steps:
-      - run: echo "Approved"
-
-  build-push:
-    needs:
-      - get-tag
-      - gate
     permissions:
       contents: read
       packages: write
