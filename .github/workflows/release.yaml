@@ -3,6 +3,10 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   validate:
     uses: ./.github/workflows/_validate.yaml

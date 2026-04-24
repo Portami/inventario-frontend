@@ -1,0 +1,19 @@
+name: GitHub Pull Request Naming Policy Action
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  naming_policy_action:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Verify policy
+        uses: nicklegan/github-pull-request-naming-policy-action@977dbdf39cde98527b827d8f90e5064e12a5337f
+        with:
+          title-regex: '^PORTAMI-\d* .*$'
+          title-error-message: 'The title must start with PORTAMI- followed by a number and a space.'
