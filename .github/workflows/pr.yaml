@@ -11,10 +11,6 @@ on:
       - labeled
       - unlabeled
 
-permissions:
-  contents: read
-  packages: read
-
 jobs:
   get-tag:
     if: ${{ !github.event.pull_request.draft }}
