@@ -1,18 +1,8 @@
 import {COLORS, TYPES} from '@/types/felt';
 import {Product} from '@/types/product';
 
-/**
- * Mock product data for development
- * These are placeholder products until backend endpoints are implemented
- * Products reference Felt specifications for color, type, and material properties
- *
- * TODO: Replace with actual backend calls to:
- * - GET /api/products
- * - GET /api/products?type=WOOL&color=RED (with filters)
- * - POST /api/products (create)
- * - DELETE /api/products/:id (delete)
- */
-export const MOCK_PRODUCTS: Product[] = [
+// Mock scrap data — used by fetchScrapDetails until a /scraps endpoint is available on the backend
+const MOCK_PRODUCTS: Product[] = [
     {
         id: '00001',
         articleNumber: 'ART-001-RED-WOOL',
@@ -134,27 +124,6 @@ export const MOCK_PRODUCTS: Product[] = [
         },
     },
 ];
-
-/**
- * Get mock products, optionally filtered
- * @param filters - Optional product filters (type and/or color)
- * @returns Filtered mock products
- */
-export const getMockProducts = (filters?: {type?: string; color?: string}): Product[] => {
-    if (!filters || (!filters.type && !filters.color)) {
-        return MOCK_PRODUCTS;
-    }
-
-    return MOCK_PRODUCTS.filter((product) => {
-        if (filters.type && product.felt?.type !== filters.type) {
-            return false;
-        }
-        if (filters.color && product.felt?.color !== filters.color) {
-            return false;
-        }
-        return true;
-    });
-};
 
 /**
  * Get a mock product by ID

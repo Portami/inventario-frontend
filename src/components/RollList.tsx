@@ -1,9 +1,9 @@
 import {ProductId} from '@/types/product';
-import {Roll} from '@/types/roll';
-import {Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useTheme} from '@mui/material';
+import {FeltRollDto} from '@/types/roll';
+import {Button} from '@mui/material';
+import {DataGrid, GridColDef} from '@mui/x-data-grid';
 
-// Re-export Roll as RollItem for backward compatibility
-export type RollItem = Roll;
+export type RollItem = FeltRollDto;
 
 type RollListProps = {
     deletingIds: Set<ProductId>;
@@ -13,56 +13,48 @@ type RollListProps = {
 };
 
 export default function RollList({deletingIds, onDelete, rolls}: Readonly<RollListProps>) {
-    const theme = useTheme();
-
-    if (!rolls.length) {
-        return <Typography variant="body1">Noch keine Rollen. Fügen Sie Ihre erste Rolle hinzu.</Typography>;
-    }
+    const columns: GridColDef<RollItem>[] = [
+        {field: 'id', headerName: 'ID', width: 80},
+        {
+            field: 'color',
+            headerName: 'Farbe / Typ',
+            flex: 1,
+            renderCell: ({row}) => `${row.feltTypeName} – ${row.color}`,
+        },
+        {field: 'articleNumber', headerName: 'Artikelnummer', flex: 1},
+        {field: 'batchName', headerName: 'Charge', flex: 1, valueGetter: (value: string | null) => value ?? '-'},
+        {field: 'storageName', headerName: 'Lagerort', flex: 1, valueGetter: (value: string | null) => value ?? '-'},
+        {
+            field: 'actions',
+            headerName: 'Aktionen',
+            width: 140,
+            sortable: false,
+            align: 'right',
+            headerAlign: 'right',
+            renderCell: ({row}) => (
+                <Button
+                    variant="outlined"
+                    color="error"
+                    size="small"
+                    disabled={deletingIds.has(row.id)}
+                    onClick={() => void onDelete(row.id)}
+                    aria-label={`delete roll ${row.id}`}
+                >
+                    {deletingIds.has(row.id) ? 'Wird gelöscht...' : 'Löschen'}
+                </Button>
+            ),
+        },
+    ];
 
     return (
-        <TableContainer component={Paper} sx={{borderRadius: `${theme.shape.borderRadius}px`}}>
-            <Table aria-label="rolls table">
-                <TableHead>
-                    <TableRow sx={{backgroundColor: theme.palette.primary.main}}>
-                        <TableCell sx={{color: theme.palette.background.paper, fontWeight: 600}}>ID</TableCell>
-                        <TableCell sx={{color: theme.palette.background.paper, fontWeight: 600}}>Name</TableCell>
-                        <TableCell sx={{color: theme.palette.background.paper, fontWeight: 600}}>Artikelnummer</TableCell>
-                        <TableCell sx={{color: theme.palette.background.paper, fontWeight: 600}}>Charge</TableCell>
-                        <TableCell sx={{color: theme.palette.background.paper, fontWeight: 600}}>Menge</TableCell>
-                        <TableCell sx={{color: theme.palette.background.paper, fontWeight: 600}}>Ort</TableCell>
-                        <TableCell align="right" sx={{color: theme.palette.background.paper, fontWeight: 600}}>
-                            Aktionen
-                        </TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {rolls.map((roll) => {
-                        const isDeleting = deletingIds.has(roll.id);
-
-                        return (
-                            <TableRow key={roll.id} sx={{'&:hover': {backgroundColor: `rgba(0, 0, 0, 0.02)`}}}>
-                                <TableCell>{String(roll.id)}</TableCell>
-                                <TableCell>{roll.name || '-'}</TableCell>
-                                <TableCell>{roll.articleNumber}</TableCell>
-                                <TableCell>{roll.batch}</TableCell>
-                                <TableCell>{roll.quantity}</TableCell>
-                                <TableCell>{roll.location}</TableCell>
-                                <TableCell align="right">
-                                    <Button
-                                        variant="outlined"
-                                        color="error"
-                                        disabled={isDeleting}
-                                        onClick={() => void onDelete(roll.id)}
-                                        aria-label={`delete roll ${roll.id}`}
-                                    >
-                                        {isDeleting ? 'Wird gelöscht...' : 'Löschen'}
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        );
-                    })}
-                </TableBody>
-            </Table>
-        </TableContainer>
+        <DataGrid
+            rows={rolls}
+            columns={columns}
+            autoHeight
+            disableRowSelectionOnClick
+            pageSizeOptions={[10, 25, 50]}
+            initialState={{pagination: {paginationModel: {pageSize: 10}}}}
+            localeText={{noRowsLabel: 'Noch keine Rollen vorhanden.'}}
+        />
     );
 }

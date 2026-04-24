@@ -3,21 +3,24 @@ import LabelsPreview from './components/LabelsPreview';
 import ProductSelectionTable from './components/ProductSelectionTable';
 import {DEFAULT_LABEL_HEIGHT_MM, DEFAULT_LABEL_WIDTH_MM} from './constants/labelConstants';
 import ListPage from '@/components/ListPage';
-import {fetchProducts} from '@/services/backend';
+import {fetchRolls} from '@/services/backend';
 import {generateLabelsPDF} from '@/services/labelPdfService';
 import {Product} from '@/types/product';
+import {FeltRollDto} from '@/types/roll';
 import DownloadIcon from '@mui/icons-material/Download';
 import {Alert, Box, Button, Stack} from '@mui/material';
 import {useEffect, useState} from 'react';
 
-/**
- * Label Generation Page
- * Allows users to select single or multiple rolls and generate printable labels with Data Matrix codes
- * Labels are generated as PDF for clean printing without navigation interference
- */
+const toProduct = (roll: FeltRollDto): Product => ({
+    id: roll.id,
+    articleNumber: roll.articleNumber,
+    name: `${roll.feltTypeName} – ${roll.color}`,
+    length: roll.length * 1000, // meters → mm
+    width: roll.width * 1000, // meters → mm
+});
 
 export default function LabelGeneratorPage() {
-    const [products, setProducts] = useState<Product[]>([]);
+    const [rolls, setRolls] = useState<FeltRollDto[]>([]);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
@@ -26,42 +29,19 @@ export default function LabelGeneratorPage() {
     const [labelHeight, setLabelHeight] = useState(DEFAULT_LABEL_HEIGHT_MM);
 
     useEffect(() => {
-        const loadProducts = async () => {
-            setIsLoading(true);
-            setError('');
+        const load = async () => {
             try {
-                const fetchedProducts = await fetchProducts();
-                setProducts(fetchedProducts);
+                setRolls(await fetchRolls());
             } catch (err) {
-                const message = err instanceof Error ? err.message : 'Failed to load rolls';
-                setError(message);
+                setError(err instanceof Error ? err.message : 'Rollen konnten nicht geladen werden');
             } finally {
                 setIsLoading(false);
             }
         };
-
-        void loadProducts();
+        void load();
     }, []);
 
-    const selectedProducts = products.filter((p) => selectedIds.has(String(p.id)));
-
-    const handleSelectAll = () => {
-        if (selectedIds.size === products.length) {
-            setSelectedIds(new Set());
-        } else {
-            setSelectedIds(new Set(products.map((p) => String(p.id))));
-        }
-    };
-
-    const handleSelectProduct = (productId: string) => {
-        const newSelectedIds = new Set(selectedIds);
-        if (newSelectedIds.has(productId)) {
-            newSelectedIds.delete(productId);
-        } else {
-            newSelectedIds.add(productId);
-        }
-        setSelectedIds(newSelectedIds);
-    };
+    const selectedProducts: Product[] = rolls.filter((r) => selectedIds.has(String(r.id))).map(toProduct);
 
     const handleDownloadPDF = async () => {
         setIsGeneratingPDF(true);
@@ -69,8 +49,7 @@ export default function LabelGeneratorPage() {
             const timestamp = new Date().toISOString().slice(0, 10);
             await generateLabelsPDF(selectedProducts, `roll-labels-${timestamp}`, labelWidth, labelHeight);
         } catch (err) {
-            const message = err instanceof Error ? err.message : 'Failed to generate PDF';
-            setError(message);
+            setError(err instanceof Error ? err.message : 'PDF konnte nicht generiert werden');
         } finally {
             setIsGeneratingPDF(false);
         }
@@ -81,15 +60,14 @@ export default function LabelGeneratorPage() {
             title="Rollenetiketten generieren"
             description="Wählen Sie eine oder mehrere Rollen aus, um druckbare PDF-Etiketten mit Data-Matrix-Codes zu generieren."
             isLoading={isLoading}
-            isEmpty={products.length === 0}
+            isEmpty={rolls.length === 0}
             emptyMessage="Keine Rollen gefunden. Bitte erstellen Sie zunächst eine Rolle."
             error={error}
             onErrorClose={() => setError('')}
         >
             <Stack spacing={3}>
-                <ProductSelectionTable products={products} selectedIds={selectedIds} onSelectAll={handleSelectAll} onSelectProduct={handleSelectProduct} />
+                <ProductSelectionTable rolls={rolls} selectedIds={selectedIds} onSelectionChange={setSelectedIds} />
 
-                {/* Selection Info */}
                 {selectedIds.size > 0 && (
                     <Alert severity="info">
                         {selectedIds.size} Rolle{selectedIds.size === 1 ? '' : 'n'} für die Etikettengenerierung ausgewählt
@@ -97,18 +75,21 @@ export default function LabelGeneratorPage() {
                 )}
 
                 {selectedIds.size > 0 && (
-                    <LabelDimensionControls labelWidth={labelWidth} labelHeight={labelHeight} onWidthChange={setLabelWidth} onHeightChange={setLabelHeight} />
+                    <>
+                        <LabelDimensionControls
+                            labelWidth={labelWidth}
+                            labelHeight={labelHeight}
+                            onWidthChange={setLabelWidth}
+                            onHeightChange={setLabelHeight}
+                        />
+                        <Box>
+                            <Button variant="contained" startIcon={<DownloadIcon />} onClick={handleDownloadPDF} disabled={isGeneratingPDF}>
+                                {isGeneratingPDF ? 'PDF wird generiert...' : 'PDF herunterladen'}
+                            </Button>
+                        </Box>
+                    </>
                 )}
 
-                {selectedIds.size > 0 && (
-                    <Box>
-                        <Button variant="contained" startIcon={<DownloadIcon />} onClick={handleDownloadPDF} disabled={isGeneratingPDF}>
-                            {isGeneratingPDF ? 'PDF wird generiert...' : 'PDF herunterladen'}
-                        </Button>
-                    </Box>
-                )}
-
-                {/* Labels Preview */}
                 {selectedProducts.length > 0 && <LabelsPreview products={selectedProducts} labelWidth={labelWidth} labelHeight={labelHeight} />}
             </Stack>
         </ListPage>

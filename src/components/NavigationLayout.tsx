@@ -1,8 +1,10 @@
 import logo from '@/assets/logo.svg';
 import AddIcon from '@mui/icons-material/Add';
+import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import ContentPasteOutlinedIcon from '@mui/icons-material/ContentPasteOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import PrintIcon from '@mui/icons-material/Print';
@@ -53,6 +55,24 @@ export default function NavigationLayout() {
                     <ListItem disableGutters>
                         <Button
                             component={NavLink}
+                            to={'/products'}
+                            startIcon={<CategoryOutlinedIcon />}
+                            sx={{
+                                justifyContent: 'flex-start',
+                                width: '100%',
+                                color: theme.palette.text.primary,
+                                '&.active': {
+                                    color: theme.palette.primary.main,
+                                    fontWeight: 600,
+                                },
+                            }}
+                        >
+                            Produkte
+                        </Button>
+                    </ListItem>
+                    <ListItem disableGutters>
+                        <Button
+                            component={NavLink}
                             to={'/scan'}
                             startIcon={<QrCodeIcon />}
                             sx={{
@@ -84,6 +104,24 @@ export default function NavigationLayout() {
                             }}
                         >
                             Etiketten
+                        </Button>
+                    </ListItem>
+                    <ListItem disableGutters>
+                        <Button
+                            component={NavLink}
+                            to={'/felts'}
+                            startIcon={<LayersOutlinedIcon />}
+                            sx={{
+                                justifyContent: 'flex-start',
+                                width: '100%',
+                                color: theme.palette.text.primary,
+                                '&.active': {
+                                    color: theme.palette.primary.main,
+                                    fontWeight: 600,
+                                },
+                            }}
+                        >
+                            Filze
                         </Button>
                     </ListItem>
                     <ListItem disableGutters>

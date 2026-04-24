@@ -1,66 +1,44 @@
-import {Product} from '@/types/product';
-import {Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, useTheme} from '@mui/material';
+import {FeltRollDto} from '@/types/roll';
+import {DataGrid, GridColDef, GridRowId, GridRowSelectionModel} from '@mui/x-data-grid';
 
 type ProductSelectionTableProps = {
-    readonly products: Product[];
+    readonly rolls: FeltRollDto[];
     readonly selectedIds: Set<string>;
-    readonly onSelectAll: () => void;
-    // eslint-disable-next-line no-unused-vars -- Parameter required for callback signature even if not used in type definition
-    readonly onSelectProduct: (productId: string) => void;
+    // eslint-disable-next-line no-unused-vars -- Parameter is part of the callback signature
+    readonly onSelectionChange: (ids: Set<string>) => void;
 };
 
-export default function ProductSelectionTable({products, selectedIds, onSelectAll, onSelectProduct}: ProductSelectionTableProps) {
-    const theme = useTheme();
+export default function ProductSelectionTable({rolls, selectedIds, onSelectionChange}: ProductSelectionTableProps) {
+    const columns: GridColDef<FeltRollDto>[] = [
+        {
+            field: 'color',
+            headerName: 'Farbe / Typ',
+            flex: 1,
+            renderCell: ({row}) => `${row.feltTypeName} – ${row.color}`,
+        },
+        {field: 'articleNumber', headerName: 'Artikelnummer', flex: 1},
+        {field: 'length', headerName: 'Länge (m)', width: 110},
+        {field: 'width', headerName: 'Breite (m)', width: 110},
+        {field: 'id', headerName: 'ID', width: 100, renderCell: ({value}) => <span style={{fontFamily: 'monospace'}}>{String(value)}</span>},
+    ];
+
+    const handleSelectionChange = (model: GridRowSelectionModel) => {
+        const included = model.type === 'include' ? [...model.ids] : rolls.map((r) => r.id as GridRowId).filter((id) => !model.ids.has(id));
+        onSelectionChange(new Set(included.map(String)));
+    };
 
     return (
-        <TableContainer component={Paper} sx={{borderRadius: `${theme.shape.borderRadius}px`}}>
-            <Table>
-                <TableHead>
-                    <TableRow sx={{backgroundColor: theme.palette.primary.main}}>
-                        <TableCell padding="checkbox" sx={{color: theme.palette.background.paper, fontWeight: 600}}>
-                            <Checkbox
-                                checked={selectedIds.size === products.length && products.length > 0}
-                                indeterminate={selectedIds.size > 0 && selectedIds.size < products.length}
-                                onChange={onSelectAll}
-                                sx={{color: theme.palette.background.paper}}
-                            />
-                        </TableCell>
-                        <TableCell sx={{color: theme.palette.background.paper, fontWeight: 600}}>Name</TableCell>
-                        <TableCell
-                            sx={{
-                                color: theme.palette.background.paper,
-                                fontWeight: 600,
-                            }}
-                        >
-                            Artikelnummer
-                        </TableCell>
-                        <TableCell sx={{color: theme.palette.background.paper, fontWeight: 600}}>Farbe</TableCell>
-                        <TableCell sx={{color: theme.palette.background.paper, fontWeight: 600}}>Dicke</TableCell>
-                        <TableCell sx={{color: theme.palette.background.paper, fontWeight: 600}}>ID</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {products.map((product) => (
-                        <TableRow
-                            key={product.id}
-                            hover
-                            sx={{
-                                backgroundColor: selectedIds.has(String(product.id)) ? `rgba(139, 92, 246, 0.08)` : 'inherit',
-                                '&:hover': {backgroundColor: `rgba(0, 0, 0, 0.02)`},
-                            }}
-                        >
-                            <TableCell padding="checkbox">
-                                <Checkbox checked={selectedIds.has(String(product.id))} onChange={() => onSelectProduct(String(product.id))} />
-                            </TableCell>
-                            <TableCell>{product.name || 'N/A'}</TableCell>
-                            <TableCell>{product.articleNumber}</TableCell>
-                            <TableCell>{product.felt?.color || '-'}</TableCell>
-                            <TableCell>{product.felt?.type || '-'}</TableCell>
-                            <TableCell sx={{fontFamily: 'monospace'}}>{product.id}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+        <DataGrid
+            rows={rolls}
+            columns={columns}
+            checkboxSelection
+            disableRowSelectionOnClick
+            rowSelectionModel={{type: 'include', ids: new Set<GridRowId>([...selectedIds].map(Number))}}
+            onRowSelectionModelChange={handleSelectionChange}
+            autoHeight
+            pageSizeOptions={[10, 25, 50]}
+            initialState={{pagination: {paginationModel: {pageSize: 10}}}}
+            localeText={{noRowsLabel: 'Keine Rollen vorhanden.'}}
+        />
     );
 }

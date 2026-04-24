@@ -1,4 +1,5 @@
 import {createTheme} from '@mui/material/styles';
+import type {} from '@mui/x-data-grid/themeAugmentation';
 
 const theme = createTheme({
     cssVariables: true,
@@ -39,6 +40,47 @@ const theme = createTheme({
         borderRadius: 12,
     },
     components: {
+        MuiDataGrid: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 12,
+                    border: '1px solid #E1E3E8',
+                    '& .MuiDataGrid-columnHeader': {
+                        backgroundColor: '#7D55C7',
+                        color: '#ffffff',
+                    },
+                    '& .MuiDataGrid-columnHeaderTitle': {
+                        fontWeight: 600,
+                    },
+                    '& .MuiDataGrid-filler': {
+                        backgroundColor: '#7D55C7',
+                    },
+                    '& .MuiDataGrid-scrollbarFiller': {
+                        backgroundColor: '#7D55C7',
+                    },
+                    '& .MuiDataGrid-columnHeader svg': {
+                        fill: '#ffffff',
+                        color: '#ffffff',
+                    },
+                    '& .MuiDataGrid-columnHeader .MuiDataGrid-sortIcon': {
+                        fill: '#ffffff !important',
+                        opacity: '1 !important',
+                    },
+                    '& .MuiDataGrid-iconButtonContainer .MuiIconButton-root': {
+                        color: '#ffffff',
+                        '&:hover': {
+                            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                        },
+                    },
+                    '& .MuiDataGrid-columnHeaderCheckbox .MuiCheckbox-root': {
+                        color: '#ffffff',
+                    },
+                    '& .MuiDataGrid-row:hover': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                    },
+                },
+            },
+        },
         MuiLink: {
             styleOverrides: {
                 root: ({theme}) => ({

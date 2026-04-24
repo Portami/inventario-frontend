@@ -18,20 +18,6 @@ export const TYPES = {
 
 export type Type = (typeof TYPES)[keyof typeof TYPES];
 
-export const colorLabels: Record<Color, string> = {
-    [COLORS.Red]: 'Red',
-    [COLORS.Green]: 'Green',
-    [COLORS.Blue]: 'Blue',
-    [COLORS.Other]: 'Other',
-} as const;
-
-export const typeLabels: Record<Type, string> = {
-    [TYPES.Wool]: 'Wool',
-    [TYPES.Synthetic]: 'Synthetic',
-    [TYPES.Blended]: 'Blended',
-    [TYPES.Industrial]: 'Industrial',
-} as const;
-
 /**
  * Felt type - represents felt specifications including color, type, and other material properties
  */
@@ -44,7 +30,30 @@ export type Felt = {
     density?: number; // Density in g/cm³
 };
 
-export type ProductFilters = {
-    type?: Type;
-    color?: Color;
+export type CreateFeltRequest = {
+    color: string;
+    supplierColor: string;
+    thickness: number;
+    density: number;
+    price: number;
+    articleNumber: string;
+    supplierId: number;
+    feltTypeId: number;
+};
+
+/** Response shape from GET /api/felts and GET /api/felts/{id} */
+export type FeltDto = {
+    id: number;
+    color: string;
+    supplierColor: string;
+    thickness: number;
+    density: number;
+    price: number;
+    feltVariantId: number;
+    articleNumber: string;
+    supplierId: number;
+    supplierName: string;
+    feltId: number;
+    feltTypeId: number;
+    feltTypeName: string;
 };

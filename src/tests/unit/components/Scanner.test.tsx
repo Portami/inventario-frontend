@@ -68,14 +68,14 @@ describe('Scanner Component', () => {
         });
     });
 
-    describe('Bluetooth Scanner Mode', () => {
-        it('should display Bluetooth scanner instructions', () => {
+    describe('HID Scanner Mode', () => {
+        it('should display HID scanner instructions', () => {
             renderScanner();
 
-            const bluetoothElements = screen.queryAllByText(/Bluetooth-Scanner/i);
-            expect(bluetoothElements.length).toBeGreaterThan(0);
+            const scannerElements = screen.queryAllByText(/Scanner-Modus/i);
+            expect(scannerElements.length).toBeGreaterThan(0);
 
-            const instructions = screen.queryByText(/Verbinden Sie Ihren Bluetooth-Scanner/i);
+            const instructions = screen.queryByText(/Verbinden Sie Ihren Scanner/i);
             expect(instructions).toBeInTheDocument();
         });
 
