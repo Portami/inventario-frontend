@@ -1,28 +1,62 @@
-import {ProductDetail} from '../types/productDetail';
+import {fetchProductById} from '@/services/backend';
+import {ProductDto} from '@/types/product';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import HistoryIcon from '@mui/icons-material/History';
 import InventoryIcon from '@mui/icons-material/Inventory';
-import {Box, Button, Chip, Container, Divider, Grid, Paper, Typography} from '@mui/material';
-import React from 'react';
+import {Box, Button, Chip, CircularProgress, Container, Divider, Grid, Paper, Typography} from '@mui/material';
+import {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router';
 
 export default function ProductDetailView() {
-    // mock data for the felt product
-    const product: ProductDetail = {
-        name: 'Shopper Uno',
-        sku: 'FLZ-BG-001',
-        description:
-            'Handgefertigte, nachhaltige Tragetasche aus 100% natürlichem Wollfilz. Bietet extrem hohen Tragekomfort und ' +
-            'ist wasserabweisend. Perfekt für den täglichen Einkauf oder als robuster Begleiter ins Büro.',
-        stock: 24,
-        price: 'CHF 168.00',
-        attributes: [
-            {label: 'Material', value: 'Wollfilz'},
-            {label: 'Dicke', value: '3 mm'},
-            {label: 'Farbe', value: 'Grau'},
-            {label: 'Abmessungen', value: '40 x 30 x 15 cm'},
-        ],
-    };
+    const {id} = useParams<{id: string}>();
+    const navigate = useNavigate();
+    const [product, setProduct] = useState<ProductDto | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const load = async () => {
+            if (!id) return;
+            try {
+                setProduct(await fetchProductById(id));
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Produkt konnte nicht geladen werden');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        void load();
+    }, [id]);
+
+    const firstVariant = product?.variants[0];
+    const price = firstVariant ? `CHF ${firstVariant.price.toFixed(2)}` : '–';
+    const variantCount = product?.variants.length ?? 0;
+
+    const specs =
+        product?.attributes.map((attr) => {
+            const val = firstVariant?.attributes.find((va) => va.attributeId === attr.id)?.value ?? '–';
+            return {label: attr.name, value: val};
+        }) ?? [];
+
+    if (isLoading) {
+        return (
+            <Box sx={{display: 'flex', justifyContent: 'center', pt: 10}}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (error || !product) {
+        return (
+            <Box sx={{p: 6}}>
+                <Typography color="error">{error || 'Produkt nicht gefunden'}</Typography>
+                <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/products')} sx={{mt: 2}}>
+                    Zurück zu Produkten
+                </Button>
+            </Box>
+        );
+    }
 
     return (
         <Box sx={{minHeight: '100vh', backgroundColor: 'background.default', py: 6}}>
@@ -32,9 +66,9 @@ export default function ProductDetailView() {
                     <Button
                         startIcon={<ArrowBackIcon />}
                         sx={{color: 'text.secondary', textTransform: 'none', fontWeight: 600}}
-                        onClick={() => window.history.back()}
+                        onClick={() => navigate('/products')}
                     >
-                        Zurück zur Lagerverwaltung
+                        Zurück zur Produktübersicht
                     </Button>
                     <Button
                         startIcon={<HistoryIcon />}
@@ -63,7 +97,7 @@ export default function ProductDetailView() {
                                 maxWidth: '300px',
                                 mx: 'left',
                                 aspectRatio: '1 / 1',
-                                backgroundColor: 'divider', // secondary-light-grey
+                                backgroundColor: 'divider',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -81,64 +115,63 @@ export default function ProductDetailView() {
                     {/* product details */}
                     <Grid size={{xs: 12, md: 6}}>
                         <Box sx={{display: 'flex', flexDirection: 'column', height: '100%'}}>
-                            {/* title and SKU */}
+                            {/* title and category */}
                             <Typography variant="h1" gutterBottom>
                                 {product.name}
                             </Typography>
                             <Typography variant="body1" sx={{fontWeight: 600, color: 'text.secondary', mb: 3}}>
-                                Artikelnummer: {product.sku}
+                                Kategorie: {product.category.name}
                             </Typography>
 
-                            {/* price and current stock */}
+                            {/* price and variant count */}
                             <Box sx={{display: 'flex', gap: 2, alignItems: 'center', mb: 4}}>
                                 <Typography variant="h2" sx={{m: 0}}>
-                                    {product.price}
+                                    {price}
                                 </Typography>
                                 <Chip
                                     icon={<InventoryIcon sx={{fontSize: '1rem'}} />}
-                                    label={`${product.stock} auf Lager`}
+                                    label={`${variantCount} Variante${variantCount !== 1 ? 'n' : ''}`}
                                     sx={{
-                                        backgroundColor: product.stock > 10 ? 'success.light' : 'warning.light',
-                                        color: product.stock > 10 ? 'success.main' : 'warning.main',
+                                        backgroundColor: variantCount > 0 ? 'success.light' : 'warning.light',
+                                        color: variantCount > 0 ? 'success.main' : 'warning.main',
                                         fontWeight: 'bold',
                                         borderRadius: '16px',
                                     }}
                                 />
                             </Box>
 
-                            {/* description */}
-                            <Typography variant="body1" sx={{mb: 4}}>
-                                {product.description}
-                            </Typography>
-
                             <Divider sx={{mb: 4}} />
 
-                            {/* specifications (filter) */}
-                            <Typography variant="h3" gutterBottom sx={{mb: 2}}>
-                                Spezifikationen
-                            </Typography>
-                            <Grid container spacing={2} sx={{mb: 5}}>
-                                {product.attributes.map((attr, index) => (
-                                    <Grid size={{xs: 6}} key={index}>
-                                        <Typography
-                                            variant="body2"
-                                            sx={{
-                                                color: 'text.secondary',
-                                                textTransform: 'uppercase',
-                                                letterSpacing: 1,
-                                                fontSize: '0.75rem',
-                                            }}
-                                        >
-                                            {attr.label}
-                                        </Typography>
-                                        <Typography variant="body1" sx={{fontWeight: 600, color: 'text.primary'}}>
-                                            {attr.value}
-                                        </Typography>
+                            {/* specifications */}
+                            {specs.length > 0 && (
+                                <>
+                                    <Typography variant="h3" gutterBottom sx={{mb: 2}}>
+                                        Spezifikationen
+                                    </Typography>
+                                    <Grid container spacing={2} sx={{mb: 5}}>
+                                        {specs.map((attr) => (
+                                            <Grid size={{xs: 6}} key={attr.label}>
+                                                <Typography
+                                                    variant="body2"
+                                                    sx={{
+                                                        color: 'text.secondary',
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: 1,
+                                                        fontSize: '0.75rem',
+                                                    }}
+                                                >
+                                                    {attr.label}
+                                                </Typography>
+                                                <Typography variant="body1" sx={{fontWeight: 600, color: 'text.primary'}}>
+                                                    {attr.value}
+                                                </Typography>
+                                            </Grid>
+                                        ))}
                                     </Grid>
-                                ))}
-                            </Grid>
+                                </>
+                            )}
 
-                            {/* actions (buttons) */}
+                            {/* actions */}
                             <Box sx={{display: 'flex', gap: 2, mt: 'auto'}}>
                                 <Button
                                     variant="contained"
@@ -150,7 +183,7 @@ export default function ProductDetailView() {
                                         textTransform: 'none',
                                         fontWeight: 'bold',
                                         boxShadow: 'none',
-                                        '&:hover': {boxShadow: '0 4px 12px rgba(125, 85, 199, 0.3)'}, // using the new accent-purple rgb
+                                        '&:hover': {boxShadow: '0 4px 12px rgba(125, 85, 199, 0.3)'},
                                     }}
                                 >
                                     Bestand bearbeiten

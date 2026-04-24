@@ -15,5 +15,5 @@ jobs:
       - name: Verify policy
         uses: nicklegan/github-pull-request-naming-policy-action@977dbdf39cde98527b827d8f90e5064e12a5337f
         with:
-          title-regex: '^PORTAMI-\d* .*$'
-          title-error-message: 'The title must start with PORTAMI- followed by a number and a space.'
+          title-regex: '^(?:PORTAMI-\d+)|(?:Bump) .*$'
+          title-error-message: 'The title must start with PORTAMI- followed by a number and a space. Or for dependencies bumps, it must start with "Bump'

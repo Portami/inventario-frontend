@@ -4,7 +4,8 @@ interface ImportMetaEnv {
     readonly VITE_DATABASE_USERNAME: string;
     readonly VITE_DATABASE_PASSWORD: string;
     readonly VITE_DATABASE_NAME: string;
-    // Add other environment variables here if needed
+    readonly DEV: boolean;
+    readonly PROD: boolean;
 }
 
 interface ImportMeta {

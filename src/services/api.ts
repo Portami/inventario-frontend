@@ -3,7 +3,7 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL ?? '/api';
 const request = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
     const headers = {
         'Content-Type': 'application/json',
-        ...(options.headers ?? {}),
+        ...options.headers,
     };
 
     const response = await fetch(`${BASE_URL}${url}`, {
