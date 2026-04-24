@@ -14,6 +14,9 @@ on:
       SONAR_TOKEN:
         required: true
 
+permissions:
+  contents: read
+
 jobs:
   sonar:
     runs-on: ubuntu-latest
