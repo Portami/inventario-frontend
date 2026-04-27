@@ -1,4 +1,4 @@
-import {del, get, post} from './api';
+import {del, get, patch, post} from './api';
 import {getMockProductById} from './mock/backendMock.ts';
 import {CreateFeltRequest, FeltDto} from '@/types/felt';
 import {Product, ProductDto, ProductId} from '@/types/product';
@@ -75,6 +75,19 @@ export const createFelt = async (payload: CreateFeltRequest): Promise<FeltDto> =
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
         const result = await post<FeltDto>('/felts', payload, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const updateFelt = async (id: number, payload: CreateFeltRequest): Promise<FeltDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await patch<FeltDto>(`/felts/${id}`, payload, {signal: controller.signal});
         clearTimeout(timeoutId);
         return result;
     } catch (error) {
