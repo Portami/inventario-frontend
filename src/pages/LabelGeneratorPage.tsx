@@ -3,6 +3,7 @@ import LabelsPreview from './components/LabelsPreview';
 import ProductSelectionTable from './components/ProductSelectionTable';
 import {DEFAULT_LABEL_HEIGHT_MM, DEFAULT_LABEL_WIDTH_MM} from './constants/labelConstants';
 import ListPage from '@/components/ListPage';
+import {useToast} from '@/components/ToastProvider';
 import {fetchRolls} from '@/services/backend';
 import {generateLabelsPDF} from '@/services/labelPdfService';
 import {Product} from '@/types/product';
@@ -20,6 +21,7 @@ const toProduct = (roll: FeltRollDto): Product => ({
 });
 
 export default function LabelGeneratorPage() {
+    const showToast = useToast();
     const [rolls, setRolls] = useState<FeltRollDto[]>([]);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [isLoading, setIsLoading] = useState(true);
@@ -48,8 +50,9 @@ export default function LabelGeneratorPage() {
         try {
             const timestamp = new Date().toISOString().slice(0, 10);
             await generateLabelsPDF(selectedProducts, `roll-labels-${timestamp}`, labelWidth, labelHeight);
+            showToast('PDF erfolgreich heruntergeladen.', 'success');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'PDF konnte nicht generiert werden');
+            showToast(err instanceof Error ? err.message : 'PDF konnte nicht generiert werden', 'error');
         } finally {
             setIsGeneratingPDF(false);
         }

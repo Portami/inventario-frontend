@@ -1,13 +1,15 @@
 import ListPage from '@/components/ListPage';
 import RollList, {RollItem} from '@/components/RollList';
+import {useToast} from '@/components/ToastProvider';
 import {createRoll, deleteRoll, fetchFelts, fetchRolls} from '@/services/backend';
 import {FeltDto} from '@/types/felt';
-import {createDeleteHandler, toErrorMessage} from '@/utils/pageUtils';
+import {toErrorMessage} from '@/utils/pageUtils';
 import AddIcon from '@mui/icons-material/Add';
 import {Button, FormControl, InputLabel, MenuItem, Paper, Select, Stack, TextField} from '@mui/material';
-import {FormEvent, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 export default function RollPage() {
+    const showToast = useToast();
     const [rolls, setRolls] = useState<RollItem[]>([]);
     const [felts, setFelts] = useState<FeltDto[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -34,20 +36,34 @@ export default function RollPage() {
         void load();
     }, []);
 
-    const handleDeleteRoll = createDeleteHandler(setRolls, setDeletingIds, setError, deleteRoll);
+    const handleDeleteRoll = async (rollId: string | number) => {
+        setDeletingIds((prev) => new Set(prev).add(rollId));
+        try {
+            await deleteRoll(rollId);
+            setRolls((prev) => prev.filter((r) => r.id !== rollId));
+            showToast('Rolle erfolgreich gelöscht.', 'success');
+        } catch {
+            showToast('Löschen fehlgeschlagen. Bitte versuche es erneut.', 'error');
+        } finally {
+            setDeletingIds((prev) => {
+                const next = new Set(prev);
+                next.delete(rollId);
+                return next;
+            });
+        }
+    };
 
-    const handleCreateRoll = async (e: FormEvent) => {
-        e.preventDefault();
+    const handleCreateRoll = async () => {
         setIsSubmitting(true);
-        setError('');
         try {
             const newRoll = await createRoll({feltId: Number(feltId), length: Number(length), width: Number(width)});
             setRolls((prev) => [...prev, newRoll]);
             setFeltId('');
             setLength('');
             setWidth('');
+            showToast('Rolle erfolgreich erstellt.', 'success');
         } catch (err) {
-            setError(toErrorMessage(err, 'Rolle konnte nicht erstellt werden'));
+            showToast(toErrorMessage(err, 'Rolle konnte nicht erstellt werden'), 'error');
         } finally {
             setIsSubmitting(false);
         }
@@ -62,7 +78,14 @@ export default function RollPage() {
             error={error}
             onErrorClose={() => setError('')}
         >
-            <Paper component="form" onSubmit={handleCreateRoll} sx={{p: 2}}>
+            <Paper
+                component="form"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    void handleCreateRoll();
+                }}
+                sx={{p: 2}}
+            >
                 <Stack direction="row" spacing={2} sx={{alignItems: 'flex-end'}}>
                     <FormControl size="small" required sx={{minWidth: 220}}>
                         <InputLabel>Filz</InputLabel>
