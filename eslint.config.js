@@ -31,6 +31,7 @@ export default [
             'simple-import-sort': simpleImportSort,
         },
         rules: {
+            'no-unused-vars': 'off',
             '@typescript-eslint/no-unused-vars': 'warn',
             'import/named': 'off',
             'react/jsx-uses-react': 'off',

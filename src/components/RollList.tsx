@@ -7,7 +7,7 @@ export type RollItem = FeltRollDto;
 
 type RollListProps = {
     deletingIds: Set<ProductId>;
-    // eslint-disable-next-line no-unused-vars -- Parameter is part of the callback signature for consumers to know what ID was deleted
+
     onDelete(rollId: ProductId): Promise<void>;
     rolls: RollItem[];
 };
