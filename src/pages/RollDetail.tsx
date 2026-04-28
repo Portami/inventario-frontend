@@ -1,4 +1,5 @@
 import DetailPage from '@/components/DetailPage';
+import {useToast} from '@/components/ToastProvider';
 import {deleteRoll, fetchRollDetails, updateRoll} from '@/services/backend';
 import {FeltRollDto} from '@/types/roll';
 import {toErrorMessage} from '@/utils/pageUtils';
@@ -46,6 +47,7 @@ const labelProps = {shrink: true, sx: {textTransform: 'uppercase' as const, lett
 export default function RollDetail() {
     const {id} = useParams<{id: string}>();
     const navigate = useNavigate();
+    const showToast = useToast();
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [roll, setRoll] = useState<FeltRollDto | null>(null);
@@ -99,8 +101,9 @@ export default function RollDetail() {
             });
             setRoll(await fetchRollDetails(id));
             setIsEditing(false);
+            showToast('Rolle erfolgreich gespeichert.');
         } catch (err) {
-            setError(toErrorMessage(err, 'Rolle konnte nicht gespeichert werden'));
+            showToast(toErrorMessage(err, 'Rolle konnte nicht gespeichert werden'), 'error');
         } finally {
             setIsSaving(false);
         }
@@ -113,7 +116,7 @@ export default function RollDetail() {
             await deleteRoll(id);
             navigate('/rolls');
         } catch (err) {
-            setError(toErrorMessage(err, 'Rolle konnte nicht gelöscht werden'));
+            showToast(toErrorMessage(err, 'Rolle konnte nicht gelöscht werden'), 'error');
             setIsDeleting(false);
             setIsDeleteOpen(false);
         }

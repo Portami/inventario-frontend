@@ -1,3 +1,4 @@
+import {useToast} from '@/components/ToastProvider';
 import {createRoll, updateRoll} from '@/services/backend';
 import {FeltDto} from '@/types/felt';
 import {FeltRollDto} from '@/types/roll';
@@ -26,6 +27,7 @@ const emptyForm: FormState = {feltId: '', length: '', width: '', batchId: '', st
 const labelProps = {shrink: true, sx: {textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontWeight: 600}};
 
 export default function RollDialog({open, onClose, onSaved, roll, felts}: RollDialogProps) {
+    const showToast = useToast();
     const [form, setForm] = useState<FormState>(emptyForm);
     const [isSaving, setIsSaving] = useState(false);
 
@@ -67,6 +69,7 @@ export default function RollDialog({open, onClose, onSaved, roll, felts}: RollDi
                     ...(form.batchId && {batchId: Number.parseInt(form.batchId, 10)}),
                     ...(form.storageId && {storageId: Number.parseInt(form.storageId, 10)}),
                 });
+                showToast('Rolle erfolgreich erstellt.');
             } else {
                 await updateRoll(roll.id, {
                     length,
@@ -74,10 +77,11 @@ export default function RollDialog({open, onClose, onSaved, roll, felts}: RollDi
                     ...(form.batchId && {batchId: Number.parseInt(form.batchId, 10)}),
                     ...(form.storageId && {storageId: Number.parseInt(form.storageId, 10)}),
                 });
+                showToast('Rolle erfolgreich gespeichert.');
             }
             onSaved();
         } catch {
-            // errors will be surfaced via toast once ToastProvider is merged
+            showToast(roll == null ? 'Rolle konnte nicht erstellt werden.' : 'Rolle konnte nicht gespeichert werden.', 'error');
         } finally {
             setIsSaving(false);
         }

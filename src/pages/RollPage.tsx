@@ -52,7 +52,7 @@ export default function RollPage() {
             await deleteRoll(rollToDelete.id);
             setRollToDelete(null);
             refetch();
-            showToast('Rolle erfolgreich erstellt.', 'success');
+            showToast('Rolle erfolgreich gelöscht.', 'success');
         } catch (err) {
             showToast(toErrorMessage(err, 'Rolle konnte nicht gelöscht werden'), 'error');
             setRollToDelete(null);
