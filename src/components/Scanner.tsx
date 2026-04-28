@@ -33,7 +33,8 @@ export default function Scanner({onSuccess, onError, isOpen, onClose}: Readonly<
     };
 
     const handleCodeScanned = async (code: string) => {
-        const trimmedCode = code.trim();
+        const trimmed = code.trim();
+        const trimmedCode = /^\d+$/.test(trimmed) ? trimmed.padStart(5, '0') : trimmed;
 
         if (!validateIdFormat(trimmedCode)) {
             setError('Ungültiges Format: Der Code muss aus 5 Ziffern bestehen (z.B. 00001)');
