@@ -2,6 +2,7 @@ import './styles/index.scss';
 import App from './App';
 import theme from './theme';
 import NavigationLayout from '@/components/NavigationLayout.tsx';
+import {ToastProvider} from '@/components/ToastProvider';
 import FeltPage from '@/pages/FeltPage.tsx';
 import InventoryPage from '@/pages/InventoryPage.tsx';
 import LabelGeneratorPage from '@/pages/LabelGeneratorPage.tsx';
@@ -19,24 +20,26 @@ import {BrowserRouter, Route, Routes} from 'react-router';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
-        <BrowserRouter>
-            <CssBaseline />
-            <Routes>
-                <Route element={<NavigationLayout />}>
-                    <Route index element={<App />} />
-                    <Route path="/scan" element={<ScanPage />} />
-                    <Route path="/labels" element={<LabelGeneratorPage />} />
-                    <Route path="/rolls" element={<RollPage />} />
-                    <Route path="/felts" element={<FeltPage />} />
-                    <Route path="/inventory" element={<InventoryPage />} />
-                    <Route path="/storage" element={<StoragePage />} />
-                    <Route path="/shopping" element={<ShoppingPage />} />
-                    <Route path="/products" element={<ProductsPage />} />
-                    <Route path="/product/:id" element={<ProductDetailView />} />
-                </Route>
-                <Route path="/roll/:id" element={<RollDetail />} />
-                <Route path="/scrap/:id" element={<ScrapDetail />} />
-            </Routes>
-        </BrowserRouter>
+        <ToastProvider>
+            <BrowserRouter>
+                <CssBaseline />
+                <Routes>
+                    <Route element={<NavigationLayout />}>
+                        <Route index element={<App />} />
+                        <Route path="/scan" element={<ScanPage />} />
+                        <Route path="/labels" element={<LabelGeneratorPage />} />
+                        <Route path="/rolls" element={<RollPage />} />
+                        <Route path="/felts" element={<FeltPage />} />
+                        <Route path="/inventory" element={<InventoryPage />} />
+                        <Route path="/storage" element={<StoragePage />} />
+                        <Route path="/shopping" element={<ShoppingPage />} />
+                        <Route path="/products" element={<ProductsPage />} />
+                        <Route path="/product/:id" element={<ProductDetailView />} />
+                    </Route>
+                    <Route path="/roll/:id" element={<RollDetail />} />
+                    <Route path="/scrap/:id" element={<ScrapDetail />} />
+                </Routes>
+            </BrowserRouter>
+        </ToastProvider>
     </ThemeProvider>,
 );

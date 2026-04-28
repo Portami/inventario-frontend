@@ -3,7 +3,7 @@ import {useEffect, useState} from 'react';
 // HID barcode/data-matrix scanners act as keyboards: they stream key events and finish with Enter.
 export const useHidScanner = (
     isActive: boolean,
-    // eslint-disable-next-line no-unused-vars -- Parameter is part of the callback signature
+
     onScan: (code: string) => void,
 ) => {
     const [scannedCode, setScannedCode] = useState('');

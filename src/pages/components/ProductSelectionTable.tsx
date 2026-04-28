@@ -4,7 +4,7 @@ import {DataGrid, GridColDef, GridRowId, GridRowSelectionModel} from '@mui/x-dat
 type ProductSelectionTableProps = {
     readonly rolls: FeltRollDto[];
     readonly selectedIds: Set<string>;
-    // eslint-disable-next-line no-unused-vars -- Parameter is part of the callback signature
+
     readonly onSelectionChange: (ids: Set<string>) => void;
 };
 

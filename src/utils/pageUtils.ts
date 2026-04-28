@@ -8,7 +8,7 @@ export const createDeleteHandler = <T extends {id: string | number}>(
     setItems: Dispatch<SetStateAction<T[]>>,
     setDeletingIds: Dispatch<SetStateAction<Set<string | number>>>,
     setError: Dispatch<SetStateAction<string>>,
-    // eslint-disable-next-line no-unused-vars -- Parameter is part of the deleteApi callback signature
+
     deleteApi: (_id: string | number) => Promise<void>,
 ) => {
     return async (itemId: string | number) => {

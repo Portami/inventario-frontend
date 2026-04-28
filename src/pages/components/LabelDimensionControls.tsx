@@ -11,9 +11,9 @@ import {Box, Paper, Stack, Typography, useTheme} from '@mui/material';
 type LabelDimensionControlsProps = {
     readonly labelWidth: number;
     readonly labelHeight: number;
-    // eslint-disable-next-line no-unused-vars -- Parameters required for callback signature even if not used in type definition
+
     readonly onWidthChange: (width: number) => void;
-    // eslint-disable-next-line no-unused-vars -- Parameters required for callback signature even if not used in type definition
+
     readonly onHeightChange: (height: number) => void;
 };
 
