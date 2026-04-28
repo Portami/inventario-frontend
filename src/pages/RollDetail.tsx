@@ -1,12 +1,26 @@
 import DetailPage from '@/components/DetailPage';
 import {deleteRoll, fetchRollDetails, updateRoll} from '@/services/backend';
-import {FeltRollDto, UpdateFeltRollRequest} from '@/types/roll';
+import {FeltRollDto} from '@/types/roll';
 import {toErrorMessage} from '@/utils/pageUtils';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
-import {Box, Button, Card, CardContent, Divider, Stack, TextField, Typography} from '@mui/material';
-import {useEffect, useState} from 'react';
+import {
+    Box,
+    Button,
+    Card,
+    CardContent,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Divider,
+    Stack,
+    TextField,
+    Typography,
+} from '@mui/material';
+import {ChangeEvent, useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router';
 
 function Field({label, value}: {readonly label: string; readonly value: string | number | null | undefined}) {
@@ -20,6 +34,15 @@ function Field({label, value}: {readonly label: string; readonly value: string |
     );
 }
 
+type FormState = {
+    length: string;
+    width: string;
+    batchId: string;
+    storageId: string;
+};
+
+const labelProps = {shrink: true, sx: {textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontWeight: 600}};
+
 export default function RollDetail() {
     const {id} = useParams<{id: string}>();
     const navigate = useNavigate();
@@ -27,13 +50,10 @@ export default function RollDetail() {
     const [error, setError] = useState('');
     const [roll, setRoll] = useState<FeltRollDto | null>(null);
     const [isEditing, setIsEditing] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-
-    const [editLength, setEditLength] = useState('');
-    const [editWidth, setEditWidth] = useState('');
-    const [editBatchId, setEditBatchId] = useState('');
-    const [editStorageId, setEditStorageId] = useState('');
+    const [form, setForm] = useState<FormState>({length: '', width: '', batchId: '', storageId: ''});
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         const load = async () => {
@@ -53,25 +73,31 @@ export default function RollDetail() {
 
     const startEdit = () => {
         if (!roll) return;
-        setEditLength(String(roll.length));
-        setEditWidth(String(roll.width));
-        setEditBatchId(roll.batchId == null ? '' : String(roll.batchId));
-        setEditStorageId(roll.storageId == null ? '' : String(roll.storageId));
+        setForm({
+            length: String(roll.length),
+            width: String(roll.width),
+            batchId: roll.batchId == null ? '' : String(roll.batchId),
+            storageId: roll.storageId == null ? '' : String(roll.storageId),
+        });
         setIsEditing(true);
     };
 
+    const setField = (field: keyof FormState) => (e: ChangeEvent<HTMLInputElement>) => setForm((prev) => ({...prev, [field]: e.target.value}));
+
     const handleSave = async () => {
         if (!roll || !id) return;
+        const length = Number.parseFloat(form.length);
+        const width = Number.parseFloat(form.width);
+        if (Number.isNaN(length) || length <= 0 || Number.isNaN(width) || width <= 0) return;
         setIsSaving(true);
-        setError('');
         try {
-            const payload: UpdateFeltRollRequest = {
-                length: Number(editLength),
-                width: Number(editWidth),
-                ...(editBatchId && {batchId: Number(editBatchId)}),
-                ...(editStorageId && {storageId: Number(editStorageId)}),
-            };
-            setRoll(await updateRoll(id, payload));
+            await updateRoll(roll.id, {
+                length,
+                width,
+                ...(form.batchId && {batchId: Number.parseInt(form.batchId, 10)}),
+                ...(form.storageId && {storageId: Number.parseInt(form.storageId, 10)}),
+            });
+            setRoll(await fetchRollDetails(id));
             setIsEditing(false);
         } catch (err) {
             setError(toErrorMessage(err, 'Rolle konnte nicht gespeichert werden'));
@@ -83,13 +109,13 @@ export default function RollDetail() {
     const handleDelete = async () => {
         if (!id) return;
         setIsDeleting(true);
-        setError('');
         try {
             await deleteRoll(id);
             navigate('/rolls');
         } catch (err) {
             setError(toErrorMessage(err, 'Rolle konnte nicht gelöscht werden'));
             setIsDeleting(false);
+            setIsDeleteOpen(false);
         }
     };
 
@@ -102,20 +128,25 @@ export default function RollDetail() {
                     <Box sx={{display: 'flex', justifyContent: 'flex-end', gap: 1}}>
                         {isEditing ? (
                             <>
-                                <Button variant="text" onClick={() => setIsEditing(false)} disabled={isSaving}>
+                                <Button variant="outlined" onClick={() => setIsEditing(false)} disabled={isSaving}>
                                     Abbrechen
                                 </Button>
-                                <Button variant="contained" startIcon={<SaveIcon />} onClick={() => void handleSave()} disabled={isSaving}>
-                                    {isSaving ? 'Wird gespeichert...' : 'Speichern'}
+                                <Button
+                                    variant="contained"
+                                    onClick={() => void handleSave()}
+                                    disabled={isSaving}
+                                    startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
+                                >
+                                    Speichern
                                 </Button>
                             </>
                         ) : (
                             <>
-                                <Button variant="outlined" startIcon={<EditIcon />} onClick={startEdit} disabled={isDeleting}>
+                                <Button variant="outlined" startIcon={<EditIcon />} onClick={startEdit}>
                                     Bearbeiten
                                 </Button>
-                                <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={() => void handleDelete()} disabled={isDeleting}>
-                                    {isDeleting ? 'Wird gelöscht...' : 'Löschen'}
+                                <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={() => setIsDeleteOpen(true)}>
+                                    Löschen
                                 </Button>
                             </>
                         )}
@@ -146,31 +177,32 @@ export default function RollDetail() {
                                     </Typography>
                                     <Box sx={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1}}>
                                         {isEditing ? (
-                                            <>
-                                                <TextField
-                                                    label="Länge (m)"
-                                                    type="number"
-                                                    size="small"
-                                                    value={editLength}
-                                                    onChange={(e) => setEditLength(e.target.value)}
-                                                    slotProps={{htmlInput: {min: 0.01, step: 0.01}}}
-                                                    required
-                                                />
-                                                <TextField
-                                                    label="Breite (m)"
-                                                    type="number"
-                                                    size="small"
-                                                    value={editWidth}
-                                                    onChange={(e) => setEditWidth(e.target.value)}
-                                                    slotProps={{htmlInput: {min: 0.01, step: 0.01}}}
-                                                    required
-                                                />
-                                            </>
+                                            <TextField
+                                                label="Länge (m)"
+                                                value={form.length}
+                                                onChange={setField('length')}
+                                                type="number"
+                                                variant="outlined"
+                                                size="small"
+                                                required
+                                                slotProps={{htmlInput: {min: 0.01, step: 0.01}, inputLabel: labelProps}}
+                                            />
                                         ) : (
-                                            <>
-                                                <Field label="Länge (m)" value={roll.length} />
-                                                <Field label="Breite (m)" value={roll.width} />
-                                            </>
+                                            <Field label="Länge (m)" value={roll.length} />
+                                        )}
+                                        {isEditing ? (
+                                            <TextField
+                                                label="Breite (m)"
+                                                value={form.width}
+                                                onChange={setField('width')}
+                                                type="number"
+                                                variant="outlined"
+                                                size="small"
+                                                required
+                                                slotProps={{htmlInput: {min: 0.01, step: 0.01}, inputLabel: labelProps}}
+                                            />
+                                        ) : (
+                                            <Field label="Breite (m)" value={roll.width} />
                                         )}
                                         <Field label="Dicke (mm)" value={roll.thickness} />
                                         <Field label="Dichte (g/m²)" value={roll.density} />
@@ -186,29 +218,30 @@ export default function RollDetail() {
                                     </Typography>
                                     <Box sx={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1}}>
                                         {isEditing ? (
-                                            <>
-                                                <TextField
-                                                    label="Charge-ID"
-                                                    type="number"
-                                                    size="small"
-                                                    value={editBatchId}
-                                                    onChange={(e) => setEditBatchId(e.target.value)}
-                                                    slotProps={{htmlInput: {min: 1}}}
-                                                />
-                                                <TextField
-                                                    label="Lagerort-ID"
-                                                    type="number"
-                                                    size="small"
-                                                    value={editStorageId}
-                                                    onChange={(e) => setEditStorageId(e.target.value)}
-                                                    slotProps={{htmlInput: {min: 1}}}
-                                                />
-                                            </>
+                                            <TextField
+                                                label="Charge-ID"
+                                                value={form.batchId}
+                                                onChange={setField('batchId')}
+                                                type="number"
+                                                variant="outlined"
+                                                size="small"
+                                                slotProps={{htmlInput: {min: 1}, inputLabel: labelProps}}
+                                            />
                                         ) : (
-                                            <>
-                                                <Field label="Charge" value={roll.batchName} />
-                                                <Field label="Lagerort" value={roll.storageName} />
-                                            </>
+                                            <Field label="Charge" value={roll.batchName} />
+                                        )}
+                                        {isEditing ? (
+                                            <TextField
+                                                label="Lagerort-ID"
+                                                value={form.storageId}
+                                                onChange={setField('storageId')}
+                                                type="number"
+                                                variant="outlined"
+                                                size="small"
+                                                slotProps={{htmlInput: {min: 1}, inputLabel: labelProps}}
+                                            />
+                                        ) : (
+                                            <Field label="Lagerort" value={roll.storageName} />
                                         )}
                                     </Box>
                                 </div>
@@ -217,6 +250,29 @@ export default function RollDetail() {
                     </Card>
                 </Stack>
             )}
+
+            <Dialog open={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} maxWidth="xs" fullWidth>
+                <DialogTitle>Rolle löschen</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        {roll?.feltTypeName} – {roll?.color} wirklich löschen?
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsDeleteOpen(false)} disabled={isDeleting}>
+                        Abbrechen
+                    </Button>
+                    <Button
+                        color="error"
+                        variant="contained"
+                        onClick={() => void handleDelete()}
+                        disabled={isDeleting}
+                        startIcon={isDeleting ? <CircularProgress size={16} color="inherit" /> : undefined}
+                    >
+                        Löschen
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </DetailPage>
     );
 }

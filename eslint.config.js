@@ -31,6 +31,7 @@ export default [
             'simple-import-sort': simpleImportSort,
         },
         rules: {
+            'no-unused-vars': 'off',
             '@typescript-eslint/no-unused-vars': 'warn',
             'import/named': 'off',
             'react/jsx-uses-react': 'off',
@@ -39,7 +40,7 @@ export default [
             'react/no-danger': 'error',
             'react/self-closing-comp': 'error',
             'comma-dangle': ['warn', 'always-multiline'],
-            indent: ['error', 4, {SwitchCase: 1}],
+            indent: 'off',
             'max-len': ['warn', {code: 166}],
             'no-console': ['error', {allow: ['warn', 'error']}],
             'no-underscore-dangle': ['error', {allowAfterThis: true, allowAfterSuper: true}],

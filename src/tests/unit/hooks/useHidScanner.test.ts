@@ -3,7 +3,6 @@ import {renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 describe('useHidScanner', () => {
-    // eslint-disable-next-line no-unused-vars -- Parameter is part of the callback signature
     let mockOnScan: (_code: string) => void;
 
     beforeEach(() => {

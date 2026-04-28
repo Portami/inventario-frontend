@@ -7,9 +7,8 @@ import {Alert, Box, Button, Chip, CircularProgress, ListItemText, MenuItem, Moda
 import React, {useState} from 'react';
 
 type ScannerProps = {
-    // eslint-disable-next-line no-unused-vars -- Parameter is part of the callback signature
     onSuccess(result: ScanResult): void;
-    // eslint-disable-next-line no-unused-vars -- Parameter is part of the callback signature
+
     onError(message: string): void;
     isOpen: boolean;
     onClose(): void;
