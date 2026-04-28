@@ -21,6 +21,13 @@ export type CreateFeltRollRequest = {
     storageId?: number;
 };
 
+export type UpdateFeltRollRequest = {
+    length: number; // meters
+    width: number; // meters
+    batchId?: number;
+    storageId?: number;
+};
+
 /** Response shape from GET /api/rolls/{id} */
 export type FeltRollDto = {
     id: number;

@@ -1,8 +1,8 @@
-import {del, get, post} from './api';
+import {del, get, patch, post} from './api';
 import {getMockProductById} from './mock/backendMock.ts';
 import {CreateFeltRequest, FeltDto} from '@/types/felt';
 import {Product, ProductDto, ProductId} from '@/types/product';
-import {CreateFeltRollRequest, FeltRollDto} from '@/types/roll';
+import {CreateFeltRollRequest, FeltRollDto, UpdateFeltRollRequest} from '@/types/roll';
 import {ScanResult} from '@/types/scanner';
 
 /**
@@ -113,6 +113,20 @@ export const createRoll = async (payload: CreateFeltRollRequest): Promise<FeltRo
         return result;
     } catch (error) {
         clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const updateRoll = async (rollId: ProductId, payload: UpdateFeltRollRequest): Promise<FeltRollDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await patch<FeltRollDto>(`/rolls/${rollId}`, payload, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        console.warn(`Failed to update roll: ${error}`);
         throw error;
     }
 };
