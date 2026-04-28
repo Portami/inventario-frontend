@@ -1,5 +1,6 @@
 import ListPage from '@/components/ListPage';
 import RollList, {RollItem} from '@/components/RollList';
+import {useToast} from '@/components/ToastProvider';
 import RollDialog from '@/pages/components/RollDialog';
 import {deleteRoll, fetchFelts, fetchRolls} from '@/services/backend';
 import {FeltDto} from '@/types/felt';
@@ -10,6 +11,7 @@ import {Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, Dia
 import {useEffect, useState} from 'react';
 
 export default function RollPage() {
+    const showToast = useToast();
     const [rolls, setRolls] = useState<RollItem[]>([]);
     const [felts, setFelts] = useState<FeltDto[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -50,8 +52,9 @@ export default function RollPage() {
             await deleteRoll(rollToDelete.id);
             setRollToDelete(null);
             refetch();
+            showToast('Rolle erfolgreich erstellt.', 'success');
         } catch (err) {
-            setError(toErrorMessage(err, 'Rolle konnte nicht gelöscht werden'));
+            showToast(toErrorMessage(err, 'Rolle konnte nicht gelöscht werden'), 'error');
             setRollToDelete(null);
         } finally {
             setIsDeleting(false);

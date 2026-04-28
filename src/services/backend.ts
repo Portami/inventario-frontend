@@ -83,6 +83,19 @@ export const createFelt = async (payload: CreateFeltRequest): Promise<FeltDto> =
     }
 };
 
+export const updateFelt = async (id: number, payload: CreateFeltRequest): Promise<FeltDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await patch<FeltDto>(`/felts/${id}`, payload, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
 /** Delete a felt. Calls DELETE /api/felts/{id}. */
 export const deleteFelt = async (feltId: number): Promise<void> => {
     const controller = new AbortController();

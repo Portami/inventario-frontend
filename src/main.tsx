@@ -2,6 +2,7 @@ import './styles/index.scss';
 import App from './App';
 import theme from './theme';
 import NavigationLayout from '@/components/NavigationLayout.tsx';
+import {ToastProvider} from '@/components/ToastProvider';
 import FeltPage from '@/pages/FeltPage.tsx';
 import InventoryPage from '@/pages/InventoryPage.tsx';
 import LabelGeneratorPage from '@/pages/LabelGeneratorPage.tsx';
@@ -19,7 +20,8 @@ import {BrowserRouter, Route, Routes} from 'react-router';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
-        <BrowserRouter>
+        <ToastProvider>
+            <BrowserRouter>
             <CssBaseline />
             <Routes>
                 <Route element={<NavigationLayout />}>
@@ -35,8 +37,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                     <Route path="/product/:id" element={<ProductDetailView />} />
                     <Route path="/roll/:id" element={<RollDetail />} />
                 </Route>
-                <Route path="/scrap/:id" element={<ScrapDetail />} />
-            </Routes>
-        </BrowserRouter>
+                    <Route path="/scrap/:id" element={<ScrapDetail />} />
+                </Routes>
+            </BrowserRouter>
+        </ToastProvider>
     </ThemeProvider>,
 );
