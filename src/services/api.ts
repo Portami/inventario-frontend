@@ -40,6 +40,9 @@ export const get = <T>(url: string, options?: RequestInit): Promise<T> => reques
 export const post = <T>(url: string, body?: unknown, options?: RequestInit): Promise<T> =>
     request<T>(url, {method: 'POST', body: JSON.stringify(body), ...options});
 
+export const put = <T>(url: string, body?: unknown, options?: RequestInit): Promise<T> =>
+    request<T>(url, {method: 'PUT', body: JSON.stringify(body), ...options});
+
 export const patch = <T>(url: string, body?: unknown, options?: RequestInit): Promise<T> =>
     request<T>(url, {method: 'PATCH', body: JSON.stringify(body), ...options});
 

@@ -1,8 +1,3 @@
-/**
- * Generic List Page Component
- * Provides consistent structure for pages displaying lists with delete functionality
- */
-
 import {Alert, Box, CircularProgress, Stack, Typography} from '@mui/material';
 import {ReactNode} from 'react';
 
@@ -32,8 +27,7 @@ export default function ListPage({
     return (
         <Box sx={{p: 3}}>
             <Stack spacing={3}>
-                {/* Header */}
-                <Box sx={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between'}}>
+                <Box sx={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2}}>
                     <Box>
                         <Typography variant="h3" component="h1" sx={{mb: 1}}>
                             {title}
@@ -44,27 +38,23 @@ export default function ListPage({
                             </Typography>
                         )}
                     </Box>
-                    {actions && <Box>{actions}</Box>}
+                    {actions && <Box sx={{flexShrink: 0}}>{actions}</Box>}
                 </Box>
 
-                {/* Error Alert */}
                 {error && (
                     <Alert severity="error" onClose={onErrorClose}>
                         {error}
                     </Alert>
                 )}
 
-                {/* Loading State */}
                 {isLoading && (
                     <Box sx={{display: 'flex', justifyContent: 'center', py: 4}}>
                         <CircularProgress />
                     </Box>
                 )}
 
-                {/* Empty State */}
                 {!isLoading && isEmpty && <Alert severity="info">{emptyMessage}</Alert>}
 
-                {/* Content */}
                 {!isLoading && !isEmpty && children}
             </Stack>
         </Box>

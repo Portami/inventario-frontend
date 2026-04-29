@@ -35,8 +35,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <Route path="/shopping" element={<ShoppingPage />} />
                         <Route path="/products" element={<ProductsPage />} />
                         <Route path="/product/:id" element={<ProductDetailView />} />
+                        <Route path="/roll/:id" element={<RollDetail />} />
                     </Route>
-                    <Route path="/roll/:id" element={<RollDetail />} />
                     <Route path="/scrap/:id" element={<ScrapDetail />} />
                 </Routes>
             </BrowserRouter>
