@@ -1,5 +1,5 @@
 import {del, get, patch, post} from './api';
-import {getMockProductById} from './mock/backendMock.ts';
+import {getMockProductById, MOCK_FELTS} from './mock/backendMock.ts';
 import {CreateFeltRequest, FeltDto} from '@/types/felt';
 import {Product, ProductDto, ProductId} from '@/types/product';
 import {CreateFeltRollRequest, FeltRollDto, UpdateFeltRollRequest} from '@/types/roll';
@@ -58,6 +58,10 @@ export const fetchRollDetails = async (rollId: ProductId): Promise<FeltRollDto> 
 };
 
 export const fetchFelts = async (): Promise<FeltDto[]> => {
+    if (import.meta.env.DEV) {
+        return MOCK_FELTS;
+    }
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {

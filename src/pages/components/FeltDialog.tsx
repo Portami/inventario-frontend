@@ -2,7 +2,20 @@ import {useToast} from '@/components/ToastProvider';
 import {createFelt, updateFelt} from '@/services/backend';
 import {FeltDto} from '@/types/felt';
 import CloseIcon from '@mui/icons-material/Close';
-import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, MenuItem, TextField} from '@mui/material';
+import {
+    Button,
+    Checkbox,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControlLabel,
+    Grid,
+    IconButton,
+    MenuItem,
+    TextField,
+} from '@mui/material';
 import {ChangeEvent, useEffect, useMemo, useState} from 'react';
 
 type FeltDialogProps = {
@@ -22,6 +35,8 @@ type FormState = {
     density: string;
     supplierId: string;
     feltTypeId: string;
+    isLowOnSupply: boolean;
+    hasBeenReordered: boolean;
 };
 
 const emptyForm: FormState = {
@@ -33,6 +48,8 @@ const emptyForm: FormState = {
     density: '',
     supplierId: '',
     feltTypeId: '',
+    isLowOnSupply: false,
+    hasBeenReordered: false,
 };
 
 const labelProps = {shrink: true, sx: {textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontWeight: 600}};
@@ -57,6 +74,8 @@ export default function FeltDialog({open, onClose, onSaved, felt, felts}: FeltDi
                       density: String(felt.density),
                       supplierId: String(felt.supplierId),
                       feltTypeId: String(felt.feltTypeId),
+                      isLowOnSupply: felt.isLowOnSupply,
+                      hasBeenReordered: felt.hasBeenReordered,
                   }
                 : emptyForm,
         );
@@ -84,7 +103,11 @@ export default function FeltDialog({open, onClose, onSaved, felt, felts}: FeltDi
             .map((f) => ({id: f.feltTypeId, name: f.feltTypeName}));
     }, [felts]);
 
-    const setField = (field: keyof FormState) => (e: ChangeEvent<HTMLInputElement>) => setForm((prev) => ({...prev, [field]: e.target.value}));
+    const setField = (field: keyof FormState) => (e: ChangeEvent<HTMLInputElement>) =>
+        setForm((prev) => ({
+            ...prev,
+            [field]: e.target.value,
+        }));
 
     const handleSave = async () => {
         const thickness = Number.parseFloat(form.thickness);
@@ -113,6 +136,8 @@ export default function FeltDialog({open, onClose, onSaved, felt, felts}: FeltDi
                     density,
                     supplierId,
                     feltTypeId,
+                    isLowOnSupply: form.isLowOnSupply,
+                    hasBeenReordered: form.hasBeenReordered,
                 });
                 showToast('Filz erfolgreich erstellt.', 'success');
             } else {
@@ -125,6 +150,8 @@ export default function FeltDialog({open, onClose, onSaved, felt, felts}: FeltDi
                     density,
                     supplierId: felt.supplierId,
                     feltTypeId: felt.feltTypeId,
+                    isLowOnSupply: form.isLowOnSupply,
+                    hasBeenReordered: form.hasBeenReordered,
                 });
                 showToast('Filz erfolgreich gespeichert.', 'success');
             }
@@ -271,6 +298,25 @@ export default function FeltDialog({open, onClose, onSaved, felt, felts}: FeltDi
                             size="small"
                             fullWidth
                             slotProps={{inputLabel: labelProps}}
+                        />
+                    </Grid>
+                    <Grid size={6}>
+                        <FormControlLabel
+                            control={
+                                <Checkbox checked={form.isLowOnSupply} onChange={(e) => setForm((prev) => ({...prev, isLowOnSupply: e.target.checked}))} />
+                            }
+                            label="Wenig Vorrat"
+                        />
+                    </Grid>
+                    <Grid size={6}>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={form.hasBeenReordered}
+                                    onChange={(e) => setForm((prev) => ({...prev, hasBeenReordered: e.target.checked}))}
+                                />
+                            }
+                            label="Nachbestellt"
                         />
                     </Grid>
                 </Grid>
