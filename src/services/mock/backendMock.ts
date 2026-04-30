@@ -1,4 +1,4 @@
-import {COLORS, TYPES} from '@/types/felt';
+import {COLORS, FeltDto, TYPES} from '@/types/felt';
 import {Product} from '@/types/product';
 
 // Mock scrap data — used by fetchScrapDetails until a /scraps endpoint is available on the backend
@@ -122,6 +122,61 @@ const MOCK_PRODUCTS: Product[] = [
             weight: 18.2,
             density: 0.72,
         },
+    },
+];
+
+// Mock felt data — used by fetchFelts in DEV mode
+export const MOCK_FELTS: FeltDto[] = [
+    {
+        id: 1,
+        feltId: 1,
+        feltTypeId: 1,
+        feltTypeName: 'Wolle',
+        feltVariantId: 101,
+        color: 'Rot',
+        supplierColor: 'Cherry Red',
+        articleNumber: 'ART-001-RED-WOOL',
+        supplierId: 1,
+        supplierName: 'Lieferant A',
+        thickness: 3.5,
+        density: 850,
+        price: 12.5,
+        isLowOnSupply: false,
+        hasBeenReordered: false,
+    },
+    {
+        id: 2,
+        feltId: 2,
+        feltTypeId: 2,
+        feltTypeName: 'Synthetik',
+        feltVariantId: 102,
+        color: 'Blau',
+        supplierColor: 'Ocean Blue',
+        articleNumber: 'ART-002-BLUE-SYN',
+        supplierId: 2,
+        supplierName: 'Lieferant B',
+        thickness: 2.8,
+        density: 720,
+        price: 9.9,
+        isLowOnSupply: true,
+        hasBeenReordered: false,
+    },
+    {
+        id: 3,
+        feltId: 3,
+        feltTypeId: 3,
+        feltTypeName: 'Gemischt',
+        feltVariantId: 103,
+        color: 'Grün',
+        supplierColor: 'Forest Green',
+        articleNumber: 'ART-003-GREEN-BLD',
+        supplierId: 1,
+        supplierName: 'Lieferant A',
+        thickness: 3.2,
+        density: 810,
+        price: 11.0,
+        isLowOnSupply: true,
+        hasBeenReordered: true,
     },
 ];
 

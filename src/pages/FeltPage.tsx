@@ -6,7 +6,7 @@ import {FeltDto} from '@/types/felt';
 import {toErrorMessage} from '@/utils/pageUtils';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography} from '@mui/material';
+import {Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography} from '@mui/material';
 import {DataGrid, GridColDef, GridRenderCellParams, GridRowParams} from '@mui/x-data-grid';
 import {useEffect, useMemo, useState} from 'react';
 
@@ -120,8 +120,39 @@ export default function FeltPage() {
                 initialState={{pagination: {paginationModel: {pageSize: 10}}}}
                 localeText={{noRowsLabel: 'Noch keine Filze vorhanden.'}}
                 onRowClick={(params: GridRowParams<FeltDto>) => setSelectedFelt(params.row)}
-                sx={{cursor: 'pointer', height: 600}}
+                getRowClassName={(params: GridRowParams<FeltDto>) => {
+                    if (params.row.isLowOnSupply && !params.row.hasBeenReordered) return 'row-low-supply';
+                    if (params.row.isLowOnSupply && params.row.hasBeenReordered) return 'row-reordered';
+                    return '';
+                }}
+                sx={{
+                    cursor: 'pointer',
+                    '& .row-low-supply': {
+                        backgroundColor: 'rgba(211, 47, 47, 0.15)',
+                        '&:hover': {backgroundColor: 'rgba(211, 47, 47, 0.25)'},
+                    },
+                    '& .row-reordered': {
+                        backgroundColor: 'rgba(255, 193, 7, 0.15)',
+                        '&:hover': {backgroundColor: 'rgba(255, 193, 7, 0.25)'},
+                    },
+                    height: 600,
+                }}
             />
+            <Box sx={{display: 'flex', gap: 3, mt: 1.5, ml: 0.5}}>
+                <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                    <Box sx={{width: 14, height: 14, borderRadius: '3px', backgroundColor: 'rgba(211, 47, 47, 0.5)', flexShrink: 0}} />
+                    <Typography variant="caption" color="text.secondary">
+                        Nachbestellen erforderlich
+                    </Typography>
+                </Box>
+                <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                    <Box sx={{width: 14, height: 14, borderRadius: '3px', backgroundColor: 'rgba(255, 193, 7, 0.5)', flexShrink: 0}} />
+                    <Typography variant="caption" color="text.secondary">
+                        Nachbestellt
+                    </Typography>
+                </Box>
+            </Box>
+
             <FeltDialog open={selectedFelt !== null} felt={selectedFelt} felts={felts} onClose={() => setSelectedFelt(null)} onSaved={handleSaved} />
             <FeltDialog open={isCreateOpen} felts={felts} onClose={() => setIsCreateOpen(false)} onSaved={handleCreated} />
 
