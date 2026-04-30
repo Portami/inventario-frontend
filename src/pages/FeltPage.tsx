@@ -135,7 +135,7 @@ export default function FeltPage() {
                         backgroundColor: 'rgba(255, 193, 7, 0.15)',
                         '&:hover': {backgroundColor: 'rgba(255, 193, 7, 0.25)'},
                     },
-                    height: 600
+                    height: 600,
                 }}
             />
             <Box sx={{display: 'flex', gap: 3, mt: 1.5, ml: 0.5}}>
