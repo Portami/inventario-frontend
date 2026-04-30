@@ -1,4 +1,5 @@
 import {del, get, patch, post} from './api';
+import {cacheGet, cacheInvalidate, cacheSet} from './cache';
 import {getMockProductById, MOCK_FELTS} from './mock/backendMock.ts';
 import {CreateFeltRequest, FeltDto} from '@/types/felt';
 import {Product, ProductDto, ProductId} from '@/types/product';
@@ -62,11 +63,15 @@ export const fetchFelts = async (): Promise<FeltDto[]> => {
         return MOCK_FELTS;
     }
 
+    const cached = cacheGet<FeltDto[]>('felts');
+    if (cached) return cached;
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
         const result = await get<FeltDto[]>('/felts', {signal: controller.signal});
         clearTimeout(timeoutId);
+        cacheSet('felts', result);
         return result;
     } catch (error) {
         clearTimeout(timeoutId);
@@ -80,6 +85,8 @@ export const createFelt = async (payload: CreateFeltRequest): Promise<FeltDto> =
     try {
         const result = await post<FeltDto>('/felts', payload, {signal: controller.signal});
         clearTimeout(timeoutId);
+        cacheInvalidate('felts');
+        cacheInvalidate('rolls');
         return result;
     } catch (error) {
         clearTimeout(timeoutId);
@@ -93,6 +100,8 @@ export const updateFelt = async (id: number, payload: CreateFeltRequest): Promis
     try {
         const result = await patch<FeltDto>(`/felts/${id}`, payload, {signal: controller.signal});
         clearTimeout(timeoutId);
+        cacheInvalidate('felts');
+        cacheInvalidate('rolls');
         return result;
     } catch (error) {
         clearTimeout(timeoutId);
@@ -107,6 +116,8 @@ export const deleteFelt = async (feltId: number): Promise<void> => {
     try {
         await del<void>(`/felts/${feltId}`, {signal: controller.signal});
         clearTimeout(timeoutId);
+        cacheInvalidate('felts');
+        cacheInvalidate('rolls');
     } catch (error) {
         clearTimeout(timeoutId);
         console.warn(`Failed to delete felt: ${error}`);
@@ -116,9 +127,14 @@ export const deleteFelt = async (feltId: number): Promise<void> => {
 
 // No global list endpoint, fetches felts first, then their rolls in parallel.
 export const fetchRolls = async (): Promise<FeltRollDto[]> => {
+    const cached = cacheGet<FeltRollDto[]>('rolls');
+    if (cached) return cached;
+
     const felts = await fetchFelts();
     const rollGroups = await Promise.all(felts.map((f) => get<FeltRollDto[]>(`/felts/${f.id}/rolls`)));
-    return rollGroups.flat();
+    const result = rollGroups.flat();
+    cacheSet('rolls', result);
+    return result;
 };
 
 export const createRoll = async (payload: CreateFeltRollRequest): Promise<FeltRollDto> => {
@@ -127,6 +143,7 @@ export const createRoll = async (payload: CreateFeltRollRequest): Promise<FeltRo
     try {
         const result = await post<FeltRollDto>('/rolls', payload, {signal: controller.signal});
         clearTimeout(timeoutId);
+        cacheInvalidate('rolls');
         return result;
     } catch (error) {
         clearTimeout(timeoutId);
@@ -140,6 +157,7 @@ export const updateRoll = async (rollId: ProductId, payload: UpdateFeltRollReque
     try {
         const result = await patch<FeltRollDto>(`/rolls/${rollId}`, payload, {signal: controller.signal});
         clearTimeout(timeoutId);
+        cacheInvalidate('rolls');
         return result;
     } catch (error) {
         clearTimeout(timeoutId);
@@ -158,6 +176,7 @@ export const deleteRoll = async (rollId: ProductId): Promise<void> => {
     try {
         await del<void>(`/rolls/${rollId}`, {signal: controller.signal});
         clearTimeout(timeoutId);
+        cacheInvalidate('rolls');
     } catch (error) {
         clearTimeout(timeoutId);
         console.warn(`Failed to delete roll: ${error}`);
@@ -198,11 +217,15 @@ export const fetchScrapDetails = async (scrapId: ProductId): Promise<Product> =>
 };
 
 export const fetchProducts = async (): Promise<ProductDto[]> => {
+    const cached = cacheGet<ProductDto[]>('products');
+    if (cached) return cached;
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
         const result = await get<ProductDto[]>('/products', {signal: controller.signal});
         clearTimeout(timeoutId);
+        cacheSet('products', result);
         return result;
     } catch (error) {
         clearTimeout(timeoutId);

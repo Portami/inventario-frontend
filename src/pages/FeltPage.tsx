@@ -8,7 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography} from '@mui/material';
 import {DataGrid, GridColDef, GridRenderCellParams, GridRowParams} from '@mui/x-data-grid';
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 export default function FeltPage() {
     const showToast = useToast();
@@ -60,39 +60,42 @@ export default function FeltPage() {
         }
     };
 
-    const columns: GridColDef<FeltDto>[] = [
-        {
-            field: 'color',
-            headerName: 'Farbe / Typ',
-            flex: 1,
-            renderCell: ({row}: GridRenderCellParams<FeltDto>) => `${row.feltTypeName} – ${row.color}`,
-        },
-        {field: 'articleNumber', headerName: 'Artikelnummer', flex: 1},
-        {field: 'supplierName', headerName: 'Lieferant', flex: 1},
-        {field: 'thickness', headerName: 'Dicke (mm)', width: 110},
-        {field: 'density', headerName: 'Dichte (g/m²)', width: 130},
-        {field: 'price', headerName: 'Preis', width: 100},
-        {
-            field: 'actions',
-            headerName: '',
-            width: 56,
-            sortable: false,
-            disableColumnMenu: true,
-            renderCell: ({row}: GridRenderCellParams<FeltDto>) => (
-                <IconButton
-                    size="small"
-                    color="error"
-                    aria-label="delete"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setFeltToDelete(row);
-                    }}
-                >
-                    <DeleteOutlinedIcon fontSize="small" />
-                </IconButton>
-            ),
-        },
-    ];
+    const columns = useMemo<GridColDef<FeltDto>[]>(
+        () => [
+            {
+                field: 'color',
+                headerName: 'Farbe / Typ',
+                flex: 1,
+                renderCell: ({row}: GridRenderCellParams<FeltDto>) => `${row.feltTypeName} – ${row.color}`,
+            },
+            {field: 'articleNumber', headerName: 'Artikelnummer', flex: 1},
+            {field: 'supplierName', headerName: 'Lieferant', flex: 1},
+            {field: 'thickness', headerName: 'Dicke (mm)', width: 110},
+            {field: 'density', headerName: 'Dichte (g/m²)', width: 130},
+            {field: 'price', headerName: 'Preis', width: 100},
+            {
+                field: 'actions',
+                headerName: '',
+                width: 56,
+                sortable: false,
+                disableColumnMenu: true,
+                renderCell: ({row}: GridRenderCellParams<FeltDto>) => (
+                    <IconButton
+                        size="small"
+                        color="error"
+                        aria-label="delete"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setFeltToDelete(row);
+                        }}
+                    >
+                        <DeleteOutlinedIcon fontSize="small" />
+                    </IconButton>
+                ),
+            },
+        ],
+        [setFeltToDelete],
+    );
 
     return (
         <ListPage
@@ -112,7 +115,6 @@ export default function FeltPage() {
                 rows={felts}
                 columns={columns}
                 loading={isLoading}
-                autoHeight
                 disableRowSelectionOnClick
                 pageSizeOptions={[10, 25, 50]}
                 initialState={{pagination: {paginationModel: {pageSize: 10}}}}
@@ -133,6 +135,7 @@ export default function FeltPage() {
                         backgroundColor: 'rgba(255, 193, 7, 0.15)',
                         '&:hover': {backgroundColor: 'rgba(255, 193, 7, 0.25)'},
                     },
+                    height: 600
                 }}
             />
             <Box sx={{display: 'flex', gap: 3, mt: 1.5, ml: 0.5}}>
