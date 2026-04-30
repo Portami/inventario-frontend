@@ -70,4 +70,28 @@ describe('useHidScanner', () => {
         const {result} = renderHook(() => useHidScanner(true, mockOnScan));
         expect(result.current.scannedCode).toBe('');
     });
+
+    it('should call onScan with the full multi-character code on Enter', () => {
+        renderHook(() => useHidScanner(true, mockOnScan));
+
+        for (const char of '12345') {
+            window.dispatchEvent(new KeyboardEvent('keydown', {key: char, bubbles: true}));
+        }
+        window.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', bubbles: true}));
+
+        expect(mockOnScan).toHaveBeenCalledOnce();
+        expect(mockOnScan).toHaveBeenCalledWith('12345');
+    });
+
+    it('should reset the buffer after a successful scan', () => {
+        renderHook(() => useHidScanner(true, mockOnScan));
+
+        for (const char of '111') {
+            window.dispatchEvent(new KeyboardEvent('keydown', {key: char, bubbles: true}));
+        }
+        window.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', bubbles: true}));
+        window.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', bubbles: true}));
+
+        expect(mockOnScan).toHaveBeenCalledOnce();
+    });
 });
