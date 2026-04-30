@@ -74,7 +74,7 @@ export default function RollLabel({product, width, height}: Readonly<RollLabelPr
                                 Länge:
                             </Typography>
                             <Typography variant="body2" sx={{fontWeight: 600, fontSize: '0.9rem', color: theme.palette.text.primary}}>
-                                {product.length ? `${product.length} mm` : '-'}
+                                {product.length ? `${product.length / 10} cm` : '-'}
                             </Typography>
                         </Box>
 
@@ -83,7 +83,7 @@ export default function RollLabel({product, width, height}: Readonly<RollLabelPr
                                 Breite:
                             </Typography>
                             <Typography variant="body2" sx={{fontWeight: 600, fontSize: '0.9rem', color: theme.palette.text.primary}}>
-                                {product.width ? `${product.width} mm` : '-'}
+                                {product.width ? `${product.width / 10} cm` : '-'}
                             </Typography>
                         </Box>
 
