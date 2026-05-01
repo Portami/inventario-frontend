@@ -24,7 +24,7 @@
         "@ericblade/quagga2": "~1.12.1",
         "@mui/icons-material": "~9.0.0",
         "@mui/material": "~9.0.0",
-        "@mui/x-data-grid": "~9.0.2",
+        "@mui/x-data-grid": "~9.0.4",
         "bwip-js": "~4.9.2",
         "html2canvas": "~1.4.1",
         "jspdf": "~4.2.1",

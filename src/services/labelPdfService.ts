@@ -105,7 +105,7 @@ const generateLabelsPdfInternal = async (
     labelWidth: number,
     labelHeight: number,
     isFixed: boolean,
-    // eslint-disable-next-line no-unused-vars -- Parameter is used by callers of this function
+
     onComplete: (pdf: jsPDF) => Promise<void>,
 ): Promise<void> => {
     if (products.length === 0) {

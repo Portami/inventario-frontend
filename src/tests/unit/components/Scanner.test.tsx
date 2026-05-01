@@ -88,11 +88,6 @@ describe('Scanner Component', () => {
         });
 
         it('should handle keyboard input in Bluetooth mode - simple test', async () => {
-            mockLookupRollCode.mockResolvedValueOnce({
-                type: 'roll' as const,
-                id: '00001',
-            });
-
             const onSuccess = vi.fn();
             renderScanner({onSuccess});
 
@@ -271,6 +266,30 @@ describe('Scanner Component', () => {
             fireEvent.click(cancelButton);
 
             expect(onClose).toHaveBeenCalled();
+        });
+    });
+
+    describe('HID Scanner – barcode ID padding', () => {
+        it.each([
+            ['1', '00001'],
+            ['12', '00012'],
+            ['123', '00123'],
+            ['1234', '01234'],
+            ['12345', '12345'],
+        ])('scanning "%s" looks up roll with padded code "%s"', async (input, expectedCode) => {
+            mockLookupRollCode.mockResolvedValueOnce({type: 'roll' as const, id: expectedCode});
+            const onSuccess = vi.fn();
+            renderScanner({onSuccess});
+
+            for (const char of input) {
+                window.dispatchEvent(new KeyboardEvent('keydown', {key: char, bubbles: true}));
+            }
+            window.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', bubbles: true}));
+
+            await waitFor(() => {
+                expect(mockLookupRollCode).toHaveBeenCalledWith(expectedCode);
+            });
+            expect(onSuccess).toHaveBeenCalledWith({type: 'roll', id: expectedCode});
         });
     });
 });

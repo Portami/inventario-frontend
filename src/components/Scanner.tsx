@@ -7,9 +7,8 @@ import {Alert, Box, Button, Chip, CircularProgress, ListItemText, MenuItem, Moda
 import React, {useState} from 'react';
 
 type ScannerProps = {
-    // eslint-disable-next-line no-unused-vars -- Parameter is part of the callback signature
     onSuccess(result: ScanResult): void;
-    // eslint-disable-next-line no-unused-vars -- Parameter is part of the callback signature
+
     onError(message: string): void;
     isOpen: boolean;
     onClose(): void;
@@ -34,7 +33,8 @@ export default function Scanner({onSuccess, onError, isOpen, onClose}: Readonly<
     };
 
     const handleCodeScanned = async (code: string) => {
-        const trimmedCode = code.trim();
+        const trimmed = code.trim();
+        const trimmedCode = /^\d+$/.test(trimmed) ? trimmed.padStart(5, '0') : trimmed;
 
         if (!validateIdFormat(trimmedCode)) {
             setError('Ungültiges Format: Der Code muss aus 5 Ziffern bestehen (z.B. 00001)');
