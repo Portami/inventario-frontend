@@ -17,6 +17,7 @@ import StoragePage from '@/pages/StoragePage.tsx';
 import {CssBaseline, ThemeProvider} from '@mui/material';
 import ReactDOM from 'react-dom/client';
 import {BrowserRouter, Route, Routes} from 'react-router';
+import FeltReorderPage from '@/pages/FeltReorderPage.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
@@ -30,6 +31,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <Route path="/labels" element={<LabelGeneratorPage />} />
                         <Route path="/rolls" element={<RollPage />} />
                         <Route path="/felts" element={<FeltPage />} />
+                        <Route path="/felts/reorder" element={<FeltReorderPage />} />
                         <Route path="/inventory" element={<InventoryPage />} />
                         <Route path="/storage" element={<StoragePage />} />
                         <Route path="/shopping" element={<ShoppingPage />} />
