@@ -41,9 +41,7 @@ export default function SearchField<T>({items, getSearchableValues, children, pl
                 sx={{mb: 2, maxWidth: 320, alignSelf: 'end'}}
                 slotProps={{
                     input: {
-                        endAdornment: (
-                            <SearchIcon />
-                        ),
+                        endAdornment: <SearchIcon />,
                     },
                 }}
             />
