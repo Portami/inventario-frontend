@@ -82,4 +82,10 @@ export default [
             },
         },
     },
+    {
+        files: ['src/components/SearchField.tsx', 'src/components/ExpandableDataGrid.tsx'],
+        rules: {
+            'no-unused-vars': 'off',
+        },
+    },
 ];
