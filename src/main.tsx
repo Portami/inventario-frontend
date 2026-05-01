@@ -4,6 +4,7 @@ import theme from './theme';
 import NavigationLayout from '@/components/NavigationLayout.tsx';
 import {ToastProvider} from '@/components/ToastProvider';
 import FeltPage from '@/pages/FeltPage.tsx';
+import FeltReorderPage from '@/pages/FeltReorderPage.tsx';
 import InventoryPage from '@/pages/InventoryPage.tsx';
 import LabelGeneratorPage from '@/pages/LabelGeneratorPage.tsx';
 import ProductDetailView from '@/pages/ProductDetailView.tsx';
@@ -17,7 +18,6 @@ import StoragePage from '@/pages/StoragePage.tsx';
 import {CssBaseline, ThemeProvider} from '@mui/material';
 import ReactDOM from 'react-dom/client';
 import {BrowserRouter, Route, Routes} from 'react-router';
-import FeltReorderPage from '@/pages/FeltReorderPage.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>

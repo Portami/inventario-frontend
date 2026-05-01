@@ -1,12 +1,12 @@
+import {useFeltManagement} from '../hooks/useFeltManagement';
 import ListPage from '@/components/ListPage';
 import DeleteFeltDialog from '@/pages/components/DeleteFeltDialog';
 import FeltDialog from '@/pages/components/FeltDialog';
-import {useFeltManagement} from '../hooks/useFeltManagement';
+import {FeltDto} from '@/types/felt';
 import AddIcon from '@mui/icons-material/Add';
 import {Box, Button, Typography} from '@mui/material';
 import {DataGrid, GridRowParams} from '@mui/x-data-grid';
 import {useState} from 'react';
-import {FeltDto} from '@/types/felt';
 
 export default function FeltPage() {
     const {

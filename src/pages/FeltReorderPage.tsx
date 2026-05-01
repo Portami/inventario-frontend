@@ -1,12 +1,12 @@
+import {useFeltManagement} from '../hooks/useFeltManagement';
 import ListPage from '@/components/ListPage';
 import DeleteFeltDialog from '@/pages/components/DeleteFeltDialog';
 import FeltDialog from '@/pages/components/FeltDialog';
-import {useFeltManagement} from '../hooks/useFeltManagement';
 import {FeltDto} from '@/types/felt';
+import AddIcon from '@mui/icons-material/Add';
 import {Box, Button, CircularProgress, Typography} from '@mui/material';
 import {DataGrid, GridRowParams} from '@mui/x-data-grid';
 import {useMemo, useState} from 'react';
-import AddIcon from '@mui/icons-material/Add';
 
 export default function FeltReorderPage() {
     const {
@@ -46,7 +46,7 @@ export default function FeltReorderPage() {
             <ListPage
                 title="Nachbestellen"
                 description="Übersicht von Filzen mit niedrigem Bestand."
-                isLoading={true}
+                isLoading
                 isEmpty={false}
                 error={error}
                 onErrorClose={() => setError('')}

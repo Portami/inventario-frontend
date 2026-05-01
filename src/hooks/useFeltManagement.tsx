@@ -3,8 +3,8 @@ import {deleteFelt, fetchFelts} from '@/services/backend';
 import {FeltDto} from '@/types/felt';
 import {toErrorMessage} from '@/utils/pageUtils';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import {GridColDef, GridRenderCellParams} from '@mui/x-data-grid';
 import {IconButton} from '@mui/material';
+import {GridColDef, GridRenderCellParams} from '@mui/x-data-grid';
 import {useEffect, useMemo, useState} from 'react';
 
 interface UseFeltManagementReturn {

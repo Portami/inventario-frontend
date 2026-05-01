@@ -1,5 +1,5 @@
-import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
 import {FeltDto} from '@/types/felt';
+import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
 
 interface DeleteFeltDialogProps {
     open: boolean;

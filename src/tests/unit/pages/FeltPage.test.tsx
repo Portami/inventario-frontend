@@ -1,7 +1,7 @@
-import React from 'react';
-import {render, screen, waitFor, fireEvent, within} from '@testing-library/react';
-import {vi} from 'vitest';
 import FeltPage from '@/pages/FeltPage';
+import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
+import React from 'react';
+import {vi} from 'vitest';
 
 // Mock backend — Daten werden INSIDE der Factory erstellt, damit hoisting kein Problem ist.
 vi.mock('@/services/backend', () => {
@@ -72,7 +72,7 @@ describe('FeltPage', () => {
         vi.clearAllMocks();
     });
 
-    test('renders rows from backend and opens edit dialog on row click', async () => {
+    it('renders rows from backend and opens edit dialog on row click', async () => {
         render(<FeltPage />);
 
         // wait for rows to render (article numbers should appear)
@@ -92,7 +92,7 @@ describe('FeltPage', () => {
         expect(within(dialog).getByText('A-1')).toBeInTheDocument();
     });
 
-    test('delete flow: clicking delete opens delete dialog and calls backend delete', async () => {
+    it('delete flow: clicking delete opens delete dialog and calls backend delete', async () => {
         const backend = await import('@/services/backend');
         render(<FeltPage />);
 

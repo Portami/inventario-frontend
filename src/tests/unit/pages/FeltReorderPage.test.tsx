@@ -1,7 +1,7 @@
-import React from 'react';
-import {render, screen, fireEvent, within} from '@testing-library/react';
-import {vi} from 'vitest';
 import FeltReorderPage from '@/pages/FeltReorderPage';
+import {fireEvent, render, screen, within} from '@testing-library/react';
+import React from 'react';
+import {vi} from 'vitest';
 
 vi.mock('@/services/backend', () => {
     const mockFelts = [
@@ -73,7 +73,7 @@ describe('FeltReorderPage', () => {
         vi.clearAllMocks();
     });
 
-    test('shows not-reordered list and grouped supplier lists', async () => {
+    it('shows not-reordered list and grouped supplier lists', async () => {
         render(<FeltReorderPage />);
 
         // The page filters felts by isLowOnSupply
@@ -89,7 +89,7 @@ describe('FeltReorderPage', () => {
         expect(screen.getByTitle('B-2')).toBeInTheDocument();
     });
 
-    test('opens edit dialog when clicking a row in any DataGrid', async () => {
+    it('opens edit dialog when clicking a row in any DataGrid', async () => {
         render(<FeltReorderPage />);
 
         // wait for data
