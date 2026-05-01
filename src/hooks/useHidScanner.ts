@@ -1,13 +1,20 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 // HID barcode/data-matrix scanners act as keyboards: they stream key events and finish with Enter.
 export const useHidScanner = (
     isActive: boolean,
-    // eslint-disable-next-line no-unused-vars -- Parameter is part of the callback signature
+
     onScan: (code: string) => void,
 ) => {
     const [scannedCode, setScannedCode] = useState('');
     const [isConnected, setIsConnected] = useState(false);
+    const bufferRef = useRef('');
+    const onScanRef = useRef(onScan);
+
+    // Keep the callback ref current without triggering effect re-runs
+    useEffect(() => {
+        onScanRef.current = onScan;
+    });
 
     useEffect(() => {
         if (!isActive) {
@@ -16,6 +23,7 @@ export const useHidScanner = (
         }
 
         setIsConnected(true);
+        bufferRef.current = '';
         setScannedCode('');
 
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -24,8 +32,10 @@ export const useHidScanner = (
             if (char === 'Enter') {
                 event.preventDefault();
 
-                if (scannedCode.trim().length > 0) {
-                    onScan(scannedCode.trim());
+                const current = bufferRef.current.trim();
+                if (current.length > 0) {
+                    onScanRef.current(current);
+                    bufferRef.current = '';
                     setScannedCode('');
                 }
 
@@ -34,7 +44,8 @@ export const useHidScanner = (
 
             if (char.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey) {
                 event.preventDefault();
-                setScannedCode((prev) => prev + char);
+                bufferRef.current += char;
+                setScannedCode(bufferRef.current);
             }
         };
 
@@ -44,7 +55,7 @@ export const useHidScanner = (
             globalThis.removeEventListener('keydown', handleKeyDown);
             setIsConnected(false);
         };
-    }, [isActive, scannedCode, onScan]);
+    }, [isActive]);
 
     return {isConnected, scannedCode};
 };

@@ -19,6 +19,7 @@ on:
 jobs:
   update-infra:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     steps:
       - name: Resolve environment config
         id: config
