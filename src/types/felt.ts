@@ -39,6 +39,8 @@ export type CreateFeltRequest = {
     articleNumber: string;
     supplierId: number;
     feltTypeId: number;
+    isLowOnSupply: boolean;
+    hasBeenReordered: boolean;
 };
 
 /** Response shape from GET /api/felts and GET /api/felts/{id} */
@@ -56,4 +58,6 @@ export type FeltDto = {
     feltId: number;
     feltTypeId: number;
     feltTypeName: string;
+    isLowOnSupply: boolean;
+    hasBeenReordered: boolean;
 };

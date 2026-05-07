@@ -4,6 +4,7 @@ import theme from './theme';
 import NavigationLayout from '@/components/NavigationLayout.tsx';
 import {ToastProvider} from '@/components/ToastProvider';
 import FeltPage from '@/pages/FeltPage.tsx';
+import FeltReorderPage from '@/pages/FeltReorderPage.tsx';
 import InventoryPage from '@/pages/InventoryPage.tsx';
 import LabelGeneratorPage from '@/pages/LabelGeneratorPage.tsx';
 import ProductDetailView from '@/pages/ProductDetailView.tsx';
@@ -30,6 +31,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <Route path="/labels" element={<LabelGeneratorPage />} />
                         <Route path="/rolls" element={<RollPage />} />
                         <Route path="/felts" element={<FeltPage />} />
+                        <Route path="/felts/reorder" element={<FeltReorderPage />} />
                         <Route path="/inventory" element={<InventoryPage />} />
                         <Route path="/storage" element={<StoragePage />} />
                         <Route path="/shopping" element={<ShoppingPage />} />
