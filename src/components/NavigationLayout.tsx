@@ -12,12 +12,13 @@ import QrCodeIcon from '@mui/icons-material/QrCode';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import {AppBar, Box, Button, Container, Drawer, IconButton, List, ListItem, Toolbar, Typography, useTheme} from '@mui/material';
-import {NavLink, Outlet} from 'react-router';
+import {NavLink, Outlet, useLocation} from 'react-router';
 
 const navigationWidth = 240;
 
 export default function NavigationLayout() {
     const theme = useTheme();
+    const location = useLocation();
 
     return (
         <Box sx={{display: 'flex'}}>
@@ -106,24 +107,80 @@ export default function NavigationLayout() {
                             Etiketten
                         </Button>
                     </ListItem>
-                    <ListItem disableGutters>
-                        <Button
-                            component={NavLink}
-                            to={'/felts'}
-                            startIcon={<LayersOutlinedIcon />}
-                            sx={{
-                                justifyContent: 'flex-start',
-                                width: '100%',
-                                color: theme.palette.text.primary,
-                                '&.active': {
-                                    color: theme.palette.primary.main,
-                                    fontWeight: 600,
-                                },
-                            }}
-                        >
-                            Filze
-                        </Button>
-                    </ListItem>
+                    <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                        <ListItem disableGutters>
+                            <Button
+                                component={NavLink}
+                                to={'/felts'}
+                                startIcon={<LayersOutlinedIcon />}
+                                sx={{
+                                    justifyContent: 'flex-start',
+                                    width: '100%',
+                                    color: theme.palette.text.primary,
+                                    '&.active': {
+                                        color: theme.palette.primary.main,
+                                        fontWeight: 600,
+                                    },
+                                }}
+                            >
+                                Filze
+                            </Button>
+                        </ListItem>
+                        <List component="div" disablePadding sx={{width: '100%'}}>
+                            <ListItem
+                                disableGutters
+                                sx={{
+                                    ml: 1.5,
+                                    pl: 2,
+                                    borderLeft:
+                                        location.pathname === '/felts' ? `3px solid ${theme.palette.primary.main}` : `3px solid ${theme.palette.divider}`,
+                                }}
+                            >
+                                <Button
+                                    component={NavLink}
+                                    to={'/felts'}
+                                    sx={{
+                                        justifyContent: 'flex-start',
+                                        width: '100%',
+                                        color: theme.palette.text.primary,
+                                        '&.active': {
+                                            color: location.pathname === '/felts' ? theme.palette.primary.main : theme.palette.text.primary,
+                                            fontWeight: 600,
+                                        },
+                                    }}
+                                >
+                                    Übersicht
+                                </Button>
+                            </ListItem>
+                            <ListItem
+                                disableGutters
+                                sx={{
+                                    ml: 1.5,
+                                    pl: 2,
+                                    borderLeft:
+                                        location.pathname === '/felts/reorder'
+                                            ? `3px solid ${theme.palette.primary.main}`
+                                            : `3px solid ${theme.palette.divider}`,
+                                }}
+                            >
+                                <Button
+                                    component={NavLink}
+                                    to={'/felts/reorder'}
+                                    sx={{
+                                        justifyContent: 'flex-start',
+                                        width: '100%',
+                                        color: theme.palette.text.primary,
+                                        '&.active': {
+                                            color: location.pathname === '/felts/reorder' ? theme.palette.primary.main : theme.palette.text.primary,
+                                            fontWeight: 600,
+                                        },
+                                    }}
+                                >
+                                    Nachbestellen
+                                </Button>
+                            </ListItem>
+                        </List>
+                    </Box>
                     <ListItem disableGutters>
                         <Button
                             component={NavLink}
