@@ -114,7 +114,7 @@ export default function RollDetail() {
         setIsDeleting(true);
         try {
             await deleteRoll(id);
-            navigate('/rolls');
+            navigate(-1);
         } catch (err) {
             showToast(toErrorMessage(err, 'Rolle konnte nicht gelöscht werden'), 'error');
             setIsDeleting(false);

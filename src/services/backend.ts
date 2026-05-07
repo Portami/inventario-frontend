@@ -1,6 +1,6 @@
 import {del, get, patch, post} from './api';
 import {cacheGet, cacheInvalidate, cacheSet} from './cache';
-import {getMockProductById} from './mock/backendMock.ts';
+import {getMockProductById, getMockProducts} from './mock/backendMock.ts';
 import {CreateFeltRequest, FeltDto} from '@/types/felt';
 import {Product, ProductDto, ProductId} from '@/types/product';
 import {CreateFeltRollRequest, FeltRollDto, UpdateFeltRollRequest} from '@/types/roll';
@@ -187,6 +187,40 @@ export const deleteRoll = async (rollId: ProductId): Promise<void> => {
  * @param scrapId - ID of the scrap piece to fetch
  * @returns Promise with scrap details
  */
+export const fetchAllScraps = async (): Promise<Product[]> => {
+    if (import.meta.env.DEV) {
+        return getMockProducts();
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<Product[]>('/scraps', {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchScrapsByFelt = async (feltId: number): Promise<Product[]> => {
+    if (import.meta.env.DEV) {
+        return getMockProducts();
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<Product[]>(`/felts/${feltId}/scraps`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
 export const fetchScrapDetails = async (scrapId: ProductId): Promise<Product> => {
     if (import.meta.env.DEV) {
         const mockProduct = getMockProductById(scrapId);
