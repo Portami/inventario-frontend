@@ -12,6 +12,7 @@ type RollDialogProps = {
     readonly onSaved: () => void;
     readonly roll?: FeltRollDto | null;
     readonly felts: FeltDto[];
+    readonly defaultFeltId?: number;
 };
 
 type FormState = {
@@ -26,7 +27,7 @@ const emptyForm: FormState = {feltId: '', length: '', width: '', batchId: '', st
 
 const labelProps = {shrink: true, sx: {textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontWeight: 600}};
 
-export default function RollDialog({open, onClose, onSaved, roll, felts}: RollDialogProps) {
+export default function RollDialog({open, onClose, onSaved, roll, felts, defaultFeltId}: RollDialogProps) {
     const showToast = useToast();
     const [form, setForm] = useState<FormState>(emptyForm);
     const [isSaving, setIsSaving] = useState(false);
@@ -44,7 +45,9 @@ export default function RollDialog({open, onClose, onSaved, roll, felts}: RollDi
                       batchId: roll.batchId == null ? '' : String(roll.batchId),
                       storageId: roll.storageId == null ? '' : String(roll.storageId),
                   }
-                : emptyForm,
+                : defaultFeltId == null
+                    ? emptyForm
+                    : {...emptyForm, feltId: String(defaultFeltId)},
         );
     }, [open, roll]);
 

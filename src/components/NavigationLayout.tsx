@@ -3,7 +3,6 @@ import AddIcon from '@mui/icons-material/Add';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import ContentPasteOutlinedIcon from '@mui/icons-material/ContentPasteOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
@@ -181,24 +180,6 @@ export default function NavigationLayout() {
                             </ListItem>
                         </List>
                     </Box>
-                    <ListItem disableGutters>
-                        <Button
-                            component={NavLink}
-                            to={'/rolls'}
-                            startIcon={<Inventory2OutlinedIcon />}
-                            sx={{
-                                justifyContent: 'flex-start',
-                                width: '100%',
-                                color: theme.palette.text.primary,
-                                '&.active': {
-                                    color: theme.palette.primary.main,
-                                    fontWeight: 600,
-                                },
-                            }}
-                        >
-                            Rollen
-                        </Button>
-                    </ListItem>
                     <ListItem disableGutters>
                         <Button
                             component={NavLink}
