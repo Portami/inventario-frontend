@@ -47,7 +47,7 @@ export default function RollDialog({open, onClose, onSaved, roll, felts, default
         } else {
             setForm(defaultFeltId == null ? emptyForm : {...emptyForm, feltId: String(defaultFeltId)});
         }
-    }, [open, roll]);
+    }, [open, roll, defaultFeltId]);
 
     const setField = (field: keyof FormState) => (e: ChangeEvent<HTMLInputElement>) => setForm((prev) => ({...prev, [field]: e.target.value}));
 

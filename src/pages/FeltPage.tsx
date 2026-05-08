@@ -5,6 +5,7 @@ import FeltDialog from '@/pages/components/FeltDialog';
 import {fetchRolls} from '@/services/backend';
 import {FeltDto} from '@/types/felt';
 import {FeltRollDto} from '@/types/roll';
+import {toErrorMessage} from '@/utils/pageUtils';
 import AddIcon from '@mui/icons-material/Add';
 import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
 import {Box, Button, Chip, MenuItem, Slider, TextField, Typography} from '@mui/material';
@@ -23,7 +24,7 @@ export default function FeltPage() {
     useEffect(() => {
         void fetchRolls()
             .then(setRolls)
-            .catch(() => {});
+            .catch((err) => setError(toErrorMessage(err, 'Rollen konnten nicht geladen werden')));
     }, []);
 
     const rollLengthBounds = useMemo((): [number, number] => {

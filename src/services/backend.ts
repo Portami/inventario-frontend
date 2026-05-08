@@ -199,7 +199,8 @@ export const fetchAllScraps = async (): Promise<Product[]> => {
 
 export const fetchScrapsByFelt = async (feltId: number): Promise<Product[]> => {
     if (import.meta.env.DEV) {
-        return getMockProducts();
+        // Mock data has no feltId field, so filtering is not possible; return empty to avoid showing unrelated scraps.
+        return [];
     }
 
     const controller = new AbortController();

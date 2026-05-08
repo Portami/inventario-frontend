@@ -47,7 +47,8 @@ export default function FeltDetailPage() {
     const navigate = useNavigate();
     const showToast = useToast();
 
-    const feltId = id ? Number.parseInt(id, 10) : null;
+    const parsed = id != null ? Number.parseInt(id, 10) : NaN;
+    const feltId = Number.isNaN(parsed) ? null : parsed;
 
     const [felt, setFelt] = useState<FeltDto | null>(null);
     const [allFelts, setAllFelts] = useState<FeltDto[]>([]);
@@ -64,9 +65,17 @@ export default function FeltDetailPage() {
 
     useEffect(() => {
         const load = async () => {
-            if (feltId == null) return;
+            if (feltId == null) {
+                setError('Ungültige Filz-ID');
+                setIsLoading(false);
+                return;
+            }
             setIsLoading(true);
             setError('');
+            setFelt(null);
+            setAllFelts([]);
+            setRolls([]);
+            setScraps([]);
             try {
                 const [allFeltsResult, allRolls, scrapList] = await Promise.all([fetchFelts(), fetchRolls(), fetchScrapsByFelt(feltId)]);
                 const found = allFeltsResult.find((f) => f.id === feltId);
