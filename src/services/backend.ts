@@ -180,13 +180,6 @@ export const deleteRoll = async (rollId: ProductId): Promise<void> => {
     }
 };
 
-/**
- * Fetch details for a specific scrap piece.
- * TODO: replace mock with GET /api/scraps/{id} once the endpoint is available.
- *
- * @param scrapId - ID of the scrap piece to fetch
- * @returns Promise with scrap details
- */
 export const fetchAllScraps = async (): Promise<Product[]> => {
     if (import.meta.env.DEV) {
         return getMockProducts();
@@ -221,6 +214,13 @@ export const fetchScrapsByFelt = async (feltId: number): Promise<Product[]> => {
     }
 };
 
+/**
+ * Fetch details for a specific scrap piece.
+ * TODO: replace mock with GET /api/scraps/{id} once the endpoint is available.
+ *
+ * @param scrapId - ID of the scrap piece to fetch
+ * @returns Promise with scrap details
+ */
 export const fetchScrapDetails = async (scrapId: ProductId): Promise<Product> => {
     if (import.meta.env.DEV) {
         const mockProduct = getMockProductById(scrapId);

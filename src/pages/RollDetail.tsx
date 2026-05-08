@@ -181,31 +181,31 @@ export default function RollDetail() {
                                     <Box sx={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1}}>
                                         {isEditing ? (
                                             <TextField
-                                                label="Länge (m)"
+                                                label="Länge (cm)"
                                                 value={form.length}
                                                 onChange={setField('length')}
                                                 type="number"
                                                 variant="outlined"
                                                 size="small"
                                                 required
-                                                slotProps={{htmlInput: {min: 0.01, step: 0.01}, inputLabel: labelProps}}
+                                                slotProps={{htmlInput: {min: 1, step: 1}, inputLabel: labelProps}}
                                             />
                                         ) : (
-                                            <Field label="Länge (m)" value={roll.length} />
+                                            <Field label="Länge (cm)" value={roll.length} />
                                         )}
                                         {isEditing ? (
                                             <TextField
-                                                label="Breite (m)"
+                                                label="Breite (cm)"
                                                 value={form.width}
                                                 onChange={setField('width')}
                                                 type="number"
                                                 variant="outlined"
                                                 size="small"
                                                 required
-                                                slotProps={{htmlInput: {min: 0.01, step: 0.01}, inputLabel: labelProps}}
+                                                slotProps={{htmlInput: {min: 1, step: 1}, inputLabel: labelProps}}
                                             />
                                         ) : (
-                                            <Field label="Breite (m)" value={roll.width} />
+                                            <Field label="Breite (cm)" value={roll.width} />
                                         )}
                                         <Field label="Dicke (mm)" value={roll.thickness} />
                                         <Field label="Dichte (g/m²)" value={roll.density} />

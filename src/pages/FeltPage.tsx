@@ -26,10 +26,9 @@ export default function FeltPage() {
             .catch(() => {});
     }, []);
 
-    // Roll length/width bounds (in cm)
     const rollLengthBounds = useMemo((): [number, number] => {
         if (rolls.length === 0) return [0, 100];
-        const lengths = rolls.map((r) => Math.round(r.length * 100));
+        const lengths = rolls.map((r) => r.length);
         return [Math.min(...lengths), Math.max(...lengths)];
     }, [rolls]);
 
@@ -52,28 +51,22 @@ export default function FeltPage() {
 
     // Felts that pass the dimension (length/width) filters only — used to derive dropdown options
     const feltsByDimension = useMemo(() => {
+        const lengthActive = activeLengthFilter[0] !== rollLengthBounds[0] || activeLengthFilter[1] !== rollLengthBounds[1];
+        const widthActive = widthFilter[0] !== 0 || widthFilter[1] !== 500;
+
         return felts.filter((felt) => {
             const feltRolls = rollsByFeltId.get(felt.id) ?? [];
-            const lengthActive = activeLengthFilter[0] !== rollLengthBounds[0] || activeLengthFilter[1] !== rollLengthBounds[1];
+
             if (lengthActive) {
-                const match = feltRolls.some((r) => {
-                    const cm = Math.round(r.length * 100);
-                    return cm >= activeLengthFilter[0] && cm <= activeLengthFilter[1];
-                });
-                if (!match) {
-                    return false;
-                }
+                const inRange = feltRolls.some((r) => r.length >= activeLengthFilter[0] && r.length <= activeLengthFilter[1]);
+                if (!inRange) return false;
             }
-            const widthActive = widthFilter[0] !== 0 || widthFilter[1] !== 500;
+
             if (widthActive) {
-                const match = feltRolls.some((r) => {
-                    const cm = Math.round(r.width * 100);
-                    return cm >= widthFilter[0] && cm <= widthFilter[1];
-                });
-                if (!match) {
-                    return false;
-                }
+                const inRange = feltRolls.some((r) => r.width >= widthFilter[0] && r.width <= widthFilter[1]);
+                if (!inRange) return false;
             }
+
             return true;
         });
     }, [felts, rollsByFeltId, activeLengthFilter, rollLengthBounds, widthFilter]);

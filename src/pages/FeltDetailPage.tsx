@@ -87,29 +87,33 @@ export default function FeltDetailPage() {
         void load();
     }, [feltId]);
 
-    const refetchFelt = () =>
-        void fetchFelts()
-            .then((felts) => {
-                if (feltId == null) return;
-                const found = felts.find((f) => f.id === feltId);
-                if (found) {
-                    setFelt(found);
-                    setAllFelts(felts);
-                }
-            })
-            .catch((err) => setError(toErrorMessage(err, 'Filz konnte nicht geladen werden')));
+    const refetchFelt = async () => {
+        if (feltId == null) return;
+        try {
+            const felts = await fetchFelts();
+            const found = felts.find((f) => f.id === feltId);
+            if (found) {
+                setFelt(found);
+                setAllFelts(felts);
+            }
+        } catch (err) {
+            setError(toErrorMessage(err, 'Filz konnte nicht geladen werden'));
+        }
+    };
 
-    const refetchRolls = () =>
-        void fetchRolls()
-            .then((allRolls) => {
-                if (feltId == null) return;
-                setRolls(allRolls.filter((r) => r.feltId === feltId));
-            })
-            .catch((err) => setError(toErrorMessage(err, 'Rollen konnten nicht geladen werden')));
+    const refetchRolls = async () => {
+        if (feltId == null) return;
+        try {
+            const allRolls = await fetchRolls();
+            setRolls(allRolls.filter((r) => r.feltId === feltId));
+        } catch (err) {
+            setError(toErrorMessage(err, 'Rollen konnten nicht geladen werden'));
+        }
+    };
 
     const handleFeltSaved = () => {
         setIsEditOpen(false);
-        refetchFelt();
+        void refetchFelt();
     };
 
     const handleFeltDelete = async () => {
@@ -129,7 +133,7 @@ export default function FeltDetailPage() {
 
     const handleRollCreated = () => {
         setIsCreateRollOpen(false);
-        refetchRolls();
+        void refetchRolls();
     };
 
     const handleRollDeleteConfirm = async () => {
@@ -138,7 +142,7 @@ export default function FeltDetailPage() {
         try {
             await deleteRoll(rollToDelete.id);
             setRollToDelete(null);
-            refetchRolls();
+            void refetchRolls();
             showToast('Rolle erfolgreich gelöscht.', 'success');
         } catch (err) {
             showToast(toErrorMessage(err, 'Rolle konnte nicht gelöscht werden'), 'error');
@@ -241,7 +245,7 @@ export default function FeltDetailPage() {
                                             >
                                                 <CardContent sx={{p: 2, '&:last-child': {pb: 2}}}>
                                                     <Typography sx={{fontSize: '1rem', fontWeight: 700, mb: 0.5, pr: 3, lineHeight: 1.3}}>
-                                                        {Math.round(roll.length * 100)} × {Math.round(roll.width * 100)} cm
+                                                        {roll.length} × {roll.width} cm
                                                     </Typography>
                                                     <Typography variant="caption" color="text.secondary" sx={{display: 'block'}}>
                                                         {roll.storageName ?? '–'}
@@ -333,9 +337,7 @@ export default function FeltDetailPage() {
                     </Box>
                 </DialogTitle>
                 <DialogContent>
-                    <Typography>
-                        {rollToDelete?.feltTypeName} – {rollToDelete?.color} wirklich löschen?
-                    </Typography>
+                    <Typography>{rollToDelete && `Rolle ${rollToDelete.length} × ${rollToDelete.width} cm wirklich löschen?`}</Typography>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setRollToDelete(null)} disabled={isDeletingRoll}>

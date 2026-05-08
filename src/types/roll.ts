@@ -15,15 +15,15 @@ export type Roll = {
 
 export type CreateFeltRollRequest = {
     feltId: number;
-    length: number; // meters
-    width: number; // meters
+    length: number; // cm
+    width: number; // cm
     batchId?: number;
     storageId?: number;
 };
 
 export type UpdateFeltRollRequest = {
-    length: number; // meters
-    width: number; // meters
+    length: number; // cm
+    width: number; // cm
     batchId?: number;
     storageId?: number;
 };
@@ -32,8 +32,8 @@ export type UpdateFeltRollRequest = {
 export type FeltRollDto = {
     id: number;
     articleNumber: string;
-    length: number; // meters
-    width: number; // meters
+    length: number; // cm
+    width: number; // cm
     feltColorVariantId: number;
     color: string;
     supplierColor: string;

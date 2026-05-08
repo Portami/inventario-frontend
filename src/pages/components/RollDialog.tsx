@@ -36,19 +36,17 @@ export default function RollDialog({open, onClose, onSaved, roll, felts, default
 
     useEffect(() => {
         if (!open) return;
-        setForm(
-            roll
-                ? {
-                      feltId: String(roll.feltId),
-                      length: String(roll.length),
-                      width: String(roll.width),
-                      batchId: roll.batchId == null ? '' : String(roll.batchId),
-                      storageId: roll.storageId == null ? '' : String(roll.storageId),
-                  }
-                : defaultFeltId == null
-                    ? emptyForm
-                    : {...emptyForm, feltId: String(defaultFeltId)},
-        );
+        if (roll) {
+            setForm({
+                feltId: String(roll.feltId),
+                length: String(roll.length),
+                width: String(roll.width),
+                batchId: roll.batchId == null ? '' : String(roll.batchId),
+                storageId: roll.storageId == null ? '' : String(roll.storageId),
+            });
+        } else {
+            setForm(defaultFeltId == null ? emptyForm : {...emptyForm, feltId: String(defaultFeltId)});
+        }
     }, [open, roll]);
 
     const setField = (field: keyof FormState) => (e: ChangeEvent<HTMLInputElement>) => setForm((prev) => ({...prev, [field]: e.target.value}));
@@ -153,7 +151,7 @@ export default function RollDialog({open, onClose, onSaved, roll, felts, default
                     </Grid>
                     <Grid size={6}>
                         <TextField
-                            label="Länge (m)"
+                            label="Länge (cm)"
                             value={form.length}
                             onChange={setField('length')}
                             type="number"
@@ -161,12 +159,12 @@ export default function RollDialog({open, onClose, onSaved, roll, felts, default
                             size="small"
                             fullWidth
                             required
-                            slotProps={{htmlInput: {min: 0.01, step: 0.01}, inputLabel: labelProps}}
+                            slotProps={{htmlInput: {min: 1, step: 1}, inputLabel: labelProps}}
                         />
                     </Grid>
                     <Grid size={6}>
                         <TextField
-                            label="Breite (m)"
+                            label="Breite (cm)"
                             value={form.width}
                             onChange={setField('width')}
                             type="number"
@@ -174,7 +172,7 @@ export default function RollDialog({open, onClose, onSaved, roll, felts, default
                             size="small"
                             fullWidth
                             required
-                            slotProps={{htmlInput: {min: 0.01, step: 0.01}, inputLabel: labelProps}}
+                            slotProps={{htmlInput: {min: 1, step: 1}, inputLabel: labelProps}}
                         />
                     </Grid>
                     <Grid size={6}>
