@@ -29,22 +29,27 @@
   ],
   "words": [
     "BWIP",
+    "Einh",
+    "Handgefertigte",
+    "Lieferantenfarbe",
+    "MWST",
     "TTFB",
+    "TTFB",
+    "Zuschnittpauschale",
     "bcid",
     "bwip",
     "bwipjs",
     "bwipjs",
     "datamatrix",
     "inventar",
-    "Handgefertigte",
-    "TTFB",
     "inventar",
-    "Lieferantenfarbe",
     "mui",
+    "offerte",
+    "offerten",
     "scss",
+    "testid",
     "tsx",
     "vite",
-    "wasserabweisend",
-    "testid"
+    "wasserabweisend"
   ]
 }

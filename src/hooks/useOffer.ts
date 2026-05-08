@@ -1,0 +1,126 @@
+import {useToast} from '@/components/ToastProvider';
+import {CUT_SURCHARGE_DEFAULT, LINE_KIND, OFFER_STATE_META, RESERVATION_KIND} from '@/pages/constants/offerConstants';
+import {addOfferLine, changeOfferState, deleteOfferLine, fetchFeltCatalog, fetchOffer, fetchProductCatalog, patchOfferLine} from '@/services/backend';
+import {FeltCatalogItem, LineItemDto, OfferDto, OfferState, ProductCatalogItem} from '@/types/offerte';
+import {toErrorMessage} from '@/utils/pageUtils';
+import {useCallback, useEffect, useState} from 'react';
+
+export interface UseOfferReturn {
+    offer: OfferDto | null;
+    feltCatalog: FeltCatalogItem[];
+    productCatalog: ProductCatalogItem[];
+    loading: boolean;
+    error: string;
+    patchLine: (lineId: string, changes: Partial<LineItemDto>) => void;
+    deleteLine: (lineId: string) => void;
+    addFeltLine: (felt: FeltCatalogItem) => Promise<void>;
+    addProductLine: (p: ProductCatalogItem) => Promise<void>;
+    changeState: (key: OfferState) => void;
+    regenDoc: (doc: string) => void;
+}
+
+export function useOffer(id: string | undefined): UseOfferReturn {
+    const showToast = useToast();
+    const [offer, setOffer] = useState<OfferDto | null>(null);
+    const [feltCatalog, setFeltCatalog] = useState<FeltCatalogItem[]>([]);
+    const [productCatalog, setProductCatalog] = useState<ProductCatalogItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        if (!id) return;
+        setLoading(true);
+        Promise.all([fetchOffer(id), fetchFeltCatalog(), fetchProductCatalog()])
+            .then(([offerData, feltData, productData]) => {
+                setOffer(offerData);
+                setFeltCatalog(feltData);
+                setProductCatalog(productData);
+                setError('');
+            })
+            .catch((err) => setError(toErrorMessage(err, 'Offerte konnte nicht geladen werden')))
+            .finally(() => setLoading(false));
+    }, [id]);
+
+    const patchLine = useCallback(
+        (lineId: string, changes: Partial<LineItemDto>) => {
+            setOffer((o) => (o ? {...o, lines: o.lines.map((l) => (l.id === lineId ? {...l, ...changes} : l))} : o));
+            if (id) void patchOfferLine(id, lineId, changes);
+        },
+        [id],
+    );
+
+    const deleteLine = useCallback(
+        (lineId: string) => {
+            setOffer((o) => (o ? {...o, lines: o.lines.filter((l) => l.id !== lineId)} : o));
+            if (id) void deleteOfferLine(id, lineId);
+        },
+        [id],
+    );
+
+    const addFeltLine = useCallback(
+        async (felt: FeltCatalogItem) => {
+            if (!id) return;
+            const line: Omit<LineItemDto, 'id'> = {
+                kind: LINE_KIND.ROLLE,
+                articleNumber: felt.articleNumber,
+                feltTypeName: felt.feltTypeName,
+                color: felt.color,
+                description: `Zuschnitt aus Rolle · 1.00 × 1.00 m · ${felt.thickness} mm`,
+                quantity: 1,
+                unit: 'Stk.',
+                pricePerUnit: felt.pricePerSqm,
+                cutSurcharge: CUT_SURCHARGE_DEFAULT,
+                extras: 0,
+                discount: 0,
+                reservation: {kind: RESERVATION_KIND.TAGGED, sourceLabel: 'Rolle (auto)'},
+            };
+            const newLine = await addOfferLine(id, line);
+            setOffer((o) => (o ? {...o, lines: [...o.lines, newLine]} : o));
+            showToast(`${felt.feltTypeName} · ${felt.color} hinzugefügt`);
+        },
+        [id, showToast],
+    );
+
+    const addProductLine = useCallback(
+        async (p: ProductCatalogItem) => {
+            if (!id) return;
+            const line: Omit<LineItemDto, 'id'> = {
+                kind: LINE_KIND.PRODUKT,
+                articleNumber: p.articleNumber,
+                feltTypeName: p.name,
+                color: null,
+                description: p.name,
+                quantity: 1,
+                unit: 'Stk.',
+                pricePerUnit: p.price,
+                cutSurcharge: 0,
+                extras: 0,
+                discount: 0,
+                reservation: null,
+            };
+            const newLine = await addOfferLine(id, line);
+            setOffer((o) => (o ? {...o, lines: [...o.lines, newLine]} : o));
+            showToast(`${p.name} hinzugefügt`);
+        },
+        [id, showToast],
+    );
+
+    const changeState = useCallback(
+        (key: OfferState) => {
+            setOffer((o) => (o ? {...o, state: key} : o));
+            if (id) void changeOfferState(id, key);
+            showToast(`Status auf »${OFFER_STATE_META[key].label}« gesetzt`, 'info');
+        },
+        [id, showToast],
+    );
+
+    const regenDoc = useCallback(
+        (doc: string) => {
+            showToast(`${doc} neu generiert`);
+            // TODO: POST /offers/{id}/documents/regenerate
+        },
+        [showToast],
+    );
+
+    return {offer, feltCatalog, productCatalog, loading, error, patchLine, deleteLine, addFeltLine, addProductLine, changeState, regenDoc};
+}

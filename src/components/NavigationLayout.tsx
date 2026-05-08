@@ -9,6 +9,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import PrintIcon from '@mui/icons-material/Print';
 import QrCodeIcon from '@mui/icons-material/QrCode';
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import {AppBar, Box, Button, Container, Drawer, IconButton, List, ListItem, Toolbar, Typography, useTheme} from '@mui/material';
@@ -251,6 +252,24 @@ export default function NavigationLayout() {
                             }}
                         >
                             Einkaufen
+                        </Button>
+                    </ListItem>
+                    <ListItem disableGutters>
+                        <Button
+                            component={NavLink}
+                            to={'/offers'}
+                            startIcon={<ReceiptLongOutlinedIcon />}
+                            sx={{
+                                justifyContent: 'flex-start',
+                                width: '100%',
+                                color: theme.palette.text.primary,
+                                '&.active': {
+                                    color: theme.palette.primary.main,
+                                    fontWeight: 600,
+                                },
+                            }}
+                        >
+                            Offerten
                         </Button>
                     </ListItem>
                 </List>

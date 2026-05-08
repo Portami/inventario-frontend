@@ -1,7 +1,9 @@
 import {del, get, patch, post} from './api';
 import {cacheGet, cacheInvalidate, cacheSet} from './cache';
 import {getMockProductById} from './mock/backendMock.ts';
+import {getMockAddedLine, getMockCreatedOffer, getMockCustomers, getMockFeltCatalog, getMockOffers, getMockProductCatalog} from './mock/offerteMock';
 import {CreateFeltRequest, FeltDto} from '@/types/felt';
+import {CustomerDto, CustomerWithIdDto, FeltCatalogItem, LineItemDto, OfferDto, OfferState, OfferSummaryDto, ProductCatalogItem} from '@/types/offerte';
 import {Product, ProductDto, ProductId} from '@/types/product';
 import {CreateFeltRollRequest, FeltRollDto, UpdateFeltRollRequest} from '@/types/roll';
 import {ScanResult} from '@/types/scanner';
@@ -222,6 +224,161 @@ export const fetchProducts = async (): Promise<ProductDto[]> => {
         const result = await get<ProductDto[]>('/products', {signal: controller.signal});
         clearTimeout(timeoutId);
         cacheSet('products', result);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchOffers = async (): Promise<OfferSummaryDto[]> => {
+    if (import.meta.env.DEV) return getMockOffers();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<OfferSummaryDto[]>('/offers', {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchOffer = async (id: string): Promise<OfferDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<OfferDto>(`/offers/${encodeURIComponent(id)}`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const changeOfferState = async (id: string, state: OfferState): Promise<void> => {
+    if (import.meta.env.DEV) return;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        await patch(`/offers/${encodeURIComponent(id)}/state`, {state}, {signal: controller.signal});
+        clearTimeout(timeoutId);
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const patchOfferLine = async (offerId: string, lineId: string, changes: Partial<LineItemDto>): Promise<void> => {
+    if (import.meta.env.DEV) return;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        await patch(`/offers/${encodeURIComponent(offerId)}/lines/${encodeURIComponent(lineId)}`, changes, {signal: controller.signal});
+        clearTimeout(timeoutId);
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const deleteOfferLine = async (offerId: string, lineId: string): Promise<void> => {
+    if (import.meta.env.DEV) return;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        await del(`/offers/${encodeURIComponent(offerId)}/lines/${encodeURIComponent(lineId)}`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const addOfferLine = async (offerId: string, line: Omit<LineItemDto, 'id'>): Promise<LineItemDto> => {
+    if (import.meta.env.DEV) return getMockAddedLine(line);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<LineItemDto>(`/offers/${encodeURIComponent(offerId)}/lines`, line, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchFeltCatalog = async (): Promise<FeltCatalogItem[]> => {
+    if (import.meta.env.DEV) return getMockFeltCatalog();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<FeltCatalogItem[]>('/offers/catalog/felts', {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchProductCatalog = async (): Promise<ProductCatalogItem[]> => {
+    if (import.meta.env.DEV) return getMockProductCatalog();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<ProductCatalogItem[]>('/offers/catalog/products', {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchCustomers = async (): Promise<CustomerWithIdDto[]> => {
+    if (import.meta.env.DEV) return getMockCustomers();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<CustomerWithIdDto[]>('/customers', {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const createCustomer = async (data: Omit<CustomerDto, 'customerNumber'>): Promise<CustomerWithIdDto> => {
+    if (import.meta.env.DEV)
+        return {
+            ...data,
+            id: 'C-' + Date.now(),
+            customerNumber: 'K-' + String(Math.floor(Math.random() * 9000 + 1000)),
+        };
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<CustomerWithIdDto>('/customers', data, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const createOffer = async (customerId: string, path: 'A' | 'B'): Promise<OfferDto> => {
+    if (import.meta.env.DEV) return getMockCreatedOffer('O-' + Date.now());
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<OfferDto>('/offers', {customerId, path}, {signal: controller.signal});
+        clearTimeout(timeoutId);
         return result;
     } catch (error) {
         clearTimeout(timeoutId);

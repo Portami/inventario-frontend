@@ -7,6 +7,8 @@ import FeltPage from '@/pages/FeltPage.tsx';
 import FeltReorderPage from '@/pages/FeltReorderPage.tsx';
 import InventoryPage from '@/pages/InventoryPage.tsx';
 import LabelGeneratorPage from '@/pages/LabelGeneratorPage.tsx';
+import OfferDetailPage from '@/pages/OfferDetailPage.tsx';
+import OffersPage from '@/pages/OffersPage.tsx';
 import ProductDetailView from '@/pages/ProductDetailView.tsx';
 import ProductsPage from '@/pages/ProductsPage.tsx';
 import RollDetail from '@/pages/RollDetail.tsx';
@@ -38,6 +40,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <Route path="/products" element={<ProductsPage />} />
                         <Route path="/product/:id" element={<ProductDetailView />} />
                         <Route path="/roll/:id" element={<RollDetail />} />
+                        <Route path="/offers" element={<OffersPage />} />
+                        <Route path="/offers/:id" element={<OfferDetailPage />} />
                     </Route>
                     <Route path="/scrap/:id" element={<ScrapDetail />} />
                 </Routes>
