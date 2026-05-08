@@ -38,14 +38,14 @@ vi.mock('@/services/backend', () => {
 });
 
 // Mock FeltDialog to be a simple component that renders when open
-vi.mock('@/pages/components/FeltDialog', () => {
+vi.mock('@/components/felts/FeltDialog', () => {
     return {
         default: ({open, felt}: any) => (open ? <div data-testid="felt-dialog">{felt?.articleNumber}</div> : null),
     };
 });
 
 // Mock DeleteFeltDialog to render a confirm button that calls onConfirm when clicked
-vi.mock('@/pages/components/DeleteFeltDialog', () => {
+vi.mock('@/components/felts/DeleteFeltDialog', () => {
     return {
         default: ({open, felt, onConfirm, onClose}: any) =>
             open ? (

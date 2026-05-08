@@ -1,7 +1,7 @@
 import ListPage from '@/components/ListPage';
-import RollList, {RollItem} from '@/components/RollList';
+import RollList, {RollItem} from '@/components/rolls/RollList';
 import {useToast} from '@/components/ToastProvider';
-import RollDialog from '@/pages/components/RollDialog';
+import RollDialog from '@/components/rolls/RollDialog';
 import {deleteRoll, fetchFelts, fetchRolls} from '@/services/backend';
 import {FeltDto} from '@/types/felt';
 import {toErrorMessage} from '@/utils/pageUtils';

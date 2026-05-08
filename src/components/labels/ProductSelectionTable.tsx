@@ -1,4 +1,4 @@
-import {FeltRollDto} from '@/types/roll';
+import {FeltRollDto} from '@/types/roll.ts';
 import {DataGrid, GridColDef, GridRowId, GridRowSelectionModel} from '@mui/x-data-grid';
 
 const columns: GridColDef<FeltRollDto>[] = [

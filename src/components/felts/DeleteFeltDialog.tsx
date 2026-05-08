@@ -1,4 +1,4 @@
-import {FeltDto} from '@/types/felt';
+import {FeltDto} from '@/types/felt.ts';
 import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
 
 interface DeleteFeltDialogProps {

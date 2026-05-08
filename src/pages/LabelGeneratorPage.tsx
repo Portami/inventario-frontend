@@ -1,6 +1,6 @@
-import LabelDimensionControls from './components/LabelDimensionControls';
-import LabelsPreview from './components/LabelsPreview';
-import ProductSelectionTable from './components/ProductSelectionTable';
+import LabelDimensionControls from '@/components/labels/LabelDimensionControls';
+import LabelsPreview from '@/components/labels/LabelsPreview';
+import ProductSelectionTable from '@/components/labels/ProductSelectionTable';
 import {DEFAULT_LABEL_HEIGHT_MM, DEFAULT_LABEL_WIDTH_MM} from './constants/labelConstants';
 import ListPage from '@/components/ListPage';
 import {useToast} from '@/components/ToastProvider';
