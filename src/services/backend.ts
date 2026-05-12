@@ -1,12 +1,98 @@
 import {del, get, patch, post} from './api';
 import {cacheGet, cacheInvalidate, cacheSet} from './cache';
-import {getMockProductById} from './mock/backendMock.ts';
-import {getMockAddedLine, getMockCreatedOffer, getMockCustomers, getMockFeltCatalog, getMockOffers, getMockProductCatalog} from './mock/offerteMock';
+import {ALL_BACKEND_STATES, OFFER_PATH_A, VAT_RATE} from '@/pages/constants/offerConstants';
 import {CreateFeltRequest, FeltDto} from '@/types/felt';
-import {CustomerDto, CustomerWithIdDto, FeltCatalogItem, LineItemDto, OfferDto, OfferState, OfferSummaryDto, ProductCatalogItem} from '@/types/offerte';
+import {
+    BackendCreateOfferItemDto,
+    BackendFullCustomerDto,
+    BackendOfferDto,
+    BackendOfferItemDto,
+    CustomerWithIdDto,
+    FeltCatalogItem,
+    LineItemDto,
+    LineItemKind,
+    OfferDto,
+    OfferState,
+    OfferSummaryDto,
+    ProductCatalogItem,
+} from '@/types/offerte';
 import {Product, ProductDto, ProductId} from '@/types/product';
 import {CreateFeltRollRequest, FeltRollDto, UpdateFeltRollRequest} from '@/types/roll';
 import {ScanResult} from '@/types/scanner';
+
+function mapBackendOffer(raw: BackendOfferDto): OfferDto {
+    return {
+        id: String(raw.id),
+        number: `A-${raw.id}`,
+        createdISO: raw.createdAt.substring(0, 10),
+        state: raw.state,
+        path: OFFER_PATH_A,
+        customer: {
+            customerNumber: String(raw.customerDto.id),
+            name: raw.customerDto.name,
+            contactPerson: '',
+            email: '',
+            phone: '',
+            street: '',
+            zip: '',
+            city: '',
+            country: '',
+            vatNumber: '',
+        },
+        lines: raw.items.map((item) => ({
+            id: String(item.id),
+            kind: 'PRODUKT' as LineItemKind,
+            articleNumber: String(item.productVariantId),
+            feltTypeName: item.description ?? '',
+            color: null,
+            description: item.description ?? '',
+            quantity: item.quantity,
+            unit: 'Stk.',
+            pricePerUnit: Number(item.unitPrice),
+            cutSurcharge: 0,
+            extras: 0,
+            discount: 0,
+            reservation: null,
+        })),
+        history: [],
+    };
+}
+
+function mapBackendOfferToSummary(raw: BackendOfferDto): OfferSummaryDto {
+    const total = raw.items.reduce((sum, item) => sum + Number(item.unitPrice) * item.quantity, 0);
+    return {
+        id: String(raw.id),
+        state: raw.state,
+        customer: raw.customerDto.name,
+        contact: '',
+        city: '',
+        lines: raw.items.length,
+        total,
+        vat: total * VAT_RATE,
+        createdISO: raw.createdAt.substring(0, 10),
+        dueISO: raw.createdAt.substring(0, 10),
+        path: 'A',
+        overdue: 0,
+        reservedScraps: 0,
+        taggedRolls: 0,
+    };
+}
+
+function mapBackendCustomer(raw: BackendFullCustomerDto): CustomerWithIdDto {
+    return {
+        id: String(raw.id),
+        customerNumber: String(raw.id),
+        name: raw.name,
+        contactPerson: raw.contactPerson,
+        email: raw.email,
+        phone: raw.phone,
+        street: raw.street,
+        zip: raw.zip,
+        city: raw.city,
+        country: raw.country,
+        vatNumber: raw.vatNumber,
+    };
+}
 
 /**
  * Lookup a roll or scrap piece by Data Matrix code.
@@ -182,36 +268,15 @@ export const deleteRoll = async (rollId: ProductId): Promise<void> => {
     }
 };
 
-/**
- * Fetch details for a specific scrap piece.
- * TODO: replace mock with GET /api/scraps/{id} once the endpoint is available.
- *
- * @param scrapId - ID of the scrap piece to fetch
- * @returns Promise with scrap details
- */
 export const fetchScrapDetails = async (scrapId: ProductId): Promise<Product> => {
-    if (import.meta.env.DEV) {
-        const mockProduct = getMockProductById(scrapId);
-        if (mockProduct) {
-            return mockProduct;
-        }
-        throw new Error(`Scrap ${scrapId} not found in mock data`);
-    }
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-    try {
-        const result = await get<Product>(`/scraps/${scrapId}`, {
-            signal: controller.signal,
-        });
-        clearTimeout(timeoutId);
-        return result;
-    } catch (error) {
-        clearTimeout(timeoutId);
-        console.warn(`Failed to fetch scrap details from backend: ${error}`);
-        throw error;
-    }
+    const roll = await fetchRollDetails(scrapId);
+    return {
+        id: roll.id,
+        articleNumber: roll.articleNumber,
+        name: `${roll.feltTypeName} · ${roll.color}`,
+        length: roll.length,
+        width: roll.width,
+    };
 };
 
 export const fetchProducts = async (): Promise<ProductDto[]> => {
@@ -232,13 +297,12 @@ export const fetchProducts = async (): Promise<ProductDto[]> => {
 };
 
 export const fetchOffers = async (): Promise<OfferSummaryDto[]> => {
-    if (import.meta.env.DEV) return getMockOffers();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
     try {
-        const result = await get<OfferSummaryDto[]>('/offers', {signal: controller.signal});
+        const results = await Promise.all(ALL_BACKEND_STATES.map((state) => get<BackendOfferDto[]>(`/offers?state=${state}`, {signal: controller.signal})));
         clearTimeout(timeoutId);
-        return result;
+        return results.flat().map(mapBackendOfferToSummary);
     } catch (error) {
         clearTimeout(timeoutId);
         throw error;
@@ -249,9 +313,9 @@ export const fetchOffer = async (id: string): Promise<OfferDto> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-        const result = await get<OfferDto>(`/offers/${encodeURIComponent(id)}`, {signal: controller.signal});
+        const raw = await get<BackendOfferDto>(`/offers/${encodeURIComponent(id)}`, {signal: controller.signal});
         clearTimeout(timeoutId);
-        return result;
+        return mapBackendOffer(raw);
     } catch (error) {
         clearTimeout(timeoutId);
         throw error;
@@ -259,11 +323,11 @@ export const fetchOffer = async (id: string): Promise<OfferDto> => {
 };
 
 export const changeOfferState = async (id: string, state: OfferState): Promise<void> => {
-    if (import.meta.env.DEV) return;
+    if (state === 'PAID') return; // No backend equivalent yet — see CHANGE_REQUEST.md
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-        await patch(`/offers/${encodeURIComponent(id)}/state`, {state}, {signal: controller.signal});
+        await patch(`/offers/${encodeURIComponent(id)}`, {state}, {signal: controller.signal});
         clearTimeout(timeoutId);
     } catch (error) {
         clearTimeout(timeoutId);
@@ -272,11 +336,14 @@ export const changeOfferState = async (id: string, state: OfferState): Promise<v
 };
 
 export const patchOfferLine = async (offerId: string, lineId: string, changes: Partial<LineItemDto>): Promise<void> => {
-    if (import.meta.env.DEV) return;
+    const itemUpdate: Record<string, unknown> = {id: Number(lineId)};
+    if (changes.quantity !== undefined) itemUpdate.quantity = changes.quantity;
+    if (changes.pricePerUnit !== undefined) itemUpdate.unitPrice = changes.pricePerUnit;
+    if (changes.description !== undefined) itemUpdate.description = changes.description;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-        await patch(`/offers/${encodeURIComponent(offerId)}/lines/${encodeURIComponent(lineId)}`, changes, {signal: controller.signal});
+        await patch(`/offers/${encodeURIComponent(offerId)}`, {items: [itemUpdate]}, {signal: controller.signal});
         clearTimeout(timeoutId);
     } catch (error) {
         clearTimeout(timeoutId);
@@ -285,11 +352,10 @@ export const patchOfferLine = async (offerId: string, lineId: string, changes: P
 };
 
 export const deleteOfferLine = async (offerId: string, lineId: string): Promise<void> => {
-    if (import.meta.env.DEV) return;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-        await del(`/offers/${encodeURIComponent(offerId)}/lines/${encodeURIComponent(lineId)}`, {signal: controller.signal});
+        await del(`/offers/${encodeURIComponent(offerId)}/items/${encodeURIComponent(lineId)}`, {signal: controller.signal});
         clearTimeout(timeoutId);
     } catch (error) {
         clearTimeout(timeoutId);
@@ -297,14 +363,19 @@ export const deleteOfferLine = async (offerId: string, lineId: string): Promise<
     }
 };
 
-export const addOfferLine = async (offerId: string, line: Omit<LineItemDto, 'id'>): Promise<LineItemDto> => {
-    if (import.meta.env.DEV) return getMockAddedLine(line);
+export const addOfferLine = async (offerId: string, productVariantId: number, line: Omit<LineItemDto, 'id'>): Promise<LineItemDto> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-        const result = await post<LineItemDto>(`/offers/${encodeURIComponent(offerId)}/lines`, line, {signal: controller.signal});
+        const payload: BackendCreateOfferItemDto = {
+            productVariantId,
+            description: line.description || undefined,
+            quantity: line.quantity,
+            unitPrice: line.pricePerUnit,
+        };
+        const raw = await post<BackendOfferItemDto>(`/offers/${encodeURIComponent(offerId)}/items`, payload, {signal: controller.signal});
         clearTimeout(timeoutId);
-        return result;
+        return {...line, id: String(raw.id)};
     } catch (error) {
         clearTimeout(timeoutId);
         throw error;
@@ -312,74 +383,63 @@ export const addOfferLine = async (offerId: string, line: Omit<LineItemDto, 'id'
 };
 
 export const fetchFeltCatalog = async (): Promise<FeltCatalogItem[]> => {
-    if (import.meta.env.DEV) return getMockFeltCatalog();
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-    try {
-        const result = await get<FeltCatalogItem[]>('/offers/catalog/felts', {signal: controller.signal});
-        clearTimeout(timeoutId);
-        return result;
-    } catch (error) {
-        clearTimeout(timeoutId);
-        throw error;
-    }
+    const felts = await fetchFelts();
+    return felts.map((f) => ({
+        id: f.id,
+        articleNumber: f.articleNumber,
+        feltTypeName: f.feltTypeName,
+        color: f.color,
+        thickness: f.thickness,
+        density: f.density,
+        pricePerSqm: f.price,
+        supplierName: f.supplierName,
+    }));
 };
 
 export const fetchProductCatalog = async (): Promise<ProductCatalogItem[]> => {
-    if (import.meta.env.DEV) return getMockProductCatalog();
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-    try {
-        const result = await get<ProductCatalogItem[]>('/offers/catalog/products', {signal: controller.signal});
-        clearTimeout(timeoutId);
-        return result;
-    } catch (error) {
-        clearTimeout(timeoutId);
-        throw error;
-    }
+    const products = await fetchProducts();
+    return products.flatMap((p) =>
+        p.variants.map((v) => ({
+            id: v.id,
+            articleNumber: String(v.id),
+            name: p.variants.length === 1 ? p.name : `${p.name} · ${v.name}`,
+            price: v.price,
+        })),
+    );
 };
 
 export const fetchCustomers = async (): Promise<CustomerWithIdDto[]> => {
-    if (import.meta.env.DEV) return getMockCustomers();
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-        const result = await get<CustomerWithIdDto[]>('/customers', {signal: controller.signal});
+        const result = await get<BackendFullCustomerDto[]>('/customers', {signal: controller.signal});
         clearTimeout(timeoutId);
-        return result;
+        return result.map(mapBackendCustomer);
     } catch (error) {
         clearTimeout(timeoutId);
         throw error;
     }
 };
 
-export const createCustomer = async (data: Omit<CustomerDto, 'customerNumber'>): Promise<CustomerWithIdDto> => {
-    if (import.meta.env.DEV)
-        return {
-            ...data,
-            id: 'C-' + Date.now(),
-            customerNumber: 'K-' + String(Math.floor(Math.random() * 9000 + 1000)),
-        };
+export const createOffer = async (customerName: string, items: BackendCreateOfferItemDto[]): Promise<OfferDto> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-        const result = await post<CustomerWithIdDto>('/customers', data, {signal: controller.signal});
+        const raw = await post<BackendOfferDto>('/offers', {customerName, items}, {signal: controller.signal});
         clearTimeout(timeoutId);
-        return result;
+        return mapBackendOffer(raw);
     } catch (error) {
         clearTimeout(timeoutId);
         throw error;
     }
 };
 
-export const createOffer = async (customerId: string, path: 'A' | 'B'): Promise<OfferDto> => {
-    if (import.meta.env.DEV) return getMockCreatedOffer('O-' + Date.now());
+export const deleteOffer = async (id: string): Promise<void> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-        const result = await post<OfferDto>('/offers', {customerId, path}, {signal: controller.signal});
+        await del(`/offers/${encodeURIComponent(id)}`, {signal: controller.signal});
         clearTimeout(timeoutId);
-        return result;
     } catch (error) {
         clearTimeout(timeoutId);
         throw error;

@@ -1,4 +1,4 @@
-export type OfferState = 'OFFERTE' | 'AUFTRAGSBESTAETIGUNG' | 'RECHNUNG' | 'ZAHLUNGSERINNERUNG' | 'MAHNUNG_1' | 'MAHNUNG_2' | 'BEZAHLT';
+export type OfferState = 'OFFER' | 'ORDER_CONFIRMATION' | 'INVOICE' | 'PAYMENT_REMINDER' | 'FIRST_DUNNING_NOTICE' | 'SECOND_DUNNING_NOTICE' | 'PAID';
 
 export interface OfferSummaryDto {
     id: string;
@@ -93,4 +93,48 @@ export interface HistoryEntry {
     ts: string;
     who: string;
     what: string;
+}
+
+export type BackendOfferState = Exclude<OfferState, 'PAID'>;
+
+export interface BackendCustomerDto {
+    id: number;
+    name: string;
+}
+
+export interface BackendFullCustomerDto {
+    id: number;
+    name: string;
+    contactPerson: string;
+    email: string;
+    phone: string;
+    street: string;
+    zip: string;
+    city: string;
+    country: string;
+    vatNumber: string;
+}
+
+export interface BackendOfferItemDto {
+    id: number;
+    productVariantId: number;
+    description: string | null;
+    quantity: number;
+    unitPrice: number;
+}
+
+export interface BackendOfferDto {
+    id: number;
+    customerDto: BackendCustomerDto;
+    state: BackendOfferState;
+    createdAt: string;
+    updatedAt: string;
+    items: BackendOfferItemDto[];
+}
+
+export interface BackendCreateOfferItemDto {
+    productVariantId: number;
+    description?: string;
+    quantity: number;
+    unitPrice: number;
 }

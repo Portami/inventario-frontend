@@ -9,7 +9,7 @@ interface DueCellProps {
 }
 
 export default function DueCell({dueISO, overdue, state}: DueCellProps) {
-    if (state === OFFER_STATE.BEZAHLT) {
+    if (state === OFFER_STATE.PAID) {
         return <Typography sx={{fontSize: 13, color: '#2e7d32'}}>{fmtDate(dueISO)}</Typography>;
     }
     if (overdue > 0) {
@@ -23,11 +23,12 @@ export default function DueCell({dueISO, overdue, state}: DueCellProps) {
         );
     }
     const days = daysFromNow(dueISO);
+    const dueLabel = days <= 0 ? 'heute fällig' : `in ${days} Tag${days === 1 ? '' : 'en'}`;
     return (
         <Box>
             <Typography sx={{fontSize: 13}}>{fmtDate(dueISO)}</Typography>
             <Typography variant="caption" color="text.secondary">
-                {days <= 0 ? 'heute fällig' : `in ${days} Tag${days === 1 ? '' : 'en'}`}
+                {dueLabel}
             </Typography>
         </Box>
     );

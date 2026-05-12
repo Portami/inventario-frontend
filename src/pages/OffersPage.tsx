@@ -55,16 +55,16 @@ export default function OffersPage() {
     const [createDlgOpen, setCreateDlgOpen] = useState(false);
 
     const stats = useMemo(() => {
-        const open = offers.filter((o) => o.state !== OFFER_STATE.BEZAHLT);
+        const open = offers.filter((o) => o.state !== OFFER_STATE.PAID);
         const overdue = offers.filter((o) => o.overdue > 0);
-        const offerten = offers.filter((o) => o.state === OFFER_STATE.OFFERTE);
-        const paid = offers.filter((o) => o.state === OFFER_STATE.BEZAHLT);
+        const quotes = offers.filter((o) => o.state === OFFER_STATE.OFFER);
+        const paid = offers.filter((o) => o.state === OFFER_STATE.PAID);
         return {
             all: offers.length,
             open: open.length,
             openSum: open.reduce((s, o) => s + o.total, 0),
             overdue: overdue.length,
-            offerten: offerten.length,
+            quotes: quotes.length,
             paid: paid.length,
             paidSum: paid.reduce((s, o) => s + o.total, 0),
         };
@@ -83,7 +83,7 @@ export default function OffersPage() {
             );
         }
         if (stateFilter === 'OPEN') {
-            rows = rows.filter((o) => o.state !== OFFER_STATE.BEZAHLT);
+            rows = rows.filter((o) => o.state !== OFFER_STATE.PAID);
         } else if (stateFilter === 'OVERDUE') {
             rows = rows.filter((o) => o.overdue > 0);
         } else if (stateFilter !== 'ALL') {
@@ -190,11 +190,11 @@ export default function OffersPage() {
                 />
                 <StatTile
                     label="Neue Offerten"
-                    value={stats.offerten}
+                    value={stats.quotes}
                     sub="zur Bearbeitung"
-                    color={OFFER_STATE_META.OFFERTE.color}
-                    active={stateFilter === OFFER_STATE.OFFERTE}
-                    onClick={() => handleStateFilter(OFFER_STATE.OFFERTE)}
+                    color={OFFER_STATE_META.OFFER.color}
+                    active={stateFilter === OFFER_STATE.OFFER}
+                    onClick={() => handleStateFilter(OFFER_STATE.OFFER)}
                 />
                 <StatTile
                     label="Überfällig"
@@ -208,9 +208,9 @@ export default function OffersPage() {
                     label="Bezahlt"
                     value={stats.paid}
                     sub={fmtCHF(stats.paidSum)}
-                    color={OFFER_STATE_META.BEZAHLT.color}
-                    active={stateFilter === OFFER_STATE.BEZAHLT}
-                    onClick={() => handleStateFilter(OFFER_STATE.BEZAHLT)}
+                    color={OFFER_STATE_META.PAID.color}
+                    active={stateFilter === OFFER_STATE.PAID}
+                    onClick={() => handleStateFilter(OFFER_STATE.PAID)}
                 />
             </Box>
 

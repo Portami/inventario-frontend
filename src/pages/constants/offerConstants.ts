@@ -1,4 +1,4 @@
-import type {LineItemDto, LineItemKind, OfferState} from '@/types/offerte';
+import type {BackendOfferState, LineItemDto, LineItemKind, OfferState} from '@/types/offerte';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
@@ -18,29 +18,29 @@ export interface OfferStateMeta {
 }
 
 export const OFFER_STATE_META: Record<OfferState, OfferStateMeta> = {
-    OFFERTE: {label: 'Offerte', doc: 'Offerte.pdf', color: '#7a4ec9', bg: '#7a4ec914', Icon: DescriptionOutlinedIcon},
-    AUFTRAGSBESTAETIGUNG: {
+    OFFER: {label: 'Offerte', doc: 'Offerte.pdf', color: '#7a4ec9', bg: '#7a4ec914', Icon: DescriptionOutlinedIcon},
+    ORDER_CONFIRMATION: {
         label: 'Auftragsbestätigung',
         doc: 'Auftragsbestätigung.pdf',
         color: '#0288d1',
         bg: '#0288d114',
         Icon: AssignmentTurnedInOutlinedIcon,
     },
-    RECHNUNG: {label: 'Rechnung', doc: 'Rechnung.pdf', color: '#1565c0', bg: '#1565c014', Icon: ReceiptLongOutlinedIcon},
-    ZAHLUNGSERINNERUNG: {label: 'Zahlungserinnerung', doc: 'Zahlungserinnerung.pdf', color: '#f57c00', bg: '#f57c0014', Icon: MailOutlinedIcon},
-    MAHNUNG_1: {label: 'Mahnung 1', doc: 'Mahnung 1.pdf', color: '#e64a19', bg: '#e64a1914', Icon: WarningAmberOutlinedIcon},
-    MAHNUNG_2: {label: 'Mahnung 2', doc: 'Mahnung 2.pdf', color: '#c62828', bg: '#c6282814', Icon: ReportProblemOutlinedIcon},
-    BEZAHLT: {label: 'Bezahlt', doc: 'Rechnung.pdf', color: '#2e7d32', bg: '#2e7d3214', Icon: CheckCircleOutlinedIcon},
+    INVOICE: {label: 'Rechnung', doc: 'Rechnung.pdf', color: '#1565c0', bg: '#1565c014', Icon: ReceiptLongOutlinedIcon},
+    PAYMENT_REMINDER: {label: 'Zahlungserinnerung', doc: 'Zahlungserinnerung.pdf', color: '#f57c00', bg: '#f57c0014', Icon: MailOutlinedIcon},
+    FIRST_DUNNING_NOTICE: {label: 'Mahnung 1', doc: 'Mahnung 1.pdf', color: '#e64a19', bg: '#e64a1914', Icon: WarningAmberOutlinedIcon},
+    SECOND_DUNNING_NOTICE: {label: 'Mahnung 2', doc: 'Mahnung 2.pdf', color: '#c62828', bg: '#c6282814', Icon: ReportProblemOutlinedIcon},
+    PAID: {label: 'Bezahlt', doc: 'Rechnung.pdf', color: '#2e7d32', bg: '#2e7d3214', Icon: CheckCircleOutlinedIcon},
 };
 
 export const OFFER_STATE = {
-    OFFERTE: 'OFFERTE',
-    AUFTRAGSBESTAETIGUNG: 'AUFTRAGSBESTAETIGUNG',
-    RECHNUNG: 'RECHNUNG',
-    ZAHLUNGSERINNERUNG: 'ZAHLUNGSERINNERUNG',
-    MAHNUNG_1: 'MAHNUNG_1',
-    MAHNUNG_2: 'MAHNUNG_2',
-    BEZAHLT: 'BEZAHLT',
+    OFFER: 'OFFER',
+    ORDER_CONFIRMATION: 'ORDER_CONFIRMATION',
+    INVOICE: 'INVOICE',
+    PAYMENT_REMINDER: 'PAYMENT_REMINDER',
+    FIRST_DUNNING_NOTICE: 'FIRST_DUNNING_NOTICE',
+    SECOND_DUNNING_NOTICE: 'SECOND_DUNNING_NOTICE',
+    PAID: 'PAID',
 } as const;
 
 export const LINE_KIND = {
@@ -55,24 +55,24 @@ export const RESERVATION_KIND = {
 } as const;
 
 export const OFFER_PATH_A: OfferState[] = [
-    OFFER_STATE.OFFERTE,
-    OFFER_STATE.AUFTRAGSBESTAETIGUNG,
-    OFFER_STATE.RECHNUNG,
-    OFFER_STATE.ZAHLUNGSERINNERUNG,
-    OFFER_STATE.MAHNUNG_1,
-    OFFER_STATE.MAHNUNG_2,
+    OFFER_STATE.OFFER,
+    OFFER_STATE.ORDER_CONFIRMATION,
+    OFFER_STATE.INVOICE,
+    OFFER_STATE.PAYMENT_REMINDER,
+    OFFER_STATE.FIRST_DUNNING_NOTICE,
+    OFFER_STATE.SECOND_DUNNING_NOTICE,
 ];
 
 export const OFFER_PATH_B: OfferState[] = [
-    OFFER_STATE.OFFERTE,
-    OFFER_STATE.RECHNUNG,
-    OFFER_STATE.ZAHLUNGSERINNERUNG,
-    OFFER_STATE.MAHNUNG_1,
-    OFFER_STATE.MAHNUNG_2,
+    OFFER_STATE.OFFER,
+    OFFER_STATE.INVOICE,
+    OFFER_STATE.PAYMENT_REMINDER,
+    OFFER_STATE.FIRST_DUNNING_NOTICE,
+    OFFER_STATE.SECOND_DUNNING_NOTICE,
 ];
 
 export const VAT_RATE = 0.081;
-export const CUT_SURCHARGE_DEFAULT = 12.0;
+export const CUT_SURCHARGE_DEFAULT = 12;
 export const RESERVATION_DAYS = 10;
 export const PAGE_SIZE = 10;
 
@@ -81,6 +81,15 @@ export const KIND_CHIP_STYLES: Record<LineItemKind, {label: string; color: strin
     ROLLE: {label: 'Rolle', color: '#1565c0', bg: '#1565c014'},
     PRODUKT: {label: 'Produkt', color: '#2e7d32', bg: '#2e7d3214'},
 };
+
+export const ALL_BACKEND_STATES: BackendOfferState[] = [
+    'OFFER',
+    'ORDER_CONFIRMATION',
+    'INVOICE',
+    'PAYMENT_REMINDER',
+    'FIRST_DUNNING_NOTICE',
+    'SECOND_DUNNING_NOTICE',
+];
 
 export const fmtCHF = (n: number): string => new Intl.NumberFormat('de-CH', {style: 'currency', currency: 'CHF', minimumFractionDigits: 2}).format(n);
 

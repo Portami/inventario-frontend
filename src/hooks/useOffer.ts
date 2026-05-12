@@ -74,9 +74,13 @@ export function useOffer(id: string | undefined): UseOfferReturn {
                 discount: 0,
                 reservation: {kind: RESERVATION_KIND.TAGGED, sourceLabel: 'Rolle (auto)'},
             };
-            const newLine = await addOfferLine(id, line);
-            setOffer((o) => (o ? {...o, lines: [...o.lines, newLine]} : o));
-            showToast(`${felt.feltTypeName} · ${felt.color} hinzugefügt`);
+            try {
+                const newLine = await addOfferLine(id, felt.id, line);
+                setOffer((o) => (o ? {...o, lines: [...o.lines, newLine]} : o));
+                showToast(`${felt.feltTypeName} · ${felt.color} hinzugefügt`);
+            } catch {
+                showToast('Position konnte nicht hinzugefügt werden', 'error');
+            }
         },
         [id, showToast],
     );
@@ -98,9 +102,13 @@ export function useOffer(id: string | undefined): UseOfferReturn {
                 discount: 0,
                 reservation: null,
             };
-            const newLine = await addOfferLine(id, line);
-            setOffer((o) => (o ? {...o, lines: [...o.lines, newLine]} : o));
-            showToast(`${p.name} hinzugefügt`);
+            try {
+                const newLine = await addOfferLine(id, p.id, line);
+                setOffer((o) => (o ? {...o, lines: [...o.lines, newLine]} : o));
+                showToast(`${p.name} hinzugefügt`);
+            } catch {
+                showToast('Position konnte nicht hinzugefügt werden', 'error');
+            }
         },
         [id, showToast],
     );

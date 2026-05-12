@@ -3,8 +3,8 @@ import KindChip from '@/components/offers/KindChip';
 import ProductSearchDialog from '@/components/offers/ProductSearchDialog';
 import {useToast} from '@/components/ToastProvider';
 import {CUT_SURCHARGE_DEFAULT, LINE_KIND, RESERVATION_KIND} from '@/pages/constants/offerConstants';
-import {addOfferLine, createCustomer, createOffer, fetchCustomers, fetchFeltCatalog, fetchProductCatalog} from '@/services/backend';
-import {CustomerWithIdDto, FeltCatalogItem, LineItemDto, ProductCatalogItem} from '@/types/offerte';
+import {createOffer, fetchCustomers, fetchFeltCatalog, fetchProductCatalog} from '@/services/backend';
+import {BackendCreateOfferItemDto, CustomerWithIdDto, FeltCatalogItem, LineItemDto, ProductCatalogItem} from '@/types/offerte';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
@@ -39,7 +39,7 @@ interface Props {
 }
 
 type CustomerMode = 'existing' | 'new';
-type StagedLine = Omit<LineItemDto, 'id'>;
+type StagedLine = Omit<LineItemDto, 'id'> & {productVariantId: number; stageKey: string};
 
 type NewCustomerForm = {
     name: string;
@@ -66,6 +66,62 @@ const emptyCustomer: NewCustomerForm = {
 };
 
 const labelSx = {shrink: true, sx: {textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontWeight: 600}};
+
+interface CustomerInputProps {
+    mode: CustomerMode;
+    customers: CustomerWithIdDto[];
+    selected: CustomerWithIdDto | null;
+    onSelect: (c: CustomerWithIdDto | null) => void;
+    form: NewCustomerForm;
+    setField: (f: keyof NewCustomerForm) => (e: ChangeEvent<HTMLInputElement>) => void;
+}
+
+function CustomerInput({mode, customers, selected, onSelect, form, setField}: CustomerInputProps) {
+    if (mode === 'existing') {
+        return (
+            <Autocomplete
+                options={customers}
+                getOptionLabel={(c) => `${c.name} · ${c.customerNumber}`}
+                value={selected}
+                onChange={(_, v) => onSelect(v)}
+                renderInput={(params) => (
+                    <TextField {...params} label="Kunde suchen" size="small" placeholder="Name oder Kundennummer …" slotProps={{inputLabel: {shrink: true}}} />
+                )}
+            />
+        );
+    }
+    return (
+        <Grid container spacing={2.5}>
+            <Grid size={6}>
+                <TextField label="Firmenname" value={form.name} onChange={setField('name')} size="small" fullWidth required slotProps={{inputLabel: labelSx}} />
+            </Grid>
+            <Grid size={6}>
+                <TextField label="Ansprechperson" value={form.contactPerson} onChange={setField('contactPerson')} size="small" fullWidth required slotProps={{inputLabel: labelSx}} />
+            </Grid>
+            <Grid size={6}>
+                <TextField label="E-Mail" value={form.email} onChange={setField('email')} type="email" size="small" fullWidth required slotProps={{inputLabel: labelSx}} />
+            </Grid>
+            <Grid size={6}>
+                <TextField label="Telefon" value={form.phone} onChange={setField('phone')} size="small" fullWidth slotProps={{inputLabel: labelSx}} />
+            </Grid>
+            <Grid size={8}>
+                <TextField label="Strasse" value={form.street} onChange={setField('street')} size="small" fullWidth slotProps={{inputLabel: labelSx}} />
+            </Grid>
+            <Grid size={4}>
+                <TextField label="PLZ" value={form.zip} onChange={setField('zip')} size="small" fullWidth slotProps={{inputLabel: labelSx}} />
+            </Grid>
+            <Grid size={6}>
+                <TextField label="Ort" value={form.city} onChange={setField('city')} size="small" fullWidth slotProps={{inputLabel: labelSx}} />
+            </Grid>
+            <Grid size={6}>
+                <TextField label="Land" value={form.country} onChange={setField('country')} size="small" fullWidth slotProps={{inputLabel: labelSx}} />
+            </Grid>
+            <Grid size={6}>
+                <TextField label="MWST-Nr." value={form.vatNumber} onChange={setField('vatNumber')} size="small" fullWidth slotProps={{inputLabel: labelSx}} />
+            </Grid>
+        </Grid>
+    );
+}
 
 export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
     const theme = useTheme();
@@ -119,6 +175,8 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
         setStagedLines((prev) => [
             ...prev,
             {
+                stageKey: crypto.randomUUID(),
+                productVariantId: felt.id,
                 kind: LINE_KIND.ROLLE,
                 articleNumber: felt.articleNumber,
                 feltTypeName: felt.feltTypeName,
@@ -141,6 +199,8 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
         setStagedLines((prev) => [
             ...prev,
             {
+                stageKey: crypto.randomUUID(),
+                productVariantId: p.id,
                 kind: LINE_KIND.PRODUKT,
                 articleNumber: p.articleNumber,
                 feltTypeName: p.name,
@@ -159,20 +219,21 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
         showToast(`${p.name} hinzugefügt`);
     };
 
+    const handleRemoveLine = (stageKey: string) => {
+        setStagedLines((prev) => prev.filter((s) => s.stageKey !== stageKey));
+    };
+
     const handleCreate = async () => {
         setIsSubmitting(true);
         try {
-            let customerId: string;
-            if (customerMode === 'existing') {
-                customerId = selectedCustomer!.id;
-            } else {
-                const created = await createCustomer(newCustomer);
-                customerId = created.id;
-            }
-            const offer = await createOffer(customerId, path);
-            for (const line of stagedLines) {
-                await addOfferLine(offer.id, line);
-            }
+            const customerName = customerMode === 'existing' ? selectedCustomer!.name : newCustomer.name.trim();
+            const backendItems: BackendCreateOfferItemDto[] = stagedLines.map((line) => ({
+                productVariantId: line.productVariantId,
+                description: line.description || undefined,
+                quantity: line.quantity,
+                unitPrice: line.pricePerUnit,
+            }));
+            const offer = await createOffer(customerName, backendItems);
             showToast('Offerte erstellt', 'success');
             onCreated(offer.id);
         } catch {
@@ -208,34 +269,18 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
                 <Divider />
 
                 <DialogContent sx={{px: 4, py: 3, minHeight: 340}}>
-                    {loadingData ? (
+                    {loadingData && (
                         <Box sx={{display: 'flex', justifyContent: 'center', py: 6}}>
                             <CircularProgress size={32} />
                         </Box>
-                    ) : step === 0 ? (
+                    )}
+                    {!loadingData && step === 0 && (
                         <Box sx={{display: 'flex', flexDirection: 'column', gap: 3}}>
-                            {/* Customer mode toggle */}
                             <Box>
-                                <Typography
-                                    variant="caption"
-                                    sx={{
-                                        display: 'block',
-                                        mb: 1.5,
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.05em',
-                                        fontWeight: 600,
-                                        color: 'text.secondary',
-                                    }}
-                                >
+                                <Typography variant="caption" sx={{display: 'block', mb: 1.5, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, color: 'text.secondary'}}>
                                     Kunde
                                 </Typography>
-                                <ToggleButtonGroup
-                                    value={customerMode}
-                                    exclusive
-                                    onChange={(_, v: CustomerMode) => v && setCustomerMode(v)}
-                                    size="small"
-                                    sx={{mb: 2}}
-                                >
+                                <ToggleButtonGroup value={customerMode} exclusive onChange={(_, v: CustomerMode) => v && setCustomerMode(v)} size="small" sx={{mb: 2}}>
                                     <ToggleButton value="existing" sx={{textTransform: 'none', gap: 0.5, px: 2}}>
                                         <BusinessOutlinedIcon sx={{fontSize: 16}} />
                                         Bestehender Kunde
@@ -245,136 +290,17 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
                                         Neuer Kunde
                                     </ToggleButton>
                                 </ToggleButtonGroup>
-
-                                {customerMode === 'existing' ? (
-                                    <Autocomplete
-                                        options={customers}
-                                        getOptionLabel={(c) => `${c.name} · ${c.customerNumber}`}
-                                        value={selectedCustomer}
-                                        onChange={(_, v) => setSelectedCustomer(v)}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Kunde suchen"
-                                                size="small"
-                                                placeholder="Name oder Kundennummer …"
-                                                slotProps={{inputLabel: {shrink: true}}}
-                                            />
-                                        )}
-                                    />
-                                ) : (
-                                    <Grid container spacing={2.5}>
-                                        <Grid size={6}>
-                                            <TextField
-                                                label="Firmenname"
-                                                value={newCustomer.name}
-                                                onChange={setField('name')}
-                                                size="small"
-                                                fullWidth
-                                                required
-                                                slotProps={{inputLabel: labelSx}}
-                                            />
-                                        </Grid>
-                                        <Grid size={6}>
-                                            <TextField
-                                                label="Ansprechperson"
-                                                value={newCustomer.contactPerson}
-                                                onChange={setField('contactPerson')}
-                                                size="small"
-                                                fullWidth
-                                                required
-                                                slotProps={{inputLabel: labelSx}}
-                                            />
-                                        </Grid>
-                                        <Grid size={6}>
-                                            <TextField
-                                                label="E-Mail"
-                                                value={newCustomer.email}
-                                                onChange={setField('email')}
-                                                type="email"
-                                                size="small"
-                                                fullWidth
-                                                required
-                                                slotProps={{inputLabel: labelSx}}
-                                            />
-                                        </Grid>
-                                        <Grid size={6}>
-                                            <TextField
-                                                label="Telefon"
-                                                value={newCustomer.phone}
-                                                onChange={setField('phone')}
-                                                size="small"
-                                                fullWidth
-                                                slotProps={{inputLabel: labelSx}}
-                                            />
-                                        </Grid>
-                                        <Grid size={8}>
-                                            <TextField
-                                                label="Strasse"
-                                                value={newCustomer.street}
-                                                onChange={setField('street')}
-                                                size="small"
-                                                fullWidth
-                                                slotProps={{inputLabel: labelSx}}
-                                            />
-                                        </Grid>
-                                        <Grid size={4}>
-                                            <TextField
-                                                label="PLZ"
-                                                value={newCustomer.zip}
-                                                onChange={setField('zip')}
-                                                size="small"
-                                                fullWidth
-                                                slotProps={{inputLabel: labelSx}}
-                                            />
-                                        </Grid>
-                                        <Grid size={6}>
-                                            <TextField
-                                                label="Ort"
-                                                value={newCustomer.city}
-                                                onChange={setField('city')}
-                                                size="small"
-                                                fullWidth
-                                                slotProps={{inputLabel: labelSx}}
-                                            />
-                                        </Grid>
-                                        <Grid size={6}>
-                                            <TextField
-                                                label="Land"
-                                                value={newCustomer.country}
-                                                onChange={setField('country')}
-                                                size="small"
-                                                fullWidth
-                                                slotProps={{inputLabel: labelSx}}
-                                            />
-                                        </Grid>
-                                        <Grid size={6}>
-                                            <TextField
-                                                label="MWST-Nr."
-                                                value={newCustomer.vatNumber}
-                                                onChange={setField('vatNumber')}
-                                                size="small"
-                                                fullWidth
-                                                slotProps={{inputLabel: labelSx}}
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                )}
+                                <CustomerInput
+                                    mode={customerMode}
+                                    customers={customers}
+                                    selected={selectedCustomer}
+                                    onSelect={setSelectedCustomer}
+                                    form={newCustomer}
+                                    setField={setField}
+                                />
                             </Box>
-
-                            {/* Path selection */}
                             <Box>
-                                <Typography
-                                    variant="caption"
-                                    sx={{
-                                        display: 'block',
-                                        mb: 1.5,
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.05em',
-                                        fontWeight: 600,
-                                        color: 'text.secondary',
-                                    }}
-                                >
+                                <Typography variant="caption" sx={{display: 'block', mb: 1.5, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, color: 'text.secondary'}}>
                                     Offerten-Pfad
                                 </Typography>
                                 <Box sx={{display: 'flex', gap: 2}}>
@@ -401,44 +327,28 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
                                 </Box>
                             </Box>
                         </Box>
-                    ) : (
-                        /* Step 1: staged lines */
+                    )}
+                    {!loadingData && step === 1 && (
                         <Box sx={{display: 'flex', flexDirection: 'column', gap: 2.5}}>
                             <Box sx={{display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap'}}>
-                                <Button
-                                    size="small"
-                                    variant="outlined"
-                                    startIcon={<SearchIcon sx={{fontSize: 16}} />}
-                                    onClick={() => setFeltDlgOpen(true)}
-                                    sx={{textTransform: 'none'}}
-                                >
+                                <Button size="small" variant="outlined" startIcon={<SearchIcon sx={{fontSize: 16}} />} onClick={() => setFeltDlgOpen(true)} sx={{textTransform: 'none'}}>
                                     Filz suchen
                                 </Button>
                                 <Button size="small" variant="outlined" onClick={() => setProductDlgOpen(true)} sx={{textTransform: 'none'}}>
                                     Produkt
                                 </Button>
                                 {stagedLines.length === 0 && (
-                                    <Typography variant="caption" color="text.secondary" sx={{ml: 0.5}}>
-                                        Optional — Positionen können auch nach der Erstellung hinzugefügt werden.
+                                    <Typography variant="caption" color="error" sx={{ml: 0.5}}>
+                                        Mindestens eine Position erforderlich.
                                     </Typography>
                                 )}
                             </Box>
-
                             {stagedLines.length > 0 && (
                                 <Box sx={{display: 'flex', flexDirection: 'column', gap: 1}}>
-                                    {stagedLines.map((l, i) => (
+                                    {stagedLines.map((l) => (
                                         <Box
-                                            key={i}
-                                            sx={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 1.5,
-                                                px: 2,
-                                                py: 1.5,
-                                                borderRadius: 1,
-                                                border: '1px solid rgba(0,0,0,0.08)',
-                                                bgcolor: 'rgba(0,0,0,0.015)',
-                                            }}
+                                            key={l.stageKey}
+                                            sx={{display: 'flex', alignItems: 'center', gap: 1.5, px: 2, py: 1.5, borderRadius: 1, border: '1px solid rgba(0,0,0,0.08)', bgcolor: 'rgba(0,0,0,0.015)'}}
                                         >
                                             <KindChip kind={l.kind} />
                                             <Box sx={{flex: 1, minWidth: 0}}>
@@ -450,11 +360,7 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
                                                     {l.articleNumber}
                                                 </Typography>
                                             </Box>
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => setStagedLines((prev) => prev.filter((_, j) => j !== i))}
-                                                sx={{color: 'rgba(0,0,0,0.35)'}}
-                                            >
+                                            <IconButton size="small" onClick={() => handleRemoveLine(l.stageKey)} sx={{color: 'rgba(0,0,0,0.35)'}}>
                                                 <DeleteOutlinedIcon sx={{fontSize: 18}} />
                                             </IconButton>
                                         </Box>
@@ -489,7 +395,7 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
                             <Button
                                 variant="contained"
                                 onClick={handleCreate}
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || stagedLines.length === 0}
                                 startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : undefined}
                                 sx={{textTransform: 'none', boxShadow: 'none', '&:hover': {boxShadow: 'none'}}}
                             >
