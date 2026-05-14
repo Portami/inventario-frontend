@@ -1,5 +1,5 @@
 import {useToast} from '@/components/ToastProvider';
-import {createRoll, updateRoll} from '@/services/backend';
+import {createRoll, fetchRolls, updateRoll} from '@/services/backend';
 import {FeltDto} from '@/types/felt';
 import {FeltRollDto} from '@/types/roll';
 import CloseIcon from '@mui/icons-material/Close';
@@ -12,6 +12,7 @@ type RollDialogProps = {
     readonly onSaved: () => void;
     readonly roll?: FeltRollDto | null;
     readonly felts: FeltDto[];
+    readonly defaultFeltId?: number;
 };
 
 type FormState = {
@@ -22,31 +23,49 @@ type FormState = {
     storageId: string;
 };
 
+type NamedOption = {id: number; name: string};
+
 const emptyForm: FormState = {feltId: '', length: '', width: '', batchId: '', storageId: ''};
 
 const labelProps = {shrink: true, sx: {textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontWeight: 600}};
 
-export default function RollDialog({open, onClose, onSaved, roll, felts}: RollDialogProps) {
+export default function RollDialog({open, onClose, onSaved, roll, felts, defaultFeltId}: RollDialogProps) {
     const showToast = useToast();
     const [form, setForm] = useState<FormState>(emptyForm);
     const [isSaving, setIsSaving] = useState(false);
+    const [storageOptions, setStorageOptions] = useState<NamedOption[]>([]);
+    const [batchOptions, setBatchOptions] = useState<NamedOption[]>([]);
 
     const isEdit = roll != null;
 
     useEffect(() => {
         if (!open) return;
-        setForm(
-            roll
-                ? {
-                      feltId: String(roll.feltId),
-                      length: String(roll.length),
-                      width: String(roll.width),
-                      batchId: roll.batchId == null ? '' : String(roll.batchId),
-                      storageId: roll.storageId == null ? '' : String(roll.storageId),
-                  }
-                : emptyForm,
-        );
-    }, [open, roll]);
+        if (roll) {
+            setForm({
+                feltId: String(roll.feltId),
+                length: String(roll.length),
+                width: String(roll.width),
+                batchId: roll.batchId == null ? '' : String(roll.batchId),
+                storageId: roll.storageId == null ? '' : String(roll.storageId),
+            });
+        } else {
+            setForm(defaultFeltId == null ? emptyForm : {...emptyForm, feltId: String(defaultFeltId)});
+        }
+    }, [open, roll, defaultFeltId]);
+
+    useEffect(() => {
+        if (!open) return;
+        void fetchRolls().then((allRolls) => {
+            const storageMap = new Map<number, string>();
+            const batchMap = new Map<number, string>();
+            for (const r of allRolls) {
+                if (r.storageId != null && r.storageName) storageMap.set(r.storageId, r.storageName);
+                if (r.batchId != null && r.batchName) batchMap.set(r.batchId, r.batchName);
+            }
+            setStorageOptions([...storageMap.entries()].map(([id, name]) => ({id, name})).sort((a, b) => a.name.localeCompare(b.name)));
+            setBatchOptions([...batchMap.entries()].map(([id, name]) => ({id, name})).sort((a, b) => a.name.localeCompare(b.name)));
+        });
+    }, [open]);
 
     const setField = (field: keyof FormState) => (e: ChangeEvent<HTMLInputElement>) => setForm((prev) => ({...prev, [field]: e.target.value}));
 
@@ -150,7 +169,7 @@ export default function RollDialog({open, onClose, onSaved, roll, felts}: RollDi
                     </Grid>
                     <Grid size={6}>
                         <TextField
-                            label="Länge (m)"
+                            label="Länge (cm)"
                             value={form.length}
                             onChange={setField('length')}
                             type="number"
@@ -158,12 +177,12 @@ export default function RollDialog({open, onClose, onSaved, roll, felts}: RollDi
                             size="small"
                             fullWidth
                             required
-                            slotProps={{htmlInput: {min: 0.01, step: 0.01}, inputLabel: labelProps}}
+                            slotProps={{htmlInput: {min: 1, step: 1}, inputLabel: labelProps}}
                         />
                     </Grid>
                     <Grid size={6}>
                         <TextField
-                            label="Breite (m)"
+                            label="Breite (cm)"
                             value={form.width}
                             onChange={setField('width')}
                             type="number"
@@ -171,32 +190,47 @@ export default function RollDialog({open, onClose, onSaved, roll, felts}: RollDi
                             size="small"
                             fullWidth
                             required
-                            slotProps={{htmlInput: {min: 0.01, step: 0.01}, inputLabel: labelProps}}
+                            slotProps={{htmlInput: {min: 1, step: 1}, inputLabel: labelProps}}
                         />
                     </Grid>
                     <Grid size={6}>
                         <TextField
-                            label="Charge-ID"
+                            select
+                            label="Charge"
                             value={form.batchId}
                             onChange={setField('batchId')}
-                            type="number"
                             variant="outlined"
                             size="small"
                             fullWidth
-                            slotProps={{htmlInput: {min: 1}, inputLabel: labelProps}}
-                        />
+                            disabled
+                            slotProps={{inputLabel: labelProps, select: {displayEmpty: true}}}
+                        >
+                            <MenuItem value="">–</MenuItem>
+                            {batchOptions.map((o) => (
+                                <MenuItem key={o.id} value={String(o.id)}>
+                                    {o.name}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                     </Grid>
                     <Grid size={6}>
                         <TextField
-                            label="Lagerort-ID"
+                            select
+                            label="Lagerort"
                             value={form.storageId}
                             onChange={setField('storageId')}
-                            type="number"
                             variant="outlined"
                             size="small"
                             fullWidth
-                            slotProps={{htmlInput: {min: 1}, inputLabel: labelProps}}
-                        />
+                            slotProps={{inputLabel: labelProps, select: {displayEmpty: true}}}
+                        >
+                            <MenuItem value="">–</MenuItem>
+                            {storageOptions.map((o) => (
+                                <MenuItem key={o.id} value={String(o.id)}>
+                                    {o.name}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                     </Grid>
                 </Grid>
             </DialogContent>

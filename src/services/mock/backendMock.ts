@@ -133,3 +133,5 @@ const MOCK_PRODUCTS: Product[] = [
 export const getMockProductById = (id: string | number): Product | undefined => {
     return MOCK_PRODUCTS.find((p) => String(p.id) === String(id));
 };
+
+export const getMockProducts = (): Product[] => MOCK_PRODUCTS;
