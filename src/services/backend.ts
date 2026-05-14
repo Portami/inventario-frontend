@@ -121,16 +121,21 @@ export const deleteFelt = async (feltId: number): Promise<void> => {
     }
 };
 
-// No global list endpoint, fetches felts first, then their rolls in parallel.
 export const fetchRolls = async (): Promise<FeltRollDto[]> => {
     const cached = cacheGet<FeltRollDto[]>('rolls');
     if (cached) return cached;
 
-    const felts = await fetchFelts();
-    const rollGroups = await Promise.all(felts.map((f) => get<FeltRollDto[]>(`/felts/${f.id}/rolls`)));
-    const result = rollGroups.flat();
-    cacheSet('rolls', result);
-    return result;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<FeltRollDto[]>('/rolls', {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheSet('rolls', result);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
 };
 
 export const createRoll = async (payload: CreateFeltRollRequest): Promise<FeltRollDto> => {

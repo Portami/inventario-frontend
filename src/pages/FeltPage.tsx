@@ -8,11 +8,21 @@ import {FeltRollDto} from '@/types/roll';
 import {toErrorMessage} from '@/utils/pageUtils';
 import AddIcon from '@mui/icons-material/Add';
 import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
-import {Box, Button, Chip, MenuItem, Slider, TextField, Typography} from '@mui/material';
+import {Box, Button, Chip, MenuItem, Slider, TextField, Tooltip, Typography} from '@mui/material';
 import {alpha} from '@mui/material/styles';
-import {DataGrid, GridRowParams} from '@mui/x-data-grid';
+import {DataGrid, GridColDef, GridRenderCellParams, GridRowParams} from '@mui/x-data-grid';
 import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router';
+
+const CHIP_PALETTE = ['#1565C0', '#2E7D32', '#C62828', '#E65100', '#00695C', '#558B2F', '#AD1457', '#37474F', '#0277BD', '#00838F'];
+
+function rollColorToChipBg(color: string): string {
+    let hash = 0;
+    for (let i = 0; i < color.length; i++) {
+        hash = color.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return CHIP_PALETTE[Math.abs(hash) % CHIP_PALETTE.length];
+}
 
 export default function FeltPage() {
     const navigate = useNavigate();
@@ -43,12 +53,71 @@ export default function FeltPage() {
     const rollsByFeltId = useMemo(() => {
         const map = new Map<number, FeltRollDto[]>();
         for (const roll of rolls) {
-            const list = map.get(roll.feltId) ?? [];
+            const list = map.get(roll.feltColorVariantId) ?? [];
             list.push(roll);
-            map.set(roll.feltId, list);
+            map.set(roll.feltColorVariantId, list);
         }
         return map;
     }, [rolls]);
+
+    const storageColorMap = useMemo(() => {
+        const map = new Map<string, string>();
+        for (const roll of rolls) {
+            if (!roll.storageName) continue;
+            if (!map.has(roll.storageName)) map.set(roll.storageName, rollColorToChipBg(roll.storageName));
+        }
+        return map;
+    }, [rolls]);
+
+    const rollsColumn = useMemo<GridColDef<FeltDto>>(
+        () => ({
+            field: 'rolls',
+            headerName: 'Rollen',
+            flex: 2,
+            minWidth: 200,
+            sortable: false,
+            disableColumnMenu: true,
+            renderCell: ({row}: GridRenderCellParams<FeltDto>) => {
+                const feltRolls = rollsByFeltId.get(row.id) ?? [];
+                if (feltRolls.length === 0)
+                    return (
+                        <Typography variant="caption" color="text.disabled">
+                            -
+                        </Typography>
+                    );
+                const visible = feltRolls.slice(0, 6);
+                const overflow = feltRolls.length - visible.length;
+                return (
+                    <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5, py: 0.75, alignContent: 'center'}}>
+                        {visible.map((roll) => {
+                            const bg = roll.storageName ? storageColorMap.get(roll.storageName) : undefined;
+                            return (
+                                <Tooltip key={roll.id} title={roll.storageName ?? 'Kein Lagerort'} arrow>
+                                    <Chip
+                                        size="small"
+                                        label={`${roll.length}×${roll.width}`}
+                                        sx={{
+                                            bgcolor: bg ?? 'action.selected',
+                                            color: bg ? '#fff' : 'text.secondary',
+                                            fontSize: '0.7rem',
+                                            height: 22,
+                                            '& .MuiChip-label': {px: 1},
+                                        }}
+                                    />
+                                </Tooltip>
+                            );
+                        })}
+                        {overflow > 0 && (
+                            <Typography variant="caption" color="text.secondary" sx={{alignSelf: 'center'}}>
+                                +{overflow}
+                            </Typography>
+                        )}
+                    </Box>
+                );
+            },
+        }),
+        [rollsByFeltId, storageColorMap],
+    );
 
     // Felts that pass the dimension (length/width) filters only — used to derive dropdown options
     const feltsByDimension = useMemo(() => {
@@ -248,7 +317,8 @@ export default function FeltPage() {
 
             <DataGrid
                 rows={filteredFelts}
-                columns={columns}
+                columns={[...columns.slice(0, -1), rollsColumn, columns[columns.length - 1]]}
+                getRowHeight={() => 'auto'}
                 loading={isLoading}
                 disableRowSelectionOnClick
                 pageSizeOptions={[10, 25, 50]}
@@ -287,6 +357,18 @@ export default function FeltPage() {
                     </Typography>
                 </Box>
             </Box>
+            {storageColorMap.size > 0 && (
+                <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 2, mt: 1, ml: 0.5}}>
+                    {Array.from(storageColorMap.entries()).map(([name, color]) => (
+                        <Box key={name} sx={{display: 'flex', alignItems: 'center', gap: 0.75}}>
+                            <Box sx={{width: 10, height: 10, borderRadius: '50%', backgroundColor: color, flexShrink: 0}} />
+                            <Typography variant="caption" color="text.secondary">
+                                {name}
+                            </Typography>
+                        </Box>
+                    ))}
+                </Box>
+            )}
 
             <FeltDialog open={isCreateOpen} felts={felts} onClose={() => setIsCreateOpen(false)} onSaved={handleCreated} />
             <DeleteFeltDialog

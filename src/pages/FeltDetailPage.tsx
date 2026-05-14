@@ -85,7 +85,7 @@ export default function FeltDetailPage() {
                 }
                 setFelt(found);
                 setAllFelts(allFeltsResult);
-                setRolls(allRolls.filter((r) => r.feltId === feltId));
+                setRolls(allRolls.filter((r) => r.feltColorVariantId === feltId));
                 setScraps(scrapList);
             } catch (err) {
                 setError(toErrorMessage(err, 'Daten konnten nicht geladen werden'));
@@ -114,7 +114,7 @@ export default function FeltDetailPage() {
         if (feltId == null) return;
         try {
             const allRolls = await fetchRolls();
-            setRolls(allRolls.filter((r) => r.feltId === feltId));
+            setRolls(allRolls.filter((r) => r.feltColorVariantId === feltId));
         } catch (err) {
             setError(toErrorMessage(err, 'Rollen konnten nicht geladen werden'));
         }
