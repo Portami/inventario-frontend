@@ -1,17 +1,14 @@
 import logo from '@/assets/logo.svg';
 import AddIcon from '@mui/icons-material/Add';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
-import ContentPasteOutlinedIcon from '@mui/icons-material/ContentPasteOutlined';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import PrintIcon from '@mui/icons-material/Print';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
-import SettingsIcon from '@mui/icons-material/Settings';
-import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import {AppBar, Box, Button, Container, Drawer, IconButton, List, ListItem, Toolbar, Typography, useTheme} from '@mui/material';
 import {NavLink, Outlet, useLocation} from 'react-router';
 
@@ -203,60 +200,6 @@ export default function NavigationLayout() {
                     <ListItem disableGutters>
                         <Button
                             component={NavLink}
-                            to={'/inventory'}
-                            startIcon={<ContentPasteOutlinedIcon />}
-                            sx={{
-                                justifyContent: 'flex-start',
-                                width: '100%',
-                                color: theme.palette.text.primary,
-                                '&.active': {
-                                    color: theme.palette.primary.main,
-                                    fontWeight: 600,
-                                },
-                            }}
-                        >
-                            Bestandsverwaltung
-                        </Button>
-                    </ListItem>
-                    <ListItem disableGutters>
-                        <Button
-                            component={NavLink}
-                            to={'/storage'}
-                            startIcon={<HomeOutlinedIcon />}
-                            sx={{
-                                justifyContent: 'flex-start',
-                                width: '100%',
-                                color: theme.palette.text.primary,
-                                '&.active': {
-                                    color: theme.palette.primary.main,
-                                    fontWeight: 600,
-                                },
-                            }}
-                        >
-                            Lagerung
-                        </Button>
-                    </ListItem>
-                    <ListItem disableGutters>
-                        <Button
-                            component={NavLink}
-                            to={'/shopping'}
-                            startIcon={<ShoppingCartOutlinedIcon />}
-                            sx={{
-                                justifyContent: 'flex-start',
-                                width: '100%',
-                                color: theme.palette.text.primary,
-                                '&.active': {
-                                    color: theme.palette.primary.main,
-                                    fontWeight: 600,
-                                },
-                            }}
-                        >
-                            Einkaufen
-                        </Button>
-                    </ListItem>
-                    <ListItem disableGutters>
-                        <Button
-                            component={NavLink}
                             to={'/offers'}
                             startIcon={<ReceiptLongOutlinedIcon />}
                             sx={{
@@ -272,18 +215,26 @@ export default function NavigationLayout() {
                             Offerten
                         </Button>
                     </ListItem>
+                    <ListItem disableGutters>
+                        <Button
+                            component={NavLink}
+                            to={'/customers'}
+                            startIcon={<PeopleOutlinedIcon />}
+                            sx={{
+                                justifyContent: 'flex-start',
+                                width: '100%',
+                                color: theme.palette.text.primary,
+                                '&.active': {
+                                    color: theme.palette.primary.main,
+                                    fontWeight: 600,
+                                },
+                            }}
+                        >
+                            Kunden
+                        </Button>
+                    </ListItem>
                 </List>
                 <Box sx={{flexGrow: 1}} />
-                <Button
-                    startIcon={<SettingsIcon />}
-                    sx={{
-                        justifyContent: 'flex-start',
-                        width: '100%',
-                        color: theme.palette.text.primary,
-                    }}
-                >
-                    Einstellungen
-                </Button>
                 <Button
                     startIcon={<LogoutIcon />}
                     sx={{

@@ -9,7 +9,7 @@ interface DueCellProps {
 }
 
 export default function DueCell({dueISO, overdue, state}: DueCellProps) {
-    if (state === OFFER_STATE.PAID) {
+    if (state === OFFER_STATE.COMPLETED) {
         return <Typography sx={{fontSize: 13, color: '#2e7d32'}}>{fmtDate(dueISO)}</Typography>;
     }
     if (overdue > 0) {

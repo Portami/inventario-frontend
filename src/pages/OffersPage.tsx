@@ -55,10 +55,10 @@ export default function OffersPage() {
     const [createDlgOpen, setCreateDlgOpen] = useState(false);
 
     const stats = useMemo(() => {
-        const open = offers.filter((o) => o.state !== OFFER_STATE.PAID);
+        const open = offers.filter((o) => o.state !== OFFER_STATE.COMPLETED);
         const overdue = offers.filter((o) => o.overdue > 0);
         const quotes = offers.filter((o) => o.state === OFFER_STATE.OFFER);
-        const paid = offers.filter((o) => o.state === OFFER_STATE.PAID);
+        const paid = offers.filter((o) => o.state === OFFER_STATE.COMPLETED);
         return {
             all: offers.length,
             open: open.length,
@@ -83,7 +83,7 @@ export default function OffersPage() {
             );
         }
         if (stateFilter === 'OPEN') {
-            rows = rows.filter((o) => o.state !== OFFER_STATE.PAID);
+            rows = rows.filter((o) => o.state !== OFFER_STATE.COMPLETED);
         } else if (stateFilter === 'OVERDUE') {
             rows = rows.filter((o) => o.overdue > 0);
         } else if (stateFilter !== 'ALL') {
@@ -163,9 +163,6 @@ export default function OffersPage() {
                     <Typography variant="h4" sx={{fontWeight: 600, mt: 0.25, color: 'text.primary'}}>
                         Offerten
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{mt: 0.5}}>
-                        Alle Kundenanfragen — von der Offerte bis zur zweiten Mahnung.
-                    </Typography>
                 </Box>
                 <Button
                     variant="contained"
@@ -208,9 +205,9 @@ export default function OffersPage() {
                     label="Bezahlt"
                     value={stats.paid}
                     sub={fmtCHF(stats.paidSum)}
-                    color={OFFER_STATE_META.PAID.color}
-                    active={stateFilter === OFFER_STATE.PAID}
-                    onClick={() => handleStateFilter(OFFER_STATE.PAID)}
+                    color={OFFER_STATE_META.COMPLETED.color}
+                    active={stateFilter === OFFER_STATE.COMPLETED}
+                    onClick={() => handleStateFilter(OFFER_STATE.COMPLETED)}
                 />
             </Box>
 

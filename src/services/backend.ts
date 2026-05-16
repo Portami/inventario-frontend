@@ -25,6 +25,7 @@ function mapBackendOffer(raw: BackendOfferDto): OfferDto {
         id: String(raw.id),
         number: `A-${raw.id}`,
         createdISO: raw.createdAt ? raw.createdAt.substring(0, 10) : new Date().toISOString().substring(0, 10),
+        dueISO: raw.dueAt ? raw.dueAt.substring(0, 10) : undefined,
         state: raw.state,
         path: OFFER_PATH_A,
         customer: {
@@ -53,7 +54,7 @@ function mapBackendOffer(raw: BackendOfferDto): OfferDto {
             extras: 0,
             discount: 0,
             reservation: null,
-            _variantId: item.productVariantId,
+            variantId: item.productVariantId,
         })),
         history: [],
     };
@@ -71,7 +72,7 @@ function mapBackendOfferToSummary(raw: BackendOfferDto): OfferSummaryDto {
         total,
         vat: total * VAT_RATE,
         createdISO: raw.createdAt ? raw.createdAt.substring(0, 10) : new Date().toISOString().substring(0, 10),
-        dueISO: raw.createdAt ? raw.createdAt.substring(0, 10) : new Date().toISOString().substring(0, 10),
+        dueISO: raw.dueAt ? raw.dueAt.substring(0, 10) : raw.createdAt ? raw.createdAt.substring(0, 10) : new Date().toISOString().substring(0, 10),
         path: 'A',
         overdue: 0,
         reservedScraps: 0,
@@ -84,14 +85,14 @@ function mapBackendCustomer(raw: BackendFullCustomerDto): CustomerWithIdDto {
         id: String(raw.id),
         customerNumber: String(raw.id),
         name: raw.name,
-        contactPerson: raw.contactPerson,
-        email: raw.email,
-        phone: raw.phone,
-        street: raw.street,
-        zip: raw.zip,
-        city: raw.city,
-        country: raw.country,
-        vatNumber: raw.vatNumber,
+        contactPerson: raw.contactPerson ?? '',
+        email: raw.email ?? '',
+        phone: raw.phone ?? '',
+        street: raw.street ?? '',
+        zip: raw.zip ?? '',
+        city: raw.city ?? '',
+        country: raw.country ?? '',
+        vatNumber: raw.vatNumber ?? '',
     };
 }
 
@@ -324,7 +325,6 @@ export const fetchOffer = async (id: string): Promise<OfferDto> => {
 };
 
 export const changeOfferState = async (id: string, state: OfferState): Promise<void> => {
-    if (state === 'PAID') return; // No backend equivalent yet — see CHANGE_REQUEST.md
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
@@ -376,7 +376,20 @@ export const addOfferLine = async (offerId: string, productVariantId: number, li
         };
         const raw = await post<BackendOfferItemDto>(`/offers/${encodeURIComponent(offerId)}/items`, payload, {signal: controller.signal});
         clearTimeout(timeoutId);
-        return {...line, id: String(raw.id), _variantId: productVariantId};
+        return {...line, id: String(raw.id), variantId: productVariantId};
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const updateOfferDueDate = async (id: string, dueISO: string): Promise<void> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const dueAt = `${dueISO}T12:00:00Z`;
+        await patch(`/offers/${encodeURIComponent(id)}`, {dueAt}, {signal: controller.signal});
+        clearTimeout(timeoutId);
     } catch (error) {
         clearTimeout(timeoutId);
         throw error;

@@ -4,7 +4,6 @@ import ReservationChip from './ReservationChip';
 import {fmtCHF, lineSubtotal} from '@/pages/constants/offerConstants';
 import {LineItemDto} from '@/types/offerte';
 import AddIcon from '@mui/icons-material/Add';
-import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import SearchIcon from '@mui/icons-material/Search';
@@ -16,9 +15,10 @@ interface LineItemsTableProps {
     onDelete: (id: string) => void;
     onAddFelt: () => void;
     onAddProduct: () => void;
+    locked?: boolean;
 }
 
-export default function LineItemsTable({lines, onPatch, onDelete, onAddFelt, onAddProduct}: LineItemsTableProps) {
+export default function LineItemsTable({lines, onPatch, onDelete, onAddFelt, onAddProduct, locked = false}: LineItemsTableProps) {
     const theme = useTheme();
     const cellPad = '12px 12px';
 
@@ -33,23 +33,22 @@ export default function LineItemsTable({lines, onPatch, onDelete, onAddFelt, onA
                         {lines.length} Position{lines.length === 1 ? '' : 'en'}
                     </Typography>
                 </Box>
-                <Box sx={{display: 'flex', gap: 1}}>
-                    <Button variant="outlined" size="small" startIcon={<AutoFixHighOutlinedIcon sx={{fontSize: 18}} />} sx={{textTransform: 'none'}}>
-                        Cut Assistant
-                    </Button>
-                    <Button variant="outlined" size="small" startIcon={<SearchIcon sx={{fontSize: 18}} />} onClick={onAddFelt} sx={{textTransform: 'none'}}>
-                        Filz suchen
-                    </Button>
-                    <Button
-                        variant="contained"
-                        size="small"
-                        startIcon={<AddIcon sx={{fontSize: 18}} />}
-                        onClick={onAddProduct}
-                        sx={{textTransform: 'none', boxShadow: 'none', '&:hover': {boxShadow: 'none'}}}
-                    >
-                        Produkt
-                    </Button>
-                </Box>
+                {!locked && (
+                    <Box sx={{display: 'flex', gap: 1}}>
+                        <Button variant="outlined" size="small" startIcon={<SearchIcon sx={{fontSize: 18}} />} onClick={onAddFelt} sx={{textTransform: 'none'}}>
+                            Filz suchen
+                        </Button>
+                        <Button
+                            variant="contained"
+                            size="small"
+                            startIcon={<AddIcon sx={{fontSize: 18}} />}
+                            onClick={onAddProduct}
+                            sx={{textTransform: 'none', boxShadow: 'none', '&:hover': {boxShadow: 'none'}}}
+                        >
+                            Produkt
+                        </Button>
+                    </Box>
+                )}
             </Box>
             <Divider />
             <TableContainer>

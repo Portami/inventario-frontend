@@ -8,6 +8,7 @@ import ProductSearchDialog from '@/components/offers/ProductSearchDialog';
 import ReservationPanel from '@/components/offers/ReservationPanel';
 import TotalsCard from '@/components/offers/TotalsCard';
 import {useOffer} from '@/hooks/useOffer';
+import {OFFER_STATE} from '@/pages/constants/offerConstants';
 import {FeltCatalogItem, ProductCatalogItem} from '@/types/offerte';
 import {Box, CircularProgress, Typography} from '@mui/material';
 import {useState} from 'react';
@@ -21,8 +22,21 @@ export default function OfferDetailPage() {
     const [productDlgOpen, setProductDlgOpen] = useState(false);
     const [editCustomerOpen, setEditCustomerOpen] = useState(false);
 
-    const {offer, feltCatalog, productCatalog, loading, error, patchLine, deleteLine, addFeltLine, addProductLine, changeState, regenDoc, editCustomer} =
-        useOffer(id);
+    const {
+        offer,
+        feltCatalog,
+        productCatalog,
+        loading,
+        error,
+        patchLine,
+        deleteLine,
+        addFeltLine,
+        addProductLine,
+        changeState,
+        regenDoc,
+        editCustomer,
+        editDueDate,
+    } = useOffer(id);
 
     const handleAddFelt = async (felt: FeltCatalogItem) => {
         await addFeltLine(felt);
@@ -52,9 +66,12 @@ export default function OfferDetailPage() {
 
     if (!offer) return null;
 
+    const editableStates = [OFFER_STATE.OFFER, OFFER_STATE.ORDER_CONFIRMATION, OFFER_STATE.INVOICE];
+    const linesLocked = !editableStates.includes(offer.state);
+
     return (
         <Box sx={{py: 4}}>
-            <OfferHeader offer={offer} onChangeState={changeState} onRegen={regenDoc} onBack={() => navigate('/offers')} />
+            <OfferHeader offer={offer} onChangeState={changeState} onRegen={regenDoc} onBack={() => navigate('/offers')} onEditDueDate={editDueDate} />
 
             <Box sx={{display: 'grid', gridTemplateColumns: '1fr 360px', gap: 3, alignItems: 'start'}}>
                 <Box sx={{display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0}}>
@@ -65,6 +82,7 @@ export default function OfferDetailPage() {
                         onDelete={deleteLine}
                         onAddFelt={() => setFeltDlgOpen(true)}
                         onAddProduct={() => setProductDlgOpen(true)}
+                        locked={linesLocked}
                     />
                 </Box>
 

@@ -56,9 +56,10 @@ interface OfferStateStepperProps {
     states: OfferState[];
     currentKey: OfferState;
     onJump: (key: OfferState) => void;
+    locked?: boolean;
 }
 
-export default function OfferStateStepper({states, currentKey, onJump}: OfferStateStepperProps) {
+export default function OfferStateStepper({states, currentKey, onJump, locked = false}: OfferStateStepperProps) {
     const theme = useTheme();
     const idx = states.indexOf(currentKey);
     return (
@@ -67,9 +68,9 @@ export default function OfferStateStepper({states, currentKey, onJump}: OfferSta
                 <Step key={key} completed={i < idx}>
                     <StepLabel
                         slots={{stepIcon: StepIconComp}}
-                        onClick={() => onJump(key)}
+                        onClick={locked ? undefined : () => onJump(key)}
                         sx={{
-                            cursor: 'pointer',
+                            cursor: locked ? 'default' : 'pointer',
                             '& .MuiStepLabel-label': {
                                 fontSize: 12.5,
                                 mt: 1,

@@ -28,9 +28,8 @@ import {
     ToggleButton,
     ToggleButtonGroup,
     Typography,
-    useTheme,
 } from '@mui/material';
-import {ChangeEvent, useEffect, useState} from 'react';
+import React, {ChangeEvent, useEffect, useState} from 'react';
 
 interface Props {
     open: boolean;
@@ -81,11 +80,39 @@ function CustomerInput({mode, customers, selected, onSelect, form, setField}: Cu
         return (
             <Autocomplete
                 options={customers}
-                getOptionLabel={(c) => `${c.name} · ${c.customerNumber}`}
+                getOptionLabel={(c) => c.name}
+                isOptionEqualToValue={(o, v) => o.id === v.id}
+                filterOptions={(options, {inputValue}) => {
+                    const needle = inputValue.toLowerCase();
+                    return options.filter(
+                        (c) => c.name.toLowerCase().includes(needle) || c.contactPerson.toLowerCase().includes(needle) || c.city.toLowerCase().includes(needle),
+                    );
+                }}
                 value={selected}
                 onChange={(_, v) => onSelect(v)}
+                renderOption={(props, c) => {
+                    const {key, ...liProps} = props as typeof props & {key: React.Key};
+                    return (
+                        <li key={key} {...liProps}>
+                            <Box>
+                                <Typography sx={{fontSize: 13, fontWeight: 500}}>{c.name}</Typography>
+                                {(c.contactPerson || c.city) && (
+                                    <Typography variant="caption" color="text.secondary">
+                                        {[c.contactPerson, c.city].filter(Boolean).join(' · ')}
+                                    </Typography>
+                                )}
+                            </Box>
+                        </li>
+                    );
+                }}
                 renderInput={(params) => (
-                    <TextField {...params} label="Kunde suchen" size="small" placeholder="Name oder Kundennummer …" slotProps={{inputLabel: {shrink: true}}} />
+                    <TextField
+                        {...params}
+                        label="Kunde suchen"
+                        size="small"
+                        placeholder="Name, Ansprechperson oder Ort …"
+                        InputLabelProps={{...params.InputLabelProps, shrink: true}}
+                    />
                 )}
             />
         );
@@ -141,15 +168,12 @@ function CustomerInput({mode, customers, selected, onSelect, form, setField}: Cu
 }
 
 export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
-    const theme = useTheme();
-    const primary = theme.palette.primary.main;
     const showToast = useToast();
 
     const [step, setStep] = useState(0);
     const [customerMode, setCustomerMode] = useState<CustomerMode>('existing');
     const [selectedCustomer, setSelectedCustomer] = useState<CustomerWithIdDto | null>(null);
     const [newCustomer, setNewCustomer] = useState<NewCustomerForm>(emptyCustomer);
-    const [path, setPath] = useState<'A' | 'B'>('A');
 
     const [stagedLines, setStagedLines] = useState<StagedLine[]>([]);
     const [feltDlgOpen, setFeltDlgOpen] = useState(false);
@@ -167,17 +191,15 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
         setCustomerMode('existing');
         setSelectedCustomer(null);
         setNewCustomer(emptyCustomer);
-        setPath('A');
         setStagedLines([]);
 
         setLoadingData(true);
-        Promise.all([fetchCustomers(), fetchFeltCatalog(), fetchProductCatalog()])
-            .then(([c, f, p]) => {
-                setCustomers(c);
-                setFeltCatalog(f);
-                setProductCatalog(p);
+        Promise.allSettled([fetchCustomers(), fetchFeltCatalog(), fetchProductCatalog()])
+            .then(([customersResult, feltResult, productResult]) => {
+                if (customersResult.status === 'fulfilled') setCustomers(customersResult.value);
+                if (feltResult.status === 'fulfilled') setFeltCatalog(feltResult.value);
+                if (productResult.status === 'fulfilled') setProductCatalog(productResult.value);
             })
-            .catch(() => showToast('Daten konnten nicht geladen werden', 'error'))
             .finally(() => setLoadingData(false));
     }, [open, showToast]);
 
@@ -266,8 +288,8 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
     return (
         <>
             <Dialog open={open} onClose={isSubmitting ? undefined : onClose} maxWidth="md" fullWidth>
-                <DialogTitle sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 4, pt: 3, pb: 2}}>
-                    <Typography variant="h6" sx={{fontWeight: 600}}>
+                <DialogTitle component="div" sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 4, pt: 3, pb: 2}}>
+                    <Typography component="span" sx={{fontWeight: 600, fontSize: '1.25rem'}}>
                         Neue Offerte erstellen
                     </Typography>
                     <IconButton onClick={onClose} size="small" disabled={isSubmitting}>
@@ -334,43 +356,6 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
                                     form={newCustomer}
                                     setField={setField}
                                 />
-                            </Box>
-                            <Box>
-                                <Typography
-                                    variant="caption"
-                                    sx={{
-                                        display: 'block',
-                                        mb: 1.5,
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.05em',
-                                        fontWeight: 600,
-                                        color: 'text.secondary',
-                                    }}
-                                >
-                                    Offerten-Pfad
-                                </Typography>
-                                <Box sx={{display: 'flex', gap: 2}}>
-                                    {(['A', 'B'] as const).map((p) => (
-                                        <Box
-                                            key={p}
-                                            onClick={() => setPath(p)}
-                                            sx={{
-                                                flex: 1,
-                                                p: 2,
-                                                borderRadius: 1.5,
-                                                border: `1.5px solid ${path === p ? primary : 'rgba(0,0,0,0.12)'}`,
-                                                bgcolor: path === p ? `${primary}08` : 'transparent',
-                                                cursor: 'pointer',
-                                                transition: 'border-color 0.15s, background-color 0.15s',
-                                            }}
-                                        >
-                                            <Typography sx={{fontWeight: 600, fontSize: 13.5, mb: 0.25}}>Pfad {p}</Typography>
-                                            <Typography variant="caption" color="text.secondary">
-                                                {p === 'A' ? 'Offerte → Auftragsbestätigung → Rechnung → Bezahlt' : 'Offerte → Rechnung → Bezahlt'}
-                                            </Typography>
-                                        </Box>
-                                    ))}
-                                </Box>
                             </Box>
                         </Box>
                     )}

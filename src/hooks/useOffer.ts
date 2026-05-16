@@ -1,6 +1,15 @@
 import {useToast} from '@/components/ToastProvider';
 import {CUT_SURCHARGE_DEFAULT, LINE_KIND, OFFER_STATE_META, RESERVATION_KIND} from '@/pages/constants/offerConstants';
-import {addOfferLine, changeOfferState, deleteOfferLine, fetchFeltCatalog, fetchOffer, fetchProductCatalog, updateCustomer} from '@/services/backend';
+import {
+    addOfferLine,
+    changeOfferState,
+    deleteOfferLine,
+    fetchFeltCatalog,
+    fetchOffer,
+    fetchProductCatalog,
+    updateCustomer,
+    updateOfferDueDate,
+} from '@/services/backend';
 import {CustomerDto, FeltCatalogItem, LineItemDto, OfferDto, OfferState, ProductCatalogItem} from '@/types/offerte';
 import {toErrorMessage} from '@/utils/pageUtils';
 import {useCallback, useEffect, useState} from 'react';
@@ -18,6 +27,7 @@ export interface UseOfferReturn {
     changeState: (key: OfferState) => void;
     regenDoc: (doc: string) => void;
     editCustomer: (changes: Partial<CustomerDto>) => Promise<void>;
+    editDueDate: (dueISO: string) => Promise<void>;
 }
 
 export function useOffer(id: string | undefined): UseOfferReturn {
@@ -46,11 +56,11 @@ export function useOffer(id: string | undefined): UseOfferReturn {
         (lineId: string, changes: Partial<LineItemDto>) => {
             if (!id) return;
             const originalLine = offer?.lines.find((l) => l.id === lineId);
-            if (!originalLine?._variantId) return;
+            if (!originalLine?.variantId) return;
 
             setOffer((o) => (o ? {...o, lines: o.lines.map((l) => (l.id === lineId ? {...l, ...changes} : l))} : o));
 
-            const variantId = originalLine._variantId;
+            const variantId = originalLine.variantId;
             const updated: Omit<LineItemDto, 'id'> = {...originalLine, ...changes};
 
             void (async () => {
@@ -177,5 +187,34 @@ export function useOffer(id: string | undefined): UseOfferReturn {
         [offer, showToast],
     );
 
-    return {offer, feltCatalog, productCatalog, loading, error, patchLine, deleteLine, addFeltLine, addProductLine, changeState, regenDoc, editCustomer};
+    const editDueDate = useCallback(
+        async (dueISO: string) => {
+            if (!id) return;
+            const prev = offer?.dueISO;
+            setOffer((o) => (o ? {...o, dueISO} : o));
+            try {
+                await updateOfferDueDate(id, dueISO);
+            } catch {
+                setOffer((o) => (o ? {...o, dueISO: prev} : o));
+                showToast('Fälligkeitsdatum konnte nicht gespeichert werden', 'error');
+            }
+        },
+        [id, offer, showToast],
+    );
+
+    return {
+        offer,
+        feltCatalog,
+        productCatalog,
+        loading,
+        error,
+        patchLine,
+        deleteLine,
+        addFeltLine,
+        addProductLine,
+        changeState,
+        regenDoc,
+        editCustomer,
+        editDueDate,
+    };
 }

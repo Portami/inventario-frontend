@@ -1,4 +1,4 @@
-export type OfferState = 'OFFER' | 'ORDER_CONFIRMATION' | 'INVOICE' | 'PAYMENT_REMINDER' | 'FIRST_DUNNING_NOTICE' | 'SECOND_DUNNING_NOTICE' | 'PAID';
+export type OfferState = 'OFFER' | 'ORDER_CONFIRMATION' | 'INVOICE' | 'PAYMENT_REMINDER' | 'FIRST_DUNNING_NOTICE' | 'SECOND_DUNNING_NOTICE' | 'COMPLETED';
 
 export interface OfferSummaryDto {
     id: string;
@@ -41,7 +41,7 @@ export interface LineItemDto {
     extras: number;
     discount: number;
     reservation: ReservationDto | null;
-    _variantId?: number;
+    variantId?: number;
 }
 
 export interface CustomerDto {
@@ -65,6 +65,7 @@ export interface OfferDto {
     id: string;
     number: string;
     createdISO: string;
+    dueISO?: string;
     state: OfferState;
     path: OfferState[];
     customer: CustomerDto;
@@ -96,7 +97,7 @@ export interface HistoryEntry {
     what: string;
 }
 
-export type BackendOfferState = Exclude<OfferState, 'PAID'>;
+export type BackendOfferState = OfferState;
 
 export interface BackendCustomerDto {
     id: number;
@@ -138,6 +139,7 @@ export interface BackendOfferDto {
     state: BackendOfferState;
     createdAt: string;
     updatedAt: string;
+    dueAt?: string;
     items: BackendOfferItemDto[];
 }
 

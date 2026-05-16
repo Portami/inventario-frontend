@@ -30,7 +30,7 @@ export const OFFER_STATE_META: Record<OfferState, OfferStateMeta> = {
     PAYMENT_REMINDER: {label: 'Zahlungserinnerung', doc: 'Zahlungserinnerung.pdf', color: '#f57c00', bg: '#f57c0014', Icon: MailOutlinedIcon},
     FIRST_DUNNING_NOTICE: {label: 'Mahnung 1', doc: 'Mahnung 1.pdf', color: '#e64a19', bg: '#e64a1914', Icon: WarningAmberOutlinedIcon},
     SECOND_DUNNING_NOTICE: {label: 'Mahnung 2', doc: 'Mahnung 2.pdf', color: '#c62828', bg: '#c6282814', Icon: ReportProblemOutlinedIcon},
-    PAID: {label: 'Bezahlt', doc: 'Rechnung.pdf', color: '#2e7d32', bg: '#2e7d3214', Icon: CheckCircleOutlinedIcon},
+    COMPLETED: {label: 'Bezahlt', doc: 'Rechnung.pdf', color: '#2e7d32', bg: '#2e7d3214', Icon: CheckCircleOutlinedIcon},
 };
 
 export const OFFER_STATE = {
@@ -40,7 +40,7 @@ export const OFFER_STATE = {
     PAYMENT_REMINDER: 'PAYMENT_REMINDER',
     FIRST_DUNNING_NOTICE: 'FIRST_DUNNING_NOTICE',
     SECOND_DUNNING_NOTICE: 'SECOND_DUNNING_NOTICE',
-    PAID: 'PAID',
+    COMPLETED: 'COMPLETED',
 } as const;
 
 export const LINE_KIND = {
@@ -61,6 +61,7 @@ export const OFFER_PATH_A: OfferState[] = [
     OFFER_STATE.PAYMENT_REMINDER,
     OFFER_STATE.FIRST_DUNNING_NOTICE,
     OFFER_STATE.SECOND_DUNNING_NOTICE,
+    OFFER_STATE.COMPLETED,
 ];
 
 export const OFFER_PATH_B: OfferState[] = [
@@ -69,6 +70,7 @@ export const OFFER_PATH_B: OfferState[] = [
     OFFER_STATE.PAYMENT_REMINDER,
     OFFER_STATE.FIRST_DUNNING_NOTICE,
     OFFER_STATE.SECOND_DUNNING_NOTICE,
+    OFFER_STATE.COMPLETED,
 ];
 
 export const VAT_RATE = 0.081;
@@ -89,6 +91,7 @@ export const ALL_BACKEND_STATES: BackendOfferState[] = [
     'PAYMENT_REMINDER',
     'FIRST_DUNNING_NOTICE',
     'SECOND_DUNNING_NOTICE',
+    'COMPLETED',
 ];
 
 export const fmtCHF = (n: number): string => new Intl.NumberFormat('de-CH', {style: 'currency', currency: 'CHF', minimumFractionDigits: 2}).format(n);
