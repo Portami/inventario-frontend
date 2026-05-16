@@ -409,6 +409,32 @@ export const fetchProductCatalog = async (): Promise<ProductCatalogItem[]> => {
     );
 };
 
+export const updateCustomer = async (
+    id: string,
+    dto: {
+        name?: string;
+        contactPerson?: string;
+        email?: string;
+        phone?: string;
+        street?: string;
+        zip?: string;
+        city?: string;
+        country?: string;
+        vatNumber?: string;
+    },
+): Promise<CustomerWithIdDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const raw = await patch<BackendFullCustomerDto>(`/customers/${encodeURIComponent(id)}`, dto, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return mapBackendCustomer(raw);
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
 export const createCustomer = async (dto: {
     name: string;
     contactPerson?: string;

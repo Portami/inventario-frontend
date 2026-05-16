@@ -1,4 +1,5 @@
 import CustomerCard from '@/components/offers/CustomerCard';
+import EditCustomerDialog from '@/components/offers/EditCustomerDialog';
 import FeltSearchDialog from '@/components/offers/FeltSearchDialog';
 import HistoryPanel from '@/components/offers/HistoryPanel';
 import LineItemsTable from '@/components/offers/LineItemsTable';
@@ -6,7 +7,6 @@ import OfferHeader from '@/components/offers/OfferHeader';
 import ProductSearchDialog from '@/components/offers/ProductSearchDialog';
 import ReservationPanel from '@/components/offers/ReservationPanel';
 import TotalsCard from '@/components/offers/TotalsCard';
-import {useToast} from '@/components/ToastProvider';
 import {useOffer} from '@/hooks/useOffer';
 import {FeltCatalogItem, ProductCatalogItem} from '@/types/offerte';
 import {Box, CircularProgress, Typography} from '@mui/material';
@@ -16,12 +16,13 @@ import {useNavigate, useParams} from 'react-router';
 export default function OfferDetailPage() {
     const {id} = useParams();
     const navigate = useNavigate();
-    const showToast = useToast();
 
     const [feltDlgOpen, setFeltDlgOpen] = useState(false);
     const [productDlgOpen, setProductDlgOpen] = useState(false);
+    const [editCustomerOpen, setEditCustomerOpen] = useState(false);
 
-    const {offer, feltCatalog, productCatalog, loading, error, patchLine, deleteLine, addFeltLine, addProductLine, changeState, regenDoc} = useOffer(id);
+    const {offer, feltCatalog, productCatalog, loading, error, patchLine, deleteLine, addFeltLine, addProductLine, changeState, regenDoc, editCustomer} =
+        useOffer(id);
 
     const handleAddFelt = async (felt: FeltCatalogItem) => {
         await addFeltLine(felt);
@@ -57,7 +58,7 @@ export default function OfferDetailPage() {
 
             <Box sx={{display: 'grid', gridTemplateColumns: '1fr 360px', gap: 3, alignItems: 'start'}}>
                 <Box sx={{display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0}}>
-                    <CustomerCard customer={offer.customer} onEdit={() => showToast('Kundendaten bearbeiten (noch nicht implementiert)', 'info')} />
+                    <CustomerCard customer={offer.customer} onEdit={() => setEditCustomerOpen(true)} />
                     <LineItemsTable
                         lines={offer.lines}
                         onPatch={patchLine}
@@ -76,6 +77,7 @@ export default function OfferDetailPage() {
 
             <FeltSearchDialog open={feltDlgOpen} catalog={feltCatalog} onClose={() => setFeltDlgOpen(false)} onPick={handleAddFelt} />
             <ProductSearchDialog open={productDlgOpen} catalog={productCatalog} onClose={() => setProductDlgOpen(false)} onPick={handleAddProduct} />
+            {offer && <EditCustomerDialog open={editCustomerOpen} customer={offer.customer} onClose={() => setEditCustomerOpen(false)} onSave={editCustomer} />}
         </Box>
     );
 }

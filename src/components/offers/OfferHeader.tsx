@@ -3,7 +3,6 @@ import {fmtDate, OFFER_STATE_META} from '@/pages/constants/offerConstants';
 import {OfferDto, OfferState} from '@/types/offerte';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import {Box, Button, Card, CardContent, Chip, Typography, useTheme} from '@mui/material';
 
@@ -79,9 +78,6 @@ export default function OfferHeader({offer, onChangeState, onRegen, onBack}: Off
                         sx={{textTransform: 'none'}}
                     >
                         {currentDoc}
-                    </Button>
-                    <Button variant="outlined" startIcon={<ContentCopyIcon sx={{fontSize: 18}} />} sx={{textTransform: 'none'}}>
-                        Duplizieren
                     </Button>
                     {nextKey && (
                         <Button

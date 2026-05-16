@@ -1,7 +1,7 @@
 import {useToast} from '@/components/ToastProvider';
 import {CUT_SURCHARGE_DEFAULT, LINE_KIND, OFFER_STATE_META, RESERVATION_KIND} from '@/pages/constants/offerConstants';
-import {addOfferLine, changeOfferState, deleteOfferLine, fetchFeltCatalog, fetchOffer, fetchProductCatalog} from '@/services/backend';
-import {FeltCatalogItem, LineItemDto, OfferDto, OfferState, ProductCatalogItem} from '@/types/offerte';
+import {addOfferLine, changeOfferState, deleteOfferLine, fetchFeltCatalog, fetchOffer, fetchProductCatalog, updateCustomer} from '@/services/backend';
+import {CustomerDto, FeltCatalogItem, LineItemDto, OfferDto, OfferState, ProductCatalogItem} from '@/types/offerte';
 import {toErrorMessage} from '@/utils/pageUtils';
 import {useCallback, useEffect, useState} from 'react';
 
@@ -17,6 +17,7 @@ export interface UseOfferReturn {
     addProductLine: (p: ProductCatalogItem) => Promise<void>;
     changeState: (key: OfferState) => void;
     regenDoc: (doc: string) => void;
+    editCustomer: (changes: Partial<CustomerDto>) => Promise<void>;
 }
 
 export function useOffer(id: string | undefined): UseOfferReturn {
@@ -147,5 +148,34 @@ export function useOffer(id: string | undefined): UseOfferReturn {
         [showToast],
     );
 
-    return {offer, feltCatalog, productCatalog, loading, error, patchLine, deleteLine, addFeltLine, addProductLine, changeState, regenDoc};
+    const editCustomer = useCallback(
+        async (changes: Partial<CustomerDto>) => {
+            if (!offer) return;
+            const customerId = offer.customer.customerNumber;
+            const updated = await updateCustomer(customerId, changes);
+            setOffer((o) =>
+                o
+                    ? {
+                          ...o,
+                          customer: {
+                              customerNumber: updated.customerNumber,
+                              name: updated.name,
+                              contactPerson: updated.contactPerson,
+                              email: updated.email,
+                              phone: updated.phone,
+                              street: updated.street,
+                              zip: updated.zip,
+                              city: updated.city,
+                              country: updated.country,
+                              vatNumber: updated.vatNumber,
+                          },
+                      }
+                    : o,
+            );
+            showToast('Kundendaten gespeichert');
+        },
+        [offer, showToast],
+    );
+
+    return {offer, feltCatalog, productCatalog, loading, error, patchLine, deleteLine, addFeltLine, addProductLine, changeState, regenDoc, editCustomer};
 }

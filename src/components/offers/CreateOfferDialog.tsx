@@ -96,10 +96,27 @@ function CustomerInput({mode, customers, selected, onSelect, form, setField}: Cu
                 <TextField label="Firmenname" value={form.name} onChange={setField('name')} size="small" fullWidth required slotProps={{inputLabel: labelSx}} />
             </Grid>
             <Grid size={6}>
-                <TextField label="Ansprechperson" value={form.contactPerson} onChange={setField('contactPerson')} size="small" fullWidth required slotProps={{inputLabel: labelSx}} />
+                <TextField
+                    label="Ansprechperson"
+                    value={form.contactPerson}
+                    onChange={setField('contactPerson')}
+                    size="small"
+                    fullWidth
+                    required
+                    slotProps={{inputLabel: labelSx}}
+                />
             </Grid>
             <Grid size={6}>
-                <TextField label="E-Mail" value={form.email} onChange={setField('email')} type="email" size="small" fullWidth required slotProps={{inputLabel: labelSx}} />
+                <TextField
+                    label="E-Mail"
+                    value={form.email}
+                    onChange={setField('email')}
+                    type="email"
+                    size="small"
+                    fullWidth
+                    required
+                    slotProps={{inputLabel: labelSx}}
+                />
             </Grid>
             <Grid size={6}>
                 <TextField label="Telefon" value={form.phone} onChange={setField('phone')} size="small" fullWidth slotProps={{inputLabel: labelSx}} />
@@ -280,10 +297,26 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
                     {!loadingData && step === 0 && (
                         <Box sx={{display: 'flex', flexDirection: 'column', gap: 3}}>
                             <Box>
-                                <Typography variant="caption" sx={{display: 'block', mb: 1.5, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, color: 'text.secondary'}}>
+                                <Typography
+                                    variant="caption"
+                                    sx={{
+                                        display: 'block',
+                                        mb: 1.5,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.05em',
+                                        fontWeight: 600,
+                                        color: 'text.secondary',
+                                    }}
+                                >
                                     Kunde
                                 </Typography>
-                                <ToggleButtonGroup value={customerMode} exclusive onChange={(_, v: CustomerMode) => v && setCustomerMode(v)} size="small" sx={{mb: 2}}>
+                                <ToggleButtonGroup
+                                    value={customerMode}
+                                    exclusive
+                                    onChange={(_, v: CustomerMode) => v && setCustomerMode(v)}
+                                    size="small"
+                                    sx={{mb: 2}}
+                                >
                                     <ToggleButton value="existing" sx={{textTransform: 'none', gap: 0.5, px: 2}}>
                                         <BusinessOutlinedIcon sx={{fontSize: 16}} />
                                         Bestehender Kunde
@@ -303,7 +336,17 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
                                 />
                             </Box>
                             <Box>
-                                <Typography variant="caption" sx={{display: 'block', mb: 1.5, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, color: 'text.secondary'}}>
+                                <Typography
+                                    variant="caption"
+                                    sx={{
+                                        display: 'block',
+                                        mb: 1.5,
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.05em',
+                                        fontWeight: 600,
+                                        color: 'text.secondary',
+                                    }}
+                                >
                                     Offerten-Pfad
                                 </Typography>
                                 <Box sx={{display: 'flex', gap: 2}}>
@@ -334,7 +377,13 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
                     {!loadingData && step === 1 && (
                         <Box sx={{display: 'flex', flexDirection: 'column', gap: 2.5}}>
                             <Box sx={{display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap'}}>
-                                <Button size="small" variant="outlined" startIcon={<SearchIcon sx={{fontSize: 16}} />} onClick={() => setFeltDlgOpen(true)} sx={{textTransform: 'none'}}>
+                                <Button
+                                    size="small"
+                                    variant="outlined"
+                                    startIcon={<SearchIcon sx={{fontSize: 16}} />}
+                                    onClick={() => setFeltDlgOpen(true)}
+                                    sx={{textTransform: 'none'}}
+                                >
                                     Filz suchen
                                 </Button>
                                 <Button size="small" variant="outlined" onClick={() => setProductDlgOpen(true)} sx={{textTransform: 'none'}}>
@@ -351,7 +400,16 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
                                     {stagedLines.map((l) => (
                                         <Box
                                             key={l.stageKey}
-                                            sx={{display: 'flex', alignItems: 'center', gap: 1.5, px: 2, py: 1.5, borderRadius: 1, border: '1px solid rgba(0,0,0,0.08)', bgcolor: 'rgba(0,0,0,0.015)'}}
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 1.5,
+                                                px: 2,
+                                                py: 1.5,
+                                                borderRadius: 1,
+                                                border: '1px solid rgba(0,0,0,0.08)',
+                                                bgcolor: 'rgba(0,0,0,0.015)',
+                                            }}
                                         >
                                             <KindChip kind={l.kind} />
                                             <Box sx={{flex: 1, minWidth: 0}}>
