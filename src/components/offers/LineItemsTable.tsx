@@ -110,14 +110,20 @@ export default function LineItemsTable({lines, onPatch, onDelete, onAddFelt, onA
                                             </Typography>
                                             {l.reservation && <ReservationChip reservation={l.reservation} />}
                                         </Box>
-                                        <Box sx={{display: 'flex', alignItems: 'center', gap: 1.5, color: 'text.secondary', fontSize: 12}}>
-                                            <Typography component="span" sx={{fontFamily: "'JetBrains Mono', monospace", fontSize: 11.5}}>
+                                        <Box sx={{display: 'flex', alignItems: 'center', gap: 1.5, color: 'text.secondary', fontSize: 12, overflow: 'hidden'}}>
+                                            <Typography component="span" sx={{fontFamily: "'JetBrains Mono', monospace", fontSize: 11.5, flexShrink: 0}}>
                                                 {l.articleNumber}
                                             </Typography>
-                                            <Typography component="span" sx={{color: 'rgba(0,0,0,0.3)'}}>
-                                                ·
-                                            </Typography>
-                                            <Typography component="span">{l.description}</Typography>
+                                            {l.description && l.description !== l.feltTypeName && (
+                                                <>
+                                                    <Typography component="span" sx={{color: 'rgba(0,0,0,0.3)', flexShrink: 0}}>
+                                                        ·
+                                                    </Typography>
+                                                    <Typography component="span" noWrap sx={{overflow: 'hidden', textOverflow: 'ellipsis'}}>
+                                                        {l.description}
+                                                    </Typography>
+                                                </>
+                                            )}
                                         </Box>
                                     </Box>
                                 </TableCell>

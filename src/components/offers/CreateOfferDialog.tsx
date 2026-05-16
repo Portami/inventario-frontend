@@ -21,6 +21,7 @@ import {
     Divider,
     Grid,
     IconButton,
+    MenuItem,
     Step,
     StepLabel,
     Stepper,
@@ -60,7 +61,7 @@ const emptyCustomer: NewCustomerForm = {
     street: '',
     zip: '',
     city: '',
-    country: 'Schweiz',
+    country: 'CH',
     vatNumber: '',
 };
 
@@ -111,7 +112,7 @@ function CustomerInput({mode, customers, selected, onSelect, form, setField}: Cu
                         label="Kunde suchen"
                         size="small"
                         placeholder="Name, Ansprechperson oder Ort …"
-                        InputLabelProps={{...params.InputLabelProps, shrink: true}}
+                        slotProps={{...params.slotProps, inputLabel: {...(params.slotProps?.inputLabel as object), shrink: true}}}
                     />
                 )}
             />
@@ -158,7 +159,19 @@ function CustomerInput({mode, customers, selected, onSelect, form, setField}: Cu
                 <TextField label="Ort" value={form.city} onChange={setField('city')} size="small" fullWidth slotProps={{inputLabel: labelSx}} />
             </Grid>
             <Grid size={6}>
-                <TextField label="Land" value={form.country} onChange={setField('country')} size="small" fullWidth slotProps={{inputLabel: labelSx}} />
+                <TextField select label="Land" value={form.country} onChange={setField('country')} size="small" fullWidth slotProps={{inputLabel: labelSx}}>
+                    {[
+                        {code: 'CH', label: 'Schweiz'},
+                        {code: 'DE', label: 'Deutschland'},
+                        {code: 'IT', label: 'Italien'},
+                        {code: 'FR', label: 'Frankreich'},
+                        {code: 'AT', label: 'Österreich'},
+                    ].map(({code, label}) => (
+                        <MenuItem key={code} value={code}>
+                            {label}
+                        </MenuItem>
+                    ))}
+                </TextField>
             </Grid>
             <Grid size={6}>
                 <TextField label="MWST-Nr." value={form.vatNumber} onChange={setField('vatNumber')} size="small" fullWidth slotProps={{inputLabel: labelSx}} />

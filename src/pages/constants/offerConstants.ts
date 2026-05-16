@@ -73,6 +73,30 @@ export const OFFER_PATH_B: OfferState[] = [
     OFFER_STATE.COMPLETED,
 ];
 
+/** Valid forward transitions from each state. */
+export const OFFER_TRANSITIONS: Record<OfferState, OfferState[]> = {
+    OFFER: ['ORDER_CONFIRMATION', 'INVOICE'],
+    ORDER_CONFIRMATION: ['INVOICE'],
+    INVOICE: ['PAYMENT_REMINDER', 'COMPLETED'],
+    PAYMENT_REMINDER: ['FIRST_DUNNING_NOTICE', 'COMPLETED'],
+    FIRST_DUNNING_NOTICE: ['SECOND_DUNNING_NOTICE', 'COMPLETED'],
+    SECOND_DUNNING_NOTICE: ['COMPLETED'],
+    COMPLETED: [],
+};
+
+/**
+ * Compute the most likely path taken to reach `state`, using the short canonical
+ * path (skipping ORDER_CONFIRMATION). Used as initial value on fresh page load.
+ */
+export function computeInitialPath(state: OfferState): OfferState[] {
+    const short: OfferState[] = ['OFFER', 'INVOICE', 'PAYMENT_REMINDER', 'FIRST_DUNNING_NOTICE', 'SECOND_DUNNING_NOTICE', 'COMPLETED'];
+    const idx = short.indexOf(state);
+    if (idx >= 0) return short.slice(0, idx + 1);
+    // ORDER_CONFIRMATION: path is OFFER → ORDER_CONFIRMATION
+    if (state === 'ORDER_CONFIRMATION') return ['OFFER', 'ORDER_CONFIRMATION'];
+    return [state];
+}
+
 export const VAT_RATE = 0.081;
 export const CUT_SURCHARGE_DEFAULT = 12;
 export const RESERVATION_DAYS = 10;

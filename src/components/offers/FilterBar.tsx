@@ -5,7 +5,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import {Box, Button, Card, CardContent, IconButton, InputAdornment, MenuItem, TextField, ToggleButton, ToggleButtonGroup} from '@mui/material';
 
 export type SortOption = 'created_desc' | 'created_asc' | 'due_asc' | 'total_desc' | 'customer';
-export type DateRange = 'all' | '7d' | '30d' | 'overdue';
+export type DateRange = 'all' | '10d' | '30d' | 'overdue';
 
 interface FilterBarProps {
     q: string;

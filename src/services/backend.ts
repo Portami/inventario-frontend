@@ -1,6 +1,6 @@
 import {del, get, patch, post} from './api';
 import {cacheGet, cacheInvalidate, cacheSet} from './cache';
-import {ALL_BACKEND_STATES, OFFER_PATH_A, VAT_RATE} from '@/pages/constants/offerConstants';
+import {ALL_BACKEND_STATES, computeInitialPath, VAT_RATE} from '@/pages/constants/offerConstants';
 import {CreateFeltRequest, FeltDto} from '@/types/felt';
 import {
     BackendCreateOfferItemDto,
@@ -27,7 +27,7 @@ function mapBackendOffer(raw: BackendOfferDto): OfferDto {
         createdISO: raw.createdAt ? raw.createdAt.substring(0, 10) : new Date().toISOString().substring(0, 10),
         dueISO: raw.dueAt ? raw.dueAt.substring(0, 10) : undefined,
         state: raw.state,
-        path: OFFER_PATH_A,
+        path: computeInitialPath(raw.state),
         customer: {
             customerNumber: String(raw.customerDto.id),
             name: raw.customerDto.name,
@@ -57,6 +57,7 @@ function mapBackendOffer(raw: BackendOfferDto): OfferDto {
             variantId: item.productVariantId,
         })),
         history: [],
+        offerSent: raw.offerSent ?? false,
     };
 }
 
@@ -329,6 +330,18 @@ export const changeOfferState = async (id: string, state: OfferState): Promise<v
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
         await patch(`/offers/${encodeURIComponent(id)}`, {state}, {signal: controller.signal});
+        clearTimeout(timeoutId);
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const markOfferSent = async (id: string, sent: boolean): Promise<void> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        await patch(`/offers/${encodeURIComponent(id)}`, {offerSent: sent}, {signal: controller.signal});
         clearTimeout(timeoutId);
     } catch (error) {
         clearTimeout(timeoutId);

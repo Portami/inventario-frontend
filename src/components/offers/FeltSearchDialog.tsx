@@ -53,7 +53,7 @@ export default function FeltSearchDialog({open, catalog, onClose, onPick}: FeltS
         <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
             <DialogTitle sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 4, pt: 3}}>
                 <Box>
-                    <Typography variant="h6" sx={{fontWeight: 600}}>
+                    <Typography variant="h6" component="span" sx={{fontWeight: 600}}>
                         Filz suchen
                     </Typography>
                     <Typography variant="caption" color="text.secondary">

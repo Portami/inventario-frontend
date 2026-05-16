@@ -89,8 +89,8 @@ export default function OffersPage() {
         } else if (stateFilter !== 'ALL') {
             rows = rows.filter((o) => o.state === stateFilter);
         }
-        if (dateRange === '7d') {
-            rows = rows.filter((o) => daysFromNow(o.createdISO) >= -7);
+        if (dateRange === '10d') {
+            rows = rows.filter((o) => daysFromNow(o.createdISO) >= -10);
         } else if (dateRange === '30d') {
             rows = rows.filter((o) => daysFromNow(o.createdISO) >= -30);
         } else if (dateRange === 'overdue') {

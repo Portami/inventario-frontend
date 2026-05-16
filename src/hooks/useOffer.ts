@@ -7,15 +7,18 @@ import {
     fetchFeltCatalog,
     fetchOffer,
     fetchProductCatalog,
+    markOfferSent,
     updateCustomer,
     updateOfferDueDate,
 } from '@/services/backend';
+import {generateOfferPdf, InvoiceOptions} from '@/services/invoicePdfService';
 import {CustomerDto, FeltCatalogItem, LineItemDto, OfferDto, OfferState, ProductCatalogItem} from '@/types/offerte';
 import {toErrorMessage} from '@/utils/pageUtils';
 import {useCallback, useEffect, useState} from 'react';
 
 export interface UseOfferReturn {
     offer: OfferDto | null;
+    prevState: OfferState | null;
     feltCatalog: FeltCatalogItem[];
     productCatalog: ProductCatalogItem[];
     loading: boolean;
@@ -25,14 +28,16 @@ export interface UseOfferReturn {
     addFeltLine: (felt: FeltCatalogItem) => Promise<void>;
     addProductLine: (p: ProductCatalogItem) => Promise<void>;
     changeState: (key: OfferState) => void;
-    regenDoc: (doc: string) => void;
+    regenDoc: (doc: string, options?: InvoiceOptions) => void;
     editCustomer: (changes: Partial<CustomerDto>) => Promise<void>;
     editDueDate: (dueISO: string) => Promise<void>;
+    toggleSent: () => void;
 }
 
 export function useOffer(id: string | undefined): UseOfferReturn {
     const showToast = useToast();
     const [offer, setOffer] = useState<OfferDto | null>(null);
+    const [statePath, setStatePath] = useState<OfferState[]>([]);
     const [feltCatalog, setFeltCatalog] = useState<FeltCatalogItem[]>([]);
     const [productCatalog, setProductCatalog] = useState<ProductCatalogItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -44,6 +49,7 @@ export function useOffer(id: string | undefined): UseOfferReturn {
         Promise.all([fetchOffer(id), fetchFeltCatalog(), fetchProductCatalog()])
             .then(([offerData, feltData, productData]) => {
                 setOffer(offerData);
+                setStatePath(offerData.path); // path = computeInitialPath(state)
                 setFeltCatalog(feltData);
                 setProductCatalog(productData);
                 setError('');
@@ -51,6 +57,8 @@ export function useOffer(id: string | undefined): UseOfferReturn {
             .catch((err) => setError(toErrorMessage(err, 'Offerte konnte nicht geladen werden')))
             .finally(() => setLoading(false));
     }, [id]);
+
+    const prevState = statePath.length > 1 ? statePath[statePath.length - 2] : null;
 
     const patchLine = useCallback(
         (lineId: string, changes: Partial<LineItemDto>) => {
@@ -143,7 +151,14 @@ export function useOffer(id: string | undefined): UseOfferReturn {
 
     const changeState = useCallback(
         (key: OfferState) => {
-            setOffer((o) => (o ? {...o, state: key} : o));
+            setStatePath((prev) => {
+                // Going back: truncate to the target state
+                const existingIdx = prev.indexOf(key);
+                if (existingIdx >= 0) return prev.slice(0, existingIdx + 1);
+                // Going forward: append
+                return [...prev, key];
+            });
+            setOffer((o) => (o ? {...o, state: key, offerSent: false} : o));
             if (id) void changeOfferState(id, key);
             showToast(`Status auf »${OFFER_STATE_META[key].label}« gesetzt`, 'info');
         },
@@ -151,11 +166,14 @@ export function useOffer(id: string | undefined): UseOfferReturn {
     );
 
     const regenDoc = useCallback(
-        (doc: string) => {
-            showToast(`${doc} neu generiert`);
-            // TODO: POST /offers/{id}/documents/regenerate
+        (doc: string, options?: InvoiceOptions) => {
+            if (!offer) return;
+            void generateOfferPdf(offer, options).catch((err: unknown) => {
+                console.error('[PDF] generation failed:', err);
+                showToast(`${doc} konnte nicht generiert werden`, 'error');
+            });
         },
-        [showToast],
+        [offer, showToast],
     );
 
     const editCustomer = useCallback(
@@ -202,8 +220,22 @@ export function useOffer(id: string | undefined): UseOfferReturn {
         [id, offer, showToast],
     );
 
+    const toggleSent = useCallback(() => {
+        if (!id || !offer) return;
+        const next = !offer.offerSent;
+        setOffer((o) => (o ? {...o, offerSent: next} : o));
+        void markOfferSent(id, next).catch(() => {
+            setOffer((o) => (o ? {...o, offerSent: !next} : o));
+            showToast('Konnte nicht gespeichert werden', 'error');
+        });
+    }, [id, offer, showToast]);
+
+    // Keep offer.path in sync with statePath so the stepper shows the actual path taken
+    const offerWithPath = offer ? {...offer, path: statePath} : null;
+
     return {
-        offer,
+        offer: offerWithPath,
+        prevState,
         feltCatalog,
         productCatalog,
         loading,
@@ -216,5 +248,6 @@ export function useOffer(id: string | undefined): UseOfferReturn {
         regenDoc,
         editCustomer,
         editDueDate,
+        toggleSent,
     };
 }

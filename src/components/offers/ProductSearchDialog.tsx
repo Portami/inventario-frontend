@@ -35,7 +35,7 @@ export default function ProductSearchDialog({open, catalog, onClose, onPick}: Pr
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 4, pt: 3}}>
-                <Typography variant="h6" sx={{fontWeight: 600}}>
+                <Typography variant="h6" component="span" sx={{fontWeight: 600}}>
                     Produkt hinzufügen
                 </Typography>
                 <IconButton onClick={onClose} size="small">

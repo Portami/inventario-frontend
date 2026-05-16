@@ -71,6 +71,7 @@ export interface OfferDto {
     customer: CustomerDto;
     lines: LineItemDto[];
     history: HistoryEntry[];
+    offerSent: boolean;
 }
 
 export interface FeltCatalogItem {
@@ -141,6 +142,7 @@ export interface BackendOfferDto {
     updatedAt: string;
     dueAt?: string;
     items: BackendOfferItemDto[];
+    offerSent: boolean;
 }
 
 export interface BackendCreateOfferItemDto {

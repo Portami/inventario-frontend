@@ -1,7 +1,17 @@
 import {CustomerDto} from '@/types/offerte';
 import CloseIcon from '@mui/icons-material/Close';
-import {Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, Grid, IconButton, TextField, Typography} from '@mui/material';
+import {Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, Grid, IconButton, MenuItem, TextField, Typography} from '@mui/material';
 import {ChangeEvent, useEffect, useState} from 'react';
+
+const COUNTRIES = [
+    {code: 'CH', label: 'Schweiz'},
+    {code: 'DE', label: 'Deutschland'},
+    {code: 'IT', label: 'Italien'},
+    {code: 'FR', label: 'Frankreich'},
+    {code: 'AT', label: 'Österreich'},
+] as const;
+
+const VALID_CODES = COUNTRIES.map((c) => c.code) as string[];
 
 interface Props {
     open: boolean;
@@ -17,7 +27,7 @@ export default function EditCustomerDialog({open, customer, onClose, onSave}: Pr
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        if (open) setForm(customer);
+        if (open) setForm({...customer, country: VALID_CODES.includes(customer.country) ? customer.country : 'CH'});
     }, [open, customer]);
 
     const setField = (f: keyof CustomerDto) => (e: ChangeEvent<HTMLInputElement>) => setForm((prev) => ({...prev, [f]: e.target.value}));
@@ -45,7 +55,7 @@ export default function EditCustomerDialog({open, customer, onClose, onSave}: Pr
     return (
         <Dialog open={open} onClose={saving ? undefined : onClose} maxWidth="sm" fullWidth>
             <DialogTitle sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 4, pt: 3, pb: 2}}>
-                <Typography variant="h6" sx={{fontWeight: 600}}>
+                <Typography variant="h6" component="span" sx={{fontWeight: 600}}>
                     Kundendaten bearbeiten
                 </Typography>
                 <IconButton onClick={onClose} size="small" disabled={saving}>
@@ -112,7 +122,21 @@ export default function EditCustomerDialog({open, customer, onClose, onSave}: Pr
                         <TextField label="Ort" value={form.city} onChange={setField('city')} size="small" fullWidth slotProps={{inputLabel: labelSx}} />
                     </Grid>
                     <Grid size={6}>
-                        <TextField label="Land" value={form.country} onChange={setField('country')} size="small" fullWidth slotProps={{inputLabel: labelSx}} />
+                        <TextField
+                            select
+                            label="Land"
+                            value={form.country}
+                            onChange={setField('country')}
+                            size="small"
+                            fullWidth
+                            slotProps={{inputLabel: labelSx}}
+                        >
+                            {COUNTRIES.map(({code, label}) => (
+                                <MenuItem key={code} value={code}>
+                                    {label}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                     </Grid>
                 </Grid>
             </DialogContent>
