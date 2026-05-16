@@ -24,20 +24,20 @@ function mapBackendOffer(raw: BackendOfferDto): OfferDto {
     return {
         id: String(raw.id),
         number: `A-${raw.id}`,
-        createdISO: raw.createdAt.substring(0, 10),
+        createdISO: raw.createdAt ? raw.createdAt.substring(0, 10) : new Date().toISOString().substring(0, 10),
         state: raw.state,
         path: OFFER_PATH_A,
         customer: {
             customerNumber: String(raw.customerDto.id),
             name: raw.customerDto.name,
-            contactPerson: '',
-            email: '',
-            phone: '',
-            street: '',
-            zip: '',
-            city: '',
-            country: '',
-            vatNumber: '',
+            contactPerson: raw.customerDto.contactPerson ?? '',
+            email: raw.customerDto.email ?? '',
+            phone: raw.customerDto.phone ?? '',
+            street: raw.customerDto.street ?? '',
+            zip: raw.customerDto.zip ?? '',
+            city: raw.customerDto.city ?? '',
+            country: raw.customerDto.country ?? '',
+            vatNumber: raw.customerDto.vatNumber ?? '',
         },
         lines: raw.items.map((item) => ({
             id: String(item.id),
@@ -53,6 +53,7 @@ function mapBackendOffer(raw: BackendOfferDto): OfferDto {
             extras: 0,
             discount: 0,
             reservation: null,
+            _variantId: item.productVariantId,
         })),
         history: [],
     };
@@ -64,13 +65,13 @@ function mapBackendOfferToSummary(raw: BackendOfferDto): OfferSummaryDto {
         id: String(raw.id),
         state: raw.state,
         customer: raw.customerDto.name,
-        contact: '',
-        city: '',
+        contact: raw.customerDto.contactPerson ?? '',
+        city: raw.customerDto.city ?? '',
         lines: raw.items.length,
         total,
         vat: total * VAT_RATE,
-        createdISO: raw.createdAt.substring(0, 10),
-        dueISO: raw.createdAt.substring(0, 10),
+        createdISO: raw.createdAt ? raw.createdAt.substring(0, 10) : new Date().toISOString().substring(0, 10),
+        dueISO: raw.createdAt ? raw.createdAt.substring(0, 10) : new Date().toISOString().substring(0, 10),
         path: 'A',
         overdue: 0,
         reservedScraps: 0,
@@ -375,7 +376,7 @@ export const addOfferLine = async (offerId: string, productVariantId: number, li
         };
         const raw = await post<BackendOfferItemDto>(`/offers/${encodeURIComponent(offerId)}/items`, payload, {signal: controller.signal});
         clearTimeout(timeoutId);
-        return {...line, id: String(raw.id)};
+        return {...line, id: String(raw.id), _variantId: productVariantId};
     } catch (error) {
         clearTimeout(timeoutId);
         throw error;
@@ -406,6 +407,29 @@ export const fetchProductCatalog = async (): Promise<ProductCatalogItem[]> => {
             price: v.price,
         })),
     );
+};
+
+export const createCustomer = async (dto: {
+    name: string;
+    contactPerson?: string;
+    email?: string;
+    phone?: string;
+    street?: string;
+    zip?: string;
+    city?: string;
+    country?: string;
+    vatNumber?: string;
+}): Promise<CustomerWithIdDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const raw = await post<BackendFullCustomerDto>('/customers', dto, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return mapBackendCustomer(raw);
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
 };
 
 export const fetchCustomers = async (): Promise<CustomerWithIdDto[]> => {

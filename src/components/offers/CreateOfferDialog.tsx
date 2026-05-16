@@ -3,7 +3,7 @@ import KindChip from '@/components/offers/KindChip';
 import ProductSearchDialog from '@/components/offers/ProductSearchDialog';
 import {useToast} from '@/components/ToastProvider';
 import {CUT_SURCHARGE_DEFAULT, LINE_KIND, RESERVATION_KIND} from '@/pages/constants/offerConstants';
-import {createOffer, fetchCustomers, fetchFeltCatalog, fetchProductCatalog} from '@/services/backend';
+import {createCustomer, createOffer, fetchCustomers, fetchFeltCatalog, fetchProductCatalog} from '@/services/backend';
 import {BackendCreateOfferItemDto, CustomerWithIdDto, FeltCatalogItem, LineItemDto, ProductCatalogItem} from '@/types/offerte';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import CloseIcon from '@mui/icons-material/Close';
@@ -226,6 +226,9 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
     const handleCreate = async () => {
         setIsSubmitting(true);
         try {
+            if (customerMode === 'new') {
+                await createCustomer(newCustomer);
+            }
             const customerName = customerMode === 'existing' ? selectedCustomer!.name : newCustomer.name.trim();
             const backendItems: BackendCreateOfferItemDto[] = stagedLines.map((line) => ({
                 productVariantId: line.productVariantId,

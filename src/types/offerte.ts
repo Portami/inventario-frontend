@@ -41,6 +41,7 @@ export interface LineItemDto {
     extras: number;
     discount: number;
     reservation: ReservationDto | null;
+    _variantId?: number;
 }
 
 export interface CustomerDto {
@@ -100,6 +101,14 @@ export type BackendOfferState = Exclude<OfferState, 'PAID'>;
 export interface BackendCustomerDto {
     id: number;
     name: string;
+    contactPerson: string | null;
+    email: string | null;
+    phone: string | null;
+    street: string | null;
+    zip: string | null;
+    city: string | null;
+    country: string | null;
+    vatNumber: string | null;
 }
 
 export interface BackendFullCustomerDto {

@@ -1,6 +1,6 @@
 import {useToast} from '@/components/ToastProvider';
 import {CUT_SURCHARGE_DEFAULT, LINE_KIND, OFFER_STATE_META, RESERVATION_KIND} from '@/pages/constants/offerConstants';
-import {addOfferLine, changeOfferState, deleteOfferLine, fetchFeltCatalog, fetchOffer, fetchProductCatalog, patchOfferLine} from '@/services/backend';
+import {addOfferLine, changeOfferState, deleteOfferLine, fetchFeltCatalog, fetchOffer, fetchProductCatalog} from '@/services/backend';
 import {FeltCatalogItem, LineItemDto, OfferDto, OfferState, ProductCatalogItem} from '@/types/offerte';
 import {toErrorMessage} from '@/utils/pageUtils';
 import {useCallback, useEffect, useState} from 'react';
@@ -43,10 +43,27 @@ export function useOffer(id: string | undefined): UseOfferReturn {
 
     const patchLine = useCallback(
         (lineId: string, changes: Partial<LineItemDto>) => {
+            if (!id) return;
+            const originalLine = offer?.lines.find((l) => l.id === lineId);
+            if (!originalLine?._variantId) return;
+
             setOffer((o) => (o ? {...o, lines: o.lines.map((l) => (l.id === lineId ? {...l, ...changes} : l))} : o));
-            if (id) void patchOfferLine(id, lineId, changes);
+
+            const variantId = originalLine._variantId;
+            const updated: Omit<LineItemDto, 'id'> = {...originalLine, ...changes};
+
+            void (async () => {
+                try {
+                    await deleteOfferLine(id, lineId);
+                    const newLine = await addOfferLine(id, variantId, updated);
+                    setOffer((o) => (o ? {...o, lines: o.lines.map((l) => (l.id === lineId ? newLine : l))} : o));
+                } catch {
+                    setOffer((o) => (o ? {...o, lines: o.lines.map((l) => (l.id === lineId ? originalLine : l))} : o));
+                    showToast('Position konnte nicht aktualisiert werden', 'error');
+                }
+            })();
         },
-        [id],
+        [id, offer, showToast],
     );
 
     const deleteLine = useCallback(
