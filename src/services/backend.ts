@@ -138,6 +138,20 @@ export const fetchRolls = async (): Promise<FeltRollDto[]> => {
     }
 };
 
+export const fetchRollsByFelt = async (feltId: number): Promise<FeltRollDto[]> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<FeltRollDto[]>(`/felts/${feltId}/rolls`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheSet('rolls', result);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
 export const createRoll = async (payload: CreateFeltRollRequest): Promise<FeltRollDto> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
