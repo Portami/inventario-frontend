@@ -1,3 +1,4 @@
+import logoSvgUrl from '@/assets/logo.svg';
 import {PORTAMI} from '@/constants/companyConstants';
 import {fmtCHF, fmtDate, fmtNum, lineSubtotal, OFFER_STATE_META} from '@/pages/constants/offerConstants';
 import {LineItemDto, OfferDto, OfferState} from '@/types/offerte';
@@ -49,6 +50,15 @@ const COL = {
 } as const;
 
 const RIGHT = A4.w - MM.right; // 195 mm
+
+const QR_ZONE_TOP = A4.h - 105; // 192 mm — top edge of QR bill zone
+const SAFE_BOTTOM_QR = QR_ZONE_TOP - 4; // 188 mm — stop content here to leave a gap
+const SAFE_BOTTOM_STD = A4.h - MM.bottom; // 282 mm — for pages without a QR bill
+
+function newPage(pdf: jsPDF): number {
+    pdf.addPage();
+    return MM.top;
+}
 
 // ─── Section renderers ────────────────────────────────────────────────────────
 
@@ -133,18 +143,15 @@ function drawDocTitle(pdf: jsPDF, offer: OfferDto, y: number): number {
     return y + 8;
 }
 
-function drawLineItemsTable(pdf: jsPDF, lines: LineItemDto[], y: number): number {
-    const ROW_H = 11; // mm per data row
-    const HDR_H = 8; // mm for header row
-    const bgGray: [number, number, number] = [245, 245, 245];
+const ROW_H = 11; // mm per data row
+const HDR_H = 8; // mm for header row
 
-    // Header background
+function drawTableHeader(pdf: jsPDF, y: number): number {
+    const bgGray: [number, number, number] = [245, 245, 245];
     pdf.setFillColor(...bgGray);
     pdf.rect(MM.left, y, CONTENT_W, HDR_H, 'F');
     hRule(pdf, y, MM.left, RIGHT, [185, 185, 185]);
     hRule(pdf, y + HDR_H, MM.left, RIGHT, [185, 185, 185]);
-
-    // Header labels
     setFont(pdf, 'bold', 7.5, C.dim);
     const hy = y + 5.5;
     txt(pdf, '#', COL.num.x, hy);
@@ -153,8 +160,11 @@ function drawLineItemsTable(pdf: jsPDF, lines: LineItemDto[], y: number): number
     txt(pdf, 'PREIS / EINH.', COL.price.x + COL.price.w, hy, {align: 'right'});
     txt(pdf, 'ZUSCHNITT', COL.cut.x + COL.cut.w, hy, {align: 'right'});
     txt(pdf, 'GESAMT', COL.total.x + COL.total.w, hy, {align: 'right'});
+    return y + HDR_H;
+}
 
-    y += HDR_H;
+function drawLineItemsTable(pdf: jsPDF, lines: LineItemDto[], y: number, safeBottom: number): number {
+    y = drawTableHeader(pdf, y);
 
     if (lines.length === 0) {
         setFont(pdf, 'normal', 9, C.muted);
@@ -162,48 +172,50 @@ function drawLineItemsTable(pdf: jsPDF, lines: LineItemDto[], y: number): number
         return y + 14;
     }
 
+    let ry = y;
+    let rowOnPage = 0;
     lines.forEach((line, i) => {
-        const ry = y + i * ROW_H;
-        const b1 = ry + 4.5; // primary text baseline
-        const b2 = ry + 8.5; // secondary text baseline
+        // Only break mid-table for large tables (>10 rows)
+        if (lines.length > 10 && ry + ROW_H > safeBottom) {
+            ry = newPage(pdf);
+            ry = drawTableHeader(pdf, ry);
+            rowOnPage = 0;
+        }
 
-        if (i % 2 === 1) {
+        const b1 = ry + 4.5;
+        const b2 = ry + 8.5;
+
+        if (rowOnPage % 2 === 1) {
             pdf.setFillColor(250, 250, 250);
             pdf.rect(MM.left, ry, CONTENT_W, ROW_H, 'F');
         }
         hRule(pdf, ry + ROW_H, MM.left, RIGHT, [228, 228, 228]);
 
-        // #
         setFont(pdf, 'normal', 8, C.muted);
         txt(pdf, String(i + 1), COL.num.x, b1);
 
-        // Artikel — primary line (truncate to column width, no wrap)
         setFont(pdf, 'bold', 9, C.ink);
         const nameText = line.feltTypeName + (line.color ? ` · ${line.color}` : '');
         txt(pdf, fitText(pdf, nameText, COL.art.w), COL.art.x, b1);
 
-        // Artikel — secondary line (skip description when it duplicates the primary name)
         setFont(pdf, 'normal', 7.5, C.dim);
         const descPart = line.description !== line.feltTypeName ? line.description : null;
         const secondary = [line.articleNumber, descPart].filter(Boolean).join(' · ');
         if (secondary) txt(pdf, fitText(pdf, secondary, COL.art.w), COL.art.x, b2);
 
-        // Menge
         setFont(pdf, 'normal', 9, C.ink);
         txt(pdf, `${line.quantity} ${line.unit}`, COL.qty.x + COL.qty.w, b1, {align: 'right'});
-
-        // Preis/Einh.
         txt(pdf, fmtCHF(line.pricePerUnit), COL.price.x + COL.price.w, b1, {align: 'right'});
-
-        // Zuschnitt
         txt(pdf, line.cutSurcharge > 0 ? fmtCHF(line.cutSurcharge) : '—', COL.cut.x + COL.cut.w, b1, {align: 'right'});
 
-        // Gesamt
         setFont(pdf, 'bold', 9, C.ink);
         txt(pdf, fmtCHF(lineSubtotal(line)), COL.total.x + COL.total.w, b1, {align: 'right'});
+
+        ry += ROW_H;
+        rowOnPage++;
     });
 
-    return y + lines.length * ROW_H + 3;
+    return ry + 3;
 }
 
 function drawTotals(pdf: jsPDF, lines: LineItemDto[], y: number, state: OfferState, options?: InvoiceOptions): number {
@@ -333,6 +345,33 @@ function drawFooter(pdf: jsPDF, state: OfferState, y: number): void {
     }
 }
 
+// ─── Logo ─────────────────────────────────────────────────────────────────────
+
+const LOGO_W_MM = 32;
+const LOGO_H_MM = LOGO_W_MM * (83 / 148); // preserve aspect ratio
+
+async function addLogo(pdf: jsPDF): Promise<void> {
+    await new Promise<void>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            const scale = 4;
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(148 * scale);
+            canvas.height = Math.round(83 * scale);
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                reject(new Error('Canvas 2D context unavailable'));
+                return;
+            }
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', MM.left, MM.top, LOGO_W_MM, LOGO_H_MM);
+            resolve();
+        };
+        img.onerror = () => reject(new Error('Logo SVG render failed'));
+        img.src = logoSvgUrl;
+    });
+}
+
 // ─── QR bill ─────────────────────────────────────────────────────────────────
 
 async function addQRBill(pdf: jsPDF, offer: OfferDto, total: number): Promise<void> {
@@ -397,12 +436,20 @@ async function addQRBill(pdf: jsPDF, offer: OfferDto, total: number): Promise<vo
 
 // ─── Main export ─────────────────────────────────────────────────────────────
 
+const COMBINED_TAIL_H = 78; // mm — actual combined height of totals + footer
+
 export async function generateOfferPdf(offer: OfferDto, options?: InvoiceOptions): Promise<void> {
     const pdf = createA4();
+    await addLogo(pdf);
+    const safeBottom = QR_STATES.includes(offer.state) ? SAFE_BOTTOM_QR : SAFE_BOTTOM_STD;
+
     let y = drawCompanyHeader(pdf);
     y = drawCustomerBlock(pdf, offer, y);
     y = drawDocTitle(pdf, offer, y);
-    y = drawLineItemsTable(pdf, offer.lines, y);
+    y = drawLineItemsTable(pdf, offer.lines, y, safeBottom);
+
+    // Only page-break if totals + footer genuinely won't fit on this page
+    if (y + COMBINED_TAIL_H > safeBottom) y = newPage(pdf);
     y = drawTotals(pdf, offer.lines, y, offer.state, options);
     drawFooter(pdf, offer.state, y);
 
