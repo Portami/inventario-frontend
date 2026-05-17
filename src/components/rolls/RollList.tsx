@@ -1,5 +1,5 @@
-import {ProductId} from '@/types/product';
-import {FeltRollDto} from '@/types/roll';
+import {ProductId} from '@/types/product.ts';
+import {FeltRollDto} from '@/types/roll.ts';
 import {Button} from '@mui/material';
 import {DataGrid, GridColDef} from '@mui/x-data-grid';
 import {useMemo} from 'react';

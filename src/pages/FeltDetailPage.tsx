@@ -1,8 +1,8 @@
 import DetailPage from '@/components/DetailPage';
+import DeleteFeltDialog from '@/components/felts/DeleteFeltDialog';
+import FeltDialog from '@/components/felts/FeltDialog';
+import RollDialog from '@/components/rolls/RollDialog';
 import {useToast} from '@/components/ToastProvider';
-import DeleteFeltDialog from '@/pages/components/DeleteFeltDialog';
-import FeltDialog from '@/pages/components/FeltDialog';
-import RollDialog from '@/pages/components/RollDialog';
 import {deleteFelt, deleteRoll, fetchFelts, fetchRolls, fetchRollsByFelt, fetchScrapsByFelt} from '@/services/backend';
 import {FeltDto} from '@/types/felt';
 import {Product} from '@/types/product';

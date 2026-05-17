@@ -1,0 +1,17 @@
+export const PORTAMI = {
+    name: 'PORTAMI - Manufaktur & Filz',
+    owners: 'Flurina & Nicola Vitali',
+    street: 'Gäuggelistrasse 49',
+    zip: '7000',
+    city: 'Chur',
+    country: 'CH',
+    addr: 'Gäuggelistrasse 49, CH-7000 Chur',
+    phone: 'Tel/Fax +41 81 253 07 73',
+    email: 'info@portami.ch',
+    web: 'www.portami.ch',
+    emailWeb: 'info@portami.ch · www.portami.ch',
+    iban: 'CH9600774110105191101',
+    ibanFormatted: 'CH96 0077 4110 1051 9110 1',
+    bank: 'Graubündner Kantonalbank (GKB), Chur',
+    uid: 'CHE-116.212.904',
+} as const;

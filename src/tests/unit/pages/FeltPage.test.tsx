@@ -40,7 +40,7 @@ vi.mock('@/services/backend', () => {
 });
 
 // Mock DeleteFeltDialog to render a confirm button that calls onConfirm when clicked
-vi.mock('@/pages/components/DeleteFeltDialog', () => {
+vi.mock('@/components/felts/DeleteFeltDialog', () => {
     return {
         default: ({open, felt, onConfirm, onClose}: any) =>
             open ? (

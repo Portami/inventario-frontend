@@ -3,11 +3,14 @@ import App from './App';
 import theme from './theme';
 import NavigationLayout from '@/components/NavigationLayout.tsx';
 import {ToastProvider} from '@/components/ToastProvider';
+import CustomersPage from '@/pages/CustomersPage.tsx';
 import FeltDetailPage from '@/pages/FeltDetailPage.tsx';
 import FeltPage from '@/pages/FeltPage.tsx';
 import FeltReorderPage from '@/pages/FeltReorderPage.tsx';
 import InventoryPage from '@/pages/InventoryPage.tsx';
 import LabelGeneratorPage from '@/pages/LabelGeneratorPage.tsx';
+import OfferDetailPage from '@/pages/OfferDetailPage.tsx';
+import OffersPage from '@/pages/OffersPage.tsx';
 import ProductDetailView from '@/pages/ProductDetailView.tsx';
 import ProductsPage from '@/pages/ProductsPage.tsx';
 import RollDetail from '@/pages/RollDetail.tsx';
@@ -38,6 +41,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <Route path="/products" element={<ProductsPage />} />
                         <Route path="/product/:id" element={<ProductDetailView />} />
                         <Route path="/roll/:id" element={<RollDetail />} />
+                        <Route path="/offers" element={<OffersPage />} />
+                        <Route path="/offers/:id" element={<OfferDetailPage />} />
+                        <Route path="/customers" element={<CustomersPage />} />
                     </Route>
                     <Route path="/scrap/:id" element={<ScrapDetail />} />
                 </Routes>

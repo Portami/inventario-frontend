@@ -48,13 +48,13 @@ vi.mock('@/services/backend', () => {
     };
 });
 
-vi.mock('@/pages/components/FeltDialog', () => {
+vi.mock('@/components/felts/FeltDialog', () => {
     return {
         default: ({open, felt}: any) => (open ? <div data-testid="felt-dialog">{felt?.articleNumber}</div> : null),
     };
 });
 
-vi.mock('@/pages/components/DeleteFeltDialog', () => {
+vi.mock('@/components/felts/DeleteFeltDialog', () => {
     return {
         default: ({open, felt, onConfirm}: any) =>
             open ? (
