@@ -51,10 +51,14 @@ export default function CustomersPage() {
 
     const handleSave = async (changes: Partial<CustomerDto>) => {
         if (!selected) return;
-        const updated = await updateCustomer(selected.customerNumber, changes);
-        setCustomers((prev) => prev.map((c) => (c.customerNumber === updated.customerNumber ? {...c, ...updated} : c)));
-        setSelected((prev) => (prev ? {...prev, ...updated} : prev));
-        showToast('Kundendaten gespeichert');
+        try {
+            const updated = await updateCustomer(selected.customerNumber, changes);
+            setCustomers((prev) => prev.map((c) => (c.customerNumber === updated.customerNumber ? {...c, ...updated} : c)));
+            setSelected((prev) => (prev ? {...prev, ...updated} : prev));
+            showToast('Kundendaten gespeichert');
+        } catch {
+            showToast('Kundendaten konnten nicht gespeichert werden', 'error');
+        }
     };
 
     const cellPad = '8px 12px';

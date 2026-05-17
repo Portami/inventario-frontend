@@ -70,11 +70,11 @@ function drawCompanyHeader(pdf: jsPDF): number {
     setFont(pdf, 'normal', 9, C.dim);
     txt(pdf, PORTAMI.owners, RIGHT, y, {align: 'right'});
     y += 4.5;
-    txt(pdf, `${PORTAMI.street}, CH-${PORTAMI.zip} ${PORTAMI.city}`, RIGHT, y, {align: 'right'});
+    txt(pdf, PORTAMI.addr, RIGHT, y, {align: 'right'});
     y += 4.5;
     txt(pdf, PORTAMI.phone, RIGHT, y, {align: 'right'});
     y += 4.5;
-    txt(pdf, `${PORTAMI.email}  ·  ${PORTAMI.web}`, RIGHT, y, {align: 'right'});
+    txt(pdf, PORTAMI.emailWeb, RIGHT, y, {align: 'right'});
 
     return y + 9; // bottom of header block
 }
@@ -172,7 +172,9 @@ function drawLineItemsTable(pdf: jsPDF, lines: LineItemDto[], y: number, safeBot
 
     let ry = y;
     let rowOnPage = 0;
-    lines.forEach((line, i) => {
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
         // Only break mid-table for large tables (>10 rows)
         if (lines.length > 10 && ry + ROW_H > safeBottom) {
             ry = newPage(pdf);
@@ -211,7 +213,7 @@ function drawLineItemsTable(pdf: jsPDF, lines: LineItemDto[], y: number, safeBot
 
         ry += ROW_H;
         rowOnPage++;
-    });
+    }
 
     return ry + 3;
 }

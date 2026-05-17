@@ -15,7 +15,6 @@ import {OfferState} from '@/types/offerte';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import ForwardIcon from '@mui/icons-material/Forward';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import {
@@ -54,25 +53,30 @@ export default function OffersPage() {
     const [sort, setSort] = useState<SortOption>('created_desc');
     const [dateRange, setDateRange] = useState<DateRange>('all');
     const [page, setPage] = useState(1);
-    const [selected, setSelected] = useState<string[]>([]);
+    const [selected, setSelected] = useState<Set<string>>(new Set());
     const [createDlgOpen, setCreateDlgOpen] = useState(false);
     const [bulkStateDlgOpen, setBulkStateDlgOpen] = useState(false);
     const [bulkLoading, setBulkLoading] = useState(false);
 
     const stats = useMemo(() => {
-        const open = offers.filter((o) => o.state !== OFFER_STATE.COMPLETED);
-        const overdue = offers.filter((o) => o.overdue > 0);
-        const quotes = offers.filter((o) => o.state === OFFER_STATE.OFFER);
-        const paid = offers.filter((o) => o.state === OFFER_STATE.COMPLETED);
-        return {
-            all: offers.length,
-            open: open.length,
-            openSum: open.reduce((s, o) => s + o.total, 0),
-            overdue: overdue.length,
-            quotes: quotes.length,
-            paid: paid.length,
-            paidSum: paid.reduce((s, o) => s + o.total, 0),
-        };
+        let open = 0,
+            openSum = 0,
+            overdue = 0,
+            quotes = 0,
+            paid = 0,
+            paidSum = 0;
+        for (const o of offers) {
+            if (o.state !== OFFER_STATE.COMPLETED) {
+                open++;
+                openSum += o.total;
+            } else {
+                paid++;
+                paidSum += o.total;
+            }
+            if (o.overdue > 0) overdue++;
+            if (o.state === OFFER_STATE.OFFER) quotes++;
+        }
+        return {all: offers.length, open, openSum, overdue, quotes, paid, paidSum};
     }, [offers]);
 
     const filtered = useMemo(() => {
@@ -129,30 +133,35 @@ export default function OffersPage() {
         setStateFilter('ALL');
         setDateRange('all');
         setPage(1);
-        setSelected([]);
+        setSelected(new Set());
     };
 
     const handleStateFilter = (key: StateFilter) => {
         setStateFilter(key);
         setPage(1);
-        setSelected([]);
+        setSelected(new Set());
     };
 
     const toggleAll = () => {
-        if (selected.length === pageRows.length) setSelected([]);
-        else setSelected(pageRows.map((r) => r.id));
+        if (selected.size === pageRows.length) setSelected(new Set());
+        else setSelected(new Set(pageRows.map((r) => r.id)));
     };
 
     const toggleOne = (id: string) => {
-        setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+        setSelected((s) => {
+            const next = new Set(s);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
     };
 
     const handleBulkStateChange = async (state: OfferState) => {
         setBulkLoading(true);
         try {
-            await Promise.all(selected.map((id) => changeOfferState(id, state)));
-            showToast(`${selected.length} Offerten auf »${OFFER_STATE_META[state].label}« gesetzt`);
-            setSelected([]);
+            await Promise.all([...selected].map((id) => changeOfferState(id, state)));
+            showToast(`${selected.size} Offerten auf »${OFFER_STATE_META[state].label}« gesetzt`);
+            setSelected(new Set());
             setBulkStateDlgOpen(false);
             await refetch();
         } catch {
@@ -169,7 +178,7 @@ export default function OffersPage() {
                 const offer = await fetchOffer(id);
                 await generateOfferPdf(offer);
             }
-            showToast(`${selected.length} PDF${selected.length > 1 ? 's' : ''} generiert`);
+            showToast(`${selected.size} PDF${selected.size > 1 ? 's' : ''} generiert`);
         } catch {
             showToast('PDF konnte nicht generiert werden', 'error');
         } finally {
@@ -263,7 +272,7 @@ export default function OffersPage() {
                         </Button>
                     )}
                 </Typography>
-                {selected.length > 0 && (
+                {selected.size > 0 && (
                     <Box
                         sx={{
                             display: 'flex',
@@ -276,7 +285,7 @@ export default function OffersPage() {
                             border: `1px solid ${primary}55`,
                         }}
                     >
-                        <Typography sx={{fontSize: 13, fontWeight: 500, color: primary}}>{selected.length} ausgewählt</Typography>
+                        <Typography sx={{fontSize: 13, fontWeight: 500, color: primary}}>{selected.size} ausgewählt</Typography>
                         <Divider orientation="vertical" flexItem />
                         <Button
                             size="small"
@@ -296,7 +305,7 @@ export default function OffersPage() {
                         >
                             Status ändern
                         </Button>
-                        <IconButton size="small" onClick={() => setSelected([])}>
+                        <IconButton size="small" onClick={() => setSelected(new Set())}>
                             <CloseIcon sx={{fontSize: 16}} />
                         </IconButton>
                     </Box>
@@ -331,8 +340,8 @@ export default function OffersPage() {
                                     <TableCell sx={{width: 40}}>
                                         <Checkbox
                                             size="small"
-                                            indeterminate={selected.length > 0 && selected.length < pageRows.length}
-                                            checked={pageRows.length > 0 && selected.length === pageRows.length}
+                                            indeterminate={selected.size > 0 && selected.size < pageRows.length}
+                                            checked={pageRows.length > 0 && selected.size === pageRows.length}
                                             onChange={toggleAll}
                                             sx={{p: 0.5, color: 'rgba(0,0,0,0.4)'}}
                                         />
@@ -355,7 +364,7 @@ export default function OffersPage() {
                             <TableBody>
                                 {pageRows.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={10} sx={{textAlign: 'center', py: 8, color: 'text.secondary'}}>
+                                        <TableCell colSpan={9} sx={{textAlign: 'center', py: 8, color: 'text.secondary'}}>
                                             <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5}}>
                                                 <ReceiptLongOutlinedIcon sx={{fontSize: 48, color: 'rgba(0,0,0,0.18)'}} />
                                                 <Typography variant="body2">Keine Offerten gefunden.</Typography>
@@ -365,7 +374,7 @@ export default function OffersPage() {
                                     </TableRow>
                                 )}
                                 {pageRows.map((o) => {
-                                    const sel = selected.includes(o.id);
+                                    const sel = selected.has(o.id);
                                     return (
                                         <TableRow
                                             key={o.id}
@@ -413,11 +422,6 @@ export default function OffersPage() {
                                             <TableCell align="right" sx={{fontWeight: 600, fontSize: 13.5, fontVariantNumeric: 'tabular-nums'}}>
                                                 {fmtCHF(o.total)}
                                             </TableCell>
-                                            <TableCell align="right" onClick={(e) => e.stopPropagation()}>
-                                                <IconButton size="small" sx={{color: 'rgba(0,0,0,0.45)'}}>
-                                                    <MoreHorizIcon sx={{fontSize: 18}} />
-                                                </IconButton>
-                                            </TableCell>
                                         </TableRow>
                                     );
                                 })}
@@ -457,7 +461,7 @@ export default function OffersPage() {
             />
             <BulkStateDialog
                 open={bulkStateDlgOpen}
-                count={selected.length}
+                count={selected.size}
                 loading={bulkLoading}
                 onClose={() => setBulkStateDlgOpen(false)}
                 onConfirm={(state) => void handleBulkStateChange(state)}

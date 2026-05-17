@@ -1,7 +1,8 @@
 import {fetchOffers} from '@/services/backend';
+import {cacheInvalidate} from '@/services/cache';
 import {OfferSummaryDto} from '@/types/offerte';
 import {toErrorMessage} from '@/utils/pageUtils';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 export interface UseOffersReturn {
     offers: OfferSummaryDto[];
@@ -15,7 +16,7 @@ export function useOffers(): UseOffersReturn {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    const load = async () => {
+    const load = useCallback(async () => {
         setLoading(true);
         try {
             const data = await fetchOffers();
@@ -26,11 +27,16 @@ export function useOffers(): UseOffersReturn {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    const refetch = useCallback(async () => {
+        cacheInvalidate('offers');
+        await load();
+    }, [load]);
 
     useEffect(() => {
         void load();
-    }, []);
+    }, [load]);
 
-    return {offers, loading, error, refetch: load};
+    return {offers, loading, error, refetch};
 }

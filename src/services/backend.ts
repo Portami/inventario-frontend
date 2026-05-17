@@ -1,6 +1,6 @@
 import {del, get, patch, post} from './api';
 import {cacheGet, cacheInvalidate, cacheSet} from './cache';
-import {ALL_BACKEND_STATES, computeInitialPath, VAT_RATE} from '@/pages/constants/offerConstants';
+import {ALL_BACKEND_STATES, computeInitialPath, daysFromNow, VAT_RATE} from '@/pages/constants/offerConstants';
 import {CreateFeltRequest, FeltDto} from '@/types/felt';
 import {
     BackendCreateOfferItemDto,
@@ -20,12 +20,14 @@ import {Product, ProductDto, ProductId} from '@/types/product';
 import {CreateFeltRollRequest, FeltRollDto, UpdateFeltRollRequest} from '@/types/roll';
 import {ScanResult} from '@/types/scanner';
 
+const toDateISO = (s?: string | null): string => (s ?? new Date().toISOString()).substring(0, 10);
+
 function mapBackendOffer(raw: BackendOfferDto): OfferDto {
     return {
         id: String(raw.id),
         number: `A-${raw.id}`,
-        createdISO: raw.createdAt ? raw.createdAt.substring(0, 10) : new Date().toISOString().substring(0, 10),
-        dueISO: raw.dueAt ? raw.dueAt.substring(0, 10) : undefined,
+        createdISO: toDateISO(raw.createdAt),
+        dueISO: raw.dueAt ? toDateISO(raw.dueAt) : undefined,
         state: raw.state,
         path: computeInitialPath(raw.state),
         customer: {
@@ -40,6 +42,7 @@ function mapBackendOffer(raw: BackendOfferDto): OfferDto {
             country: raw.customerDto.country ?? '',
             vatNumber: raw.customerDto.vatNumber ?? '',
         },
+        // TODO: map item kind from backend once the API exposes it
         lines: raw.items.map((item) => ({
             id: String(item.id),
             kind: 'PRODUKT' as LineItemKind,
@@ -63,6 +66,7 @@ function mapBackendOffer(raw: BackendOfferDto): OfferDto {
 
 function mapBackendOfferToSummary(raw: BackendOfferDto): OfferSummaryDto {
     const total = raw.items.reduce((sum, item) => sum + Number(item.unitPrice) * item.quantity, 0);
+    const dueISO = raw.dueAt ? toDateISO(raw.dueAt) : toDateISO(raw.createdAt);
     return {
         id: String(raw.id),
         state: raw.state,
@@ -72,10 +76,10 @@ function mapBackendOfferToSummary(raw: BackendOfferDto): OfferSummaryDto {
         lines: raw.items.length,
         total,
         vat: total * VAT_RATE,
-        createdISO: raw.createdAt ? raw.createdAt.substring(0, 10) : new Date().toISOString().substring(0, 10),
-        dueISO: raw.dueAt ? raw.dueAt.substring(0, 10) : raw.createdAt ? raw.createdAt.substring(0, 10) : new Date().toISOString().substring(0, 10),
+        createdISO: toDateISO(raw.createdAt),
+        dueISO,
         path: 'A',
-        overdue: 0,
+        overdue: raw.dueAt ? Math.max(0, -daysFromNow(toDateISO(raw.dueAt))) : 0,
         reservedScraps: 0,
         taggedRolls: 0,
     };
@@ -336,12 +340,17 @@ export const fetchProducts = async (): Promise<ProductDto[]> => {
 };
 
 export const fetchOffers = async (): Promise<OfferSummaryDto[]> => {
+    const cached = cacheGet<OfferSummaryDto[]>('offers');
+    if (cached) return cached;
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
     try {
         const results = await Promise.all(ALL_BACKEND_STATES.map((state) => get<BackendOfferDto[]>(`/offers?state=${state}`, {signal: controller.signal})));
         clearTimeout(timeoutId);
-        return results.flat().map(mapBackendOfferToSummary);
+        const data = results.flat().map(mapBackendOfferToSummary);
+        cacheSet('offers', data);
+        return data;
     } catch (error) {
         clearTimeout(timeoutId);
         throw error;

@@ -21,7 +21,6 @@ interface NavBtnProps {
     icon: React.ReactNode;
     label: string;
     collapsed: boolean;
-    active?: boolean;
 }
 
 function NavBtn({to, icon, label, collapsed}: NavBtnProps) {

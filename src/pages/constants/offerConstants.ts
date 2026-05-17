@@ -126,4 +126,4 @@ export const fmtDate = (iso: string): string => new Date(iso + 'T00:00:00').toLo
 
 export const daysFromNow = (iso: string): number => Math.round((new Date(iso + 'T00:00:00').getTime() - Date.now()) / 86400000);
 
-export const lineSubtotal = (l: LineItemDto): number => l.pricePerUnit * l.quantity + l.cutSurcharge * l.quantity + (l.extras ?? 0) - (l.discount ?? 0);
+export const lineSubtotal = (l: LineItemDto): number => l.pricePerUnit * l.quantity + l.cutSurcharge * l.quantity + l.extras - l.discount;

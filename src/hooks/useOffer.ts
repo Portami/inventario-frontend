@@ -179,27 +179,8 @@ export function useOffer(id: string | undefined): UseOfferReturn {
     const editCustomer = useCallback(
         async (changes: Partial<CustomerDto>) => {
             if (!offer) return;
-            const customerId = offer.customer.customerNumber;
-            const updated = await updateCustomer(customerId, changes);
-            setOffer((o) =>
-                o
-                    ? {
-                          ...o,
-                          customer: {
-                              customerNumber: updated.customerNumber,
-                              name: updated.name,
-                              contactPerson: updated.contactPerson,
-                              email: updated.email,
-                              phone: updated.phone,
-                              street: updated.street,
-                              zip: updated.zip,
-                              city: updated.city,
-                              country: updated.country,
-                              vatNumber: updated.vatNumber,
-                          },
-                      }
-                    : o,
-            );
+            const updated = await updateCustomer(offer.customer.customerNumber, changes);
+            setOffer((o) => (o ? {...o, customer: updated} : o));
             showToast('Kundendaten gespeichert');
         },
         [offer, showToast],
