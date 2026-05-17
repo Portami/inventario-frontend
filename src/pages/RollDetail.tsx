@@ -332,12 +332,7 @@ export default function RollDetail() {
                 </DialogActions>
             </Dialog>
 
-            <Dialog
-                open={isSplitOpen}
-                onClose={() => setIsSplitOpen(false)}
-                maxWidth="xs"
-                fullWidth
-            >
+            <Dialog open={isSplitOpen} onClose={() => setIsSplitOpen(false)} maxWidth="xs" fullWidth>
                 <DialogTitle>Rolle abschneiden</DialogTitle>
                 <DialogContent>
                     <TextField

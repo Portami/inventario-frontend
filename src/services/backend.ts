@@ -1,12 +1,12 @@
 import {del, get, patch, post} from './api';
 import {cacheGet, cacheInvalidate, cacheSet} from './cache';
 import {getMockProductById, getMockProducts} from './mock/backendMock.ts';
+import {Batch} from '@/types/batches.ts';
 import {CreateFeltRequest, FeltDto, FeltTypeDto} from '@/types/felt';
 import {Product, ProductDto, ProductId} from '@/types/product';
 import {CreateFeltRollRequest, FeltRollDto, UpdateFeltRollRequest} from '@/types/roll';
 import {ScanResult} from '@/types/scanner';
 import {Storage} from '@/types/storage';
-import {Batch} from '@/types/batches.ts';
 import {Supplier} from '@/types/supplier.ts';
 
 /**
