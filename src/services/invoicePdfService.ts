@@ -1,13 +1,11 @@
+import {computeTotal} from './invoiceTotal';
+import {A4, C, CONTENT_W, createA4, fitText, hRule, MM, setFont, txt} from './pdfFactory';
 import logoSvgUrl from '@/assets/logo.svg';
 import {PORTAMI} from '@/constants/companyConstants';
 import {fmtCHF, fmtDate, fmtNum, lineSubtotal, OFFER_STATE_META} from '@/pages/constants/offerConstants';
 import {LineItemDto, OfferDto, OfferState} from '@/types/offerte';
-
-export interface InvoiceOptions {
-    shippingFee?: number;
-    vatRate?: number;
-}
-import {A4, C, CONTENT_W, createA4, fitText, hRule, MM, setFont, txt} from './pdfFactory';
+export type {InvoiceOptions} from './invoiceTotal';
+import type {InvoiceOptions} from './invoiceTotal';
 import jsPDF from 'jspdf';
 import {SwissQRBill} from 'swissqrbill/svg';
 
@@ -219,13 +217,7 @@ function drawLineItemsTable(pdf: jsPDF, lines: LineItemDto[], y: number, safeBot
 }
 
 function drawTotals(pdf: jsPDF, lines: LineItemDto[], y: number, state: OfferState, options?: InvoiceOptions): number {
-    const subtotal = lines.reduce((s, l) => s + lineSubtotal(l), 0);
-    const shippingFee = options?.shippingFee ?? 0;
-    const vatRate = options?.vatRate ?? 0;
-    const dunningFee = state === 'SECOND_DUNNING_NOTICE' ? 30 : 0;
-    const vatBase = subtotal + shippingFee;
-    const vatAmount = vatBase * vatRate;
-    const total = vatBase + vatAmount + dunningFee;
+    const {subtotal, shippingFee, vatRate, vatAmount, dunningFee, total} = computeTotal(lines, state, options);
     const labelX = COL.cut.x;
 
     y += 2;
@@ -453,11 +445,7 @@ export async function generateOfferPdf(offer: OfferDto, options?: InvoiceOptions
     y = drawTotals(pdf, offer.lines, y, offer.state, options);
     drawFooter(pdf, offer.state, y);
 
-    const shippingFee = options?.shippingFee ?? 0;
-    const vatRate = options?.vatRate ?? 0;
-    const subtotal = offer.lines.reduce((s, l) => s + lineSubtotal(l), 0);
-    const vatAmount = (subtotal + shippingFee) * vatRate;
-    const total = subtotal + shippingFee + vatAmount + (offer.state === 'SECOND_DUNNING_NOTICE' ? 30 : 0);
+    const {total} = computeTotal(offer.lines, offer.state, options);
     if (QR_STATES.includes(offer.state)) {
         await addQRBill(pdf, offer, total);
     }
