@@ -40,6 +40,10 @@ import {useNavigate} from 'react-router';
 
 type StateFilter = 'ALL' | 'OPEN' | 'OVERDUE' | OfferState;
 
+/**
+ * Main offers list page. Displays stat tiles for quick filtering, a search and sort bar,
+ * a paginated data table, and bulk actions for PDF generation and state changes.
+ */
 export default function OffersPage() {
     const theme = useTheme();
     const primary = theme.palette.primary.main;
@@ -58,6 +62,7 @@ export default function OffersPage() {
     const [bulkStateDlgOpen, setBulkStateDlgOpen] = useState(false);
     const [bulkLoading, setBulkLoading] = useState(false);
 
+    // Aggregate counts and sums across all offers for the stat tiles.
     const stats = useMemo(() => {
         let open = 0,
             openSum = 0,
@@ -79,6 +84,7 @@ export default function OffersPage() {
         return {all: offers.length, open, openSum, overdue, quotes, paid, paidSum};
     }, [offers]);
 
+    // Apply search query, state filter, and date range, then sort the result.
     const filtered = useMemo(() => {
         let rows = offers.slice();
         if (q.trim()) {
@@ -156,6 +162,7 @@ export default function OffersPage() {
         });
     };
 
+    /** Changes the state of all selected offers in parallel, then refetches to reflect the updated data. */
     const handleBulkStateChange = async (state: OfferState) => {
         setBulkLoading(true);
         try {
@@ -171,6 +178,7 @@ export default function OffersPage() {
         }
     };
 
+    /** Generates and downloads a PDF for each selected offer sequentially. */
     const handleBulkPdf = async () => {
         setBulkLoading(true);
         try {

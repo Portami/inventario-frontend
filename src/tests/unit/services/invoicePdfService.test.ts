@@ -2,8 +2,7 @@ import {generateOfferPdf} from '@/services/invoicePdfService';
 import {CustomerDto, LineItemDto, OfferDto, OfferState} from '@/types/offerte';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-// ─── Hoisted mocks ────────────────────────────────────────────────────────────
-// vi.hoisted ensures these are initialized before vi.mock factories run.
+// Hoisted mocks — vi.hoisted ensures initialization before vi.mock factories run.
 
 const mockPdf = vi.hoisted(() => ({
     setFont: vi.fn(),
@@ -36,7 +35,7 @@ vi.mock('jspdf', () => ({
 vi.mock('swissqrbill/svg', () => ({SwissQRBill: MockQRBill}));
 vi.mock('@/assets/logo.svg', () => ({default: 'data:image/svg+xml,<svg/>'}));
 
-// ─── Fixtures ─────────────────────────────────────────────────────────────────
+// Fixtures
 
 const CUSTOMER: CustomerDto = {
     customerNumber: 'C-1',
@@ -85,7 +84,7 @@ function makeOffer(overrides: Partial<OfferDto> = {}): OfferDto {
     };
 }
 
-// ─── DOM / browser API mocks ──────────────────────────────────────────────────
+// DOM and browser API mocks
 
 class MockImage {
     onload: (() => void) | null = null;
@@ -130,7 +129,7 @@ afterEach(() => {
     restoreCreateElement?.();
 });
 
-// ─── QR bill generation by state ─────────────────────────────────────────────
+// QR bill generation by state
 
 const QR_STATES: OfferState[] = ['INVOICE', 'PAYMENT_REMINDER', 'FIRST_DUNNING_NOTICE', 'SECOND_DUNNING_NOTICE', 'COMPLETED'];
 const NON_QR_STATES: OfferState[] = ['OFFER', 'ORDER_CONFIRMATION'];
@@ -157,7 +156,7 @@ describe('QR bill — generated for QR states only', () => {
     });
 });
 
-// ─── Total passed to QR bill ──────────────────────────────────────────────────
+// Total passed to QR bill
 
 describe('QR bill amount — matches computeTotal', () => {
     it('passes correct total for INVOICE (no dunning, no VAT)', async () => {
@@ -215,7 +214,7 @@ describe('QR bill amount — matches computeTotal', () => {
     });
 });
 
-// ─── PDF filename ─────────────────────────────────────────────────────────────
+// PDF filename
 
 describe('generateOfferPdf — filename', () => {
     it('saves PDF with date-stamped filename for INVOICE', async () => {
@@ -240,7 +239,7 @@ describe('generateOfferPdf — filename', () => {
     });
 });
 
-// ─── Page breaks ──────────────────────────────────────────────────────────────
+// Page breaks
 
 describe('generateOfferPdf — page layout', () => {
     it('does not add a new page for a 3-line OFFER (non-QR, 282mm safe bottom)', async () => {

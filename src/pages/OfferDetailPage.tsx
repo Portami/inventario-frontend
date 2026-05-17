@@ -20,6 +20,11 @@ import {Box, CircularProgress, Typography} from '@mui/material';
 import {ReactNode, useState} from 'react';
 import {useNavigate, useParams} from 'react-router';
 
+/**
+ * Detail view for a single offer. Renders a state-specific layout:
+ * editable line items for the OFFER state, document previews for INVOICE and dunning states,
+ * and summary cards for ORDER_CONFIRMATION and COMPLETED.
+ */
 export default function OfferDetailPage() {
     const {id} = useParams();
     const navigate = useNavigate();

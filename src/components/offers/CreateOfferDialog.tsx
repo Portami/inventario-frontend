@@ -76,6 +76,7 @@ interface CustomerInputProps {
     setField: (f: keyof NewCustomerForm) => (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
+/** Renders either a searchable customer autocomplete (existing mode) or a full address form (new mode). */
 function CustomerInput({mode, customers, selected, onSelect, form, setField}: CustomerInputProps) {
     if (mode === 'existing') {
         return (
@@ -180,6 +181,10 @@ function CustomerInput({mode, customers, selected, onSelect, form, setField}: Cu
     );
 }
 
+/**
+ * Two-step dialog for creating a new offer. Step 1 selects or creates a customer;
+ * step 2 adds line items from the felt or product catalog before submission.
+ */
 export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
     const showToast = useToast();
 

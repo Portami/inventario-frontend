@@ -9,9 +9,9 @@ import type {InvoiceOptions} from './invoiceTotal';
 import jsPDF from 'jspdf';
 import {SwissQRBill} from 'swissqrbill/svg';
 
-// ─── Document metadata ───────────────────────────────────────────────────────
+// Document metadata
 
-const QR_STATES: OfferState[] = ['INVOICE', 'PAYMENT_REMINDER', 'FIRST_DUNNING_NOTICE', 'SECOND_DUNNING_NOTICE', 'COMPLETED'];
+const QR_STATES: Set<string> = new Set(['INVOICE', 'PAYMENT_REMINDER', 'FIRST_DUNNING_NOTICE', 'SECOND_DUNNING_NOTICE', 'COMPLETED']);
 
 const DOC_TITLE: Record<OfferState, string> = {
     OFFER: 'OFFERTE',
@@ -35,7 +35,7 @@ const DOC_SUBTITLE: Record<OfferState, string> = {
     COMPLETED: 'Für die bei uns bestellten Artikel stellen wir Ihnen wie folgt Rechnung:',
 };
 
-// ─── Table column layout (left margin 15 mm, right edge 195 mm = 210−15) ─────
+// Table column layout — left margin 15 mm, right edge 195 mm (210 minus 15)
 // widths: 6 + 82 + 20 + 28 + 22 + 22 = 180 mm = CONTENT_W
 
 const COL = {
@@ -53,13 +53,15 @@ const QR_ZONE_TOP = A4.h - 105; // 192 mm — top edge of QR bill zone
 const SAFE_BOTTOM_QR = QR_ZONE_TOP - 4; // 188 mm — stop content here to leave a gap
 const SAFE_BOTTOM_STD = A4.h - MM.bottom; // 282 mm — for pages without a QR bill
 
+/** Adds a new page and returns the top-margin y position. */
 function newPage(pdf: jsPDF): number {
     pdf.addPage();
     return MM.top;
 }
 
-// ─── Section renderers ────────────────────────────────────────────────────────
+// Section renderers
 
+/** Renders Portami's contact block aligned to the top-right corner. */
 function drawCompanyHeader(pdf: jsPDF): number {
     let y = MM.top + 4;
 
@@ -79,6 +81,7 @@ function drawCompanyHeader(pdf: jsPDF): number {
     return y + 9; // bottom of header block
 }
 
+/** Renders the customer address (left column) and order metadata such as number, date, and due date (right column). */
 function drawCustomerBlock(pdf: jsPDF, offer: OfferDto, y: number): number {
     const {customer} = offer;
     const lx = MM.left;
@@ -112,8 +115,7 @@ function drawCustomerBlock(pdf: jsPDF, offer: OfferDto, y: number): number {
         ['Datum:', fmtDate(offer.createdISO)],
     ];
     if (offer.state === 'ORDER_CONFIRMATION') {
-        rows.push(['Versandart:', 'Economy']);
-        rows.push(['Liefertermin:', 'ca. 10–12 Arbeitstage']);
+        rows.push(['Versandart:', 'Economy'], ['Liefertermin:', 'ca. 10–12 Arbeitstage']);
     }
     if (offer.dueISO) rows.push(['Fällig bis:', fmtDate(offer.dueISO)]);
 
@@ -130,6 +132,7 @@ function drawCustomerBlock(pdf: jsPDF, offer: OfferDto, y: number): number {
     return blockBottom + 6;
 }
 
+/** Renders the localized document title (e.g. "RECHNUNG") and the state-specific opening subtitle. */
 function drawDocTitle(pdf: jsPDF, offer: OfferDto, y: number): number {
     const title = offer.state === 'PAYMENT_REMINDER' ? `ZAHLUNGSERINNERUNG / RECHNUNG VOM ${fmtDate(offer.createdISO)}` : DOC_TITLE[offer.state];
     setFont(pdf, 'bold', 16, C.ink);
@@ -144,6 +147,7 @@ function drawDocTitle(pdf: jsPDF, offer: OfferDto, y: number): number {
 const ROW_H = 11; // mm per data row
 const HDR_H = 8; // mm for header row
 
+/** Renders the gray column header row with uppercase labels for the line items table. */
 function drawTableHeader(pdf: jsPDF, y: number): number {
     const bgGray: [number, number, number] = [245, 245, 245];
     pdf.setFillColor(...bgGray);
@@ -161,6 +165,7 @@ function drawTableHeader(pdf: jsPDF, y: number): number {
     return y + HDR_H;
 }
 
+/** Renders all line items with alternating row shading. Breaks to a new page mid-table when more than 10 rows exceed the safe bottom margin. */
 function drawLineItemsTable(pdf: jsPDF, lines: LineItemDto[], y: number, safeBottom: number): number {
     y = drawTableHeader(pdf, y);
 
@@ -199,7 +204,7 @@ function drawLineItemsTable(pdf: jsPDF, lines: LineItemDto[], y: number, safeBot
         txt(pdf, fitText(pdf, nameText, COL.art.w), COL.art.x, b1);
 
         setFont(pdf, 'normal', 7.5, C.dim);
-        const descPart = line.description !== line.feltTypeName ? line.description : null;
+        const descPart = line.description === line.feltTypeName ? null : line.description;
         const secondary = [line.articleNumber, descPart].filter(Boolean).join(' · ');
         if (secondary) txt(pdf, fitText(pdf, secondary, COL.art.w), COL.art.x, b2);
 
@@ -218,6 +223,7 @@ function drawLineItemsTable(pdf: jsPDF, lines: LineItemDto[], y: number, safeBot
     return ry + 3;
 }
 
+/** Renders the totals block: subtotal, optional shipping fee, VAT, optional dunning fee, and grand total. */
 function drawTotals(pdf: jsPDF, lines: LineItemDto[], y: number, state: OfferState, options?: InvoiceOptions): number {
     const {subtotal, shippingFee, vatRate, vatAmount, dunningFee, total} = computeTotal(lines, state, options);
     const labelX = COL.cut.x;
@@ -280,6 +286,7 @@ const HAFTUNG_LINES = [
     'Naturprodukte vorbehalten. Beim Filz sind Strukturen sichtbar (Sprenkel, Tupfer, Fäden etc.).',
 ];
 
+/** Renders the closing salutation, payment terms, and (for offers) the liability disclaimer. */
 function drawFooter(pdf: jsPDF, state: OfferState, y: number): void {
     hRule(pdf, y);
     y += 6;
@@ -339,11 +346,12 @@ function drawFooter(pdf: jsPDF, state: OfferState, y: number): void {
     }
 }
 
-// ─── Logo ─────────────────────────────────────────────────────────────────────
+// Logo rendering
 
 const LOGO_W_MM = 32;
 const LOGO_H_MM = LOGO_W_MM * (83 / 148); // preserve aspect ratio
 
+/** Rasterizes the SVG logo at 4x scale via an off-screen canvas and embeds it as a PNG in the top-left corner. */
 async function addLogo(pdf: jsPDF): Promise<void> {
     await new Promise<void>((resolve, reject) => {
         const img = new Image();
@@ -366,8 +374,9 @@ async function addLogo(pdf: jsPDF): Promise<void> {
     });
 }
 
-// ─── QR bill ─────────────────────────────────────────────────────────────────
+// QR bill rendering
 
+/** Generates the Swiss QR payment slip SVG and embeds it as a 210x105 mm image at the bottom of the last page. */
 async function addQRBill(pdf: jsPDF, offer: OfferDto, total: number): Promise<void> {
     const {customer} = offer;
     const hasAddress = Boolean(customer.street && customer.city);
@@ -428,14 +437,19 @@ async function addQRBill(pdf: jsPDF, offer: OfferDto, total: number): Promise<vo
     });
 }
 
-// ─── Main export ─────────────────────────────────────────────────────────────
+// Main export
 
 const COMBINED_TAIL_H = 78; // mm — actual combined height of totals + footer
 
+/**
+ * Builds and saves a complete PDF for the given offer.
+ * Adds a QR payment slip on the last page for invoice-stage states.
+ * The filename encodes the document type, offer number, customer slug, and today's date.
+ */
 export async function generateOfferPdf(offer: OfferDto, options?: InvoiceOptions): Promise<void> {
     const pdf = createA4();
     await addLogo(pdf);
-    const safeBottom = QR_STATES.includes(offer.state) ? SAFE_BOTTOM_QR : SAFE_BOTTOM_STD;
+    const safeBottom = QR_STATES.has(offer.state) ? SAFE_BOTTOM_QR : SAFE_BOTTOM_STD;
 
     let y = drawCompanyHeader(pdf);
     y = drawCustomerBlock(pdf, offer, y);
@@ -448,12 +462,12 @@ export async function generateOfferPdf(offer: OfferDto, options?: InvoiceOptions
     drawFooter(pdf, offer.state, y);
 
     const {total} = computeTotal(offer.lines, offer.state, options);
-    if (QR_STATES.includes(offer.state)) {
+    if (QR_STATES.has(offer.state)) {
         await addQRBill(pdf, offer, total);
     }
 
     const docName = OFFER_STATE_META[offer.state].doc.replace('.pdf', '');
-    const customerSlug = offer.customer.name.replace(/[^a-zA-Z0-9äöüÄÖÜ]+/g, '-').replace(/^-|-$/g, '');
+    const customerSlug = offer.customer.name.replaceAll(/[^a-zA-Z0-9äöüÄÖÜ]+/g, '-').replaceAll(/^-|-$/g, '');
     const dateStr = new Date().toISOString().slice(0, 10);
     pdf.save(`${docName}-${offer.number}-${customerSlug}-${dateStr}.pdf`);
 }

@@ -16,24 +16,35 @@ import {CustomerDto, FeltCatalogItem, LineItemDto, OfferDto, OfferState, Product
 import {toErrorMessage} from '@/utils/pageUtils';
 import {useCallback, useEffect, useState} from 'react';
 
+/** All state and actions exposed by the useOffer hook for the offer detail page. */
 export interface UseOfferReturn {
+    /** The current offer, with path kept in sync with navigation history, or null while loading. */
     offer: OfferDto | null;
+    /** The state immediately before the current one, used to render a "go back" button. */
     prevState: OfferState | null;
     feltCatalog: FeltCatalogItem[];
     productCatalog: ProductCatalogItem[];
     loading: boolean;
     error: string;
+    /** Optimistically updates a line item by deleting and re-adding it via the API. Rolls back on failure. */
     patchLine: (lineId: string, changes: Partial<LineItemDto>) => void;
     deleteLine: (lineId: string) => void;
     addFeltLine: (felt: FeltCatalogItem) => Promise<void>;
     addProductLine: (p: ProductCatalogItem) => Promise<void>;
+    /** Advances or rewinds the state, updates the local path history, and persists the change to the backend. */
     changeState: (key: OfferState) => void;
+    /** Triggers PDF generation for the current offer state and document type. */
     regenDoc: (doc: string, options?: InvoiceOptions) => void;
     editCustomer: (changes: Partial<CustomerDto>) => Promise<void>;
     editDueDate: (dueISO: string) => Promise<void>;
     toggleSent: () => void;
 }
 
+/**
+ * Manages all data and mutations for the offer detail view.
+ * Loads the offer, felt catalog, and product catalog in parallel on mount.
+ * Keeps a local state path so the stepper reflects the actual navigation taken, not just the current state.
+ */
 export function useOffer(id: string | undefined): UseOfferReturn {
     const showToast = useToast();
     const [offer, setOffer] = useState<OfferDto | null>(null);

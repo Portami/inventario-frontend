@@ -118,12 +118,17 @@ export const ALL_BACKEND_STATES: BackendOfferState[] = [
     'COMPLETED',
 ];
 
+/** Formats a number as a Swiss franc currency string (e.g. "CHF 1'234.50"). */
 export const fmtCHF = (n: number): string => new Intl.NumberFormat('de-CH', {style: 'currency', currency: 'CHF', minimumFractionDigits: 2}).format(n);
 
+/** Formats a number with Swiss locale grouping and a configurable number of decimal places. */
 export const fmtNum = (n: number, d = 2): string => new Intl.NumberFormat('de-CH', {minimumFractionDigits: d, maximumFractionDigits: d}).format(n);
 
+/** Formats an ISO date string (YYYY-MM-DD) as a Swiss locale date (DD.MM.YYYY). */
 export const fmtDate = (iso: string): string => new Date(iso + 'T00:00:00').toLocaleDateString('de-CH', {year: 'numeric', month: '2-digit', day: '2-digit'});
 
+/** Returns the number of days between an ISO date and today. Negative means the date is in the past. */
 export const daysFromNow = (iso: string): number => Math.round((new Date(iso + 'T00:00:00').getTime() - Date.now()) / 86400000);
 
+/** Computes the net subtotal for a single line item: (price + cut surcharge) × quantity + extras - discount. */
 export const lineSubtotal = (l: LineItemDto): number => l.pricePerUnit * l.quantity + l.cutSurcharge * l.quantity + l.extras - l.discount;

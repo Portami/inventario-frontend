@@ -1,5 +1,6 @@
 export type OfferState = 'OFFER' | 'ORDER_CONFIRMATION' | 'INVOICE' | 'PAYMENT_REMINDER' | 'FIRST_DUNNING_NOTICE' | 'SECOND_DUNNING_NOTICE' | 'COMPLETED';
 
+/** Lightweight list-view snapshot of an offer, returned by the offers collection endpoint. */
 export interface OfferSummaryDto {
     id: string;
     state: OfferState;
@@ -21,12 +22,14 @@ export type LineItemKind = 'RESTSTUECK' | 'ROLLE' | 'PRODUKT';
 
 export type ReservationKind = 'RESERVED' | 'TAGGED';
 
+/** Stock reservation attached to a line item, tracking which physical roll or scrap is held. */
 export interface ReservationDto {
     kind: ReservationKind;
     untilISO?: string;
     sourceLabel?: string;
 }
 
+/** One position on an offer: a felt cut from a roll, a scrap piece, or a standalone product. */
 export interface LineItemDto {
     id: string;
     kind: LineItemKind;
@@ -44,6 +47,7 @@ export interface LineItemDto {
     variantId?: number;
 }
 
+/** Customer contact and address data as used within the frontend domain model. */
 export interface CustomerDto {
     customerNumber: string;
     name: string;
@@ -61,6 +65,7 @@ export interface CustomerWithIdDto extends CustomerDto {
     id: string;
 }
 
+/** Full offer document returned by the detail endpoint, including all line items and state history. */
 export interface OfferDto {
     id: string;
     number: string;
@@ -74,6 +79,7 @@ export interface OfferDto {
     offerSent: boolean;
 }
 
+/** Felt product variant from the catalog, used for searching and adding roll-based line items. */
 export interface FeltCatalogItem {
     id: number;
     articleNumber: string;
@@ -85,6 +91,7 @@ export interface FeltCatalogItem {
     supplierName: string;
 }
 
+/** Non-felt product (e.g. accessories) from the catalog, used for adding product-type line items. */
 export interface ProductCatalogItem {
     id: number;
     articleNumber: string;
@@ -92,6 +99,7 @@ export interface ProductCatalogItem {
     price: number;
 }
 
+/** Single audit trail entry recording who changed what and when on an offer. */
 export interface HistoryEntry {
     ts: string;
     who: string;

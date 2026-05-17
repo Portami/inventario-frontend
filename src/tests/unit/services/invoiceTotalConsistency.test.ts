@@ -25,8 +25,8 @@ const ALL_STATES: OfferState[] = ['OFFER', 'ORDER_CONFIRMATION', 'INVOICE', 'PAY
 
 const QR_STATES: OfferState[] = ['INVOICE', 'PAYMENT_REMINDER', 'FIRST_DUNNING_NOTICE', 'SECOND_DUNNING_NOTICE', 'COMPLETED'];
 
-// ─── Formula identity: the two formerly-duplicated call sites ─────────────────
-// drawTotals used:      vatBase + vatAmount + dunningFee
+// Formula identity: the two formerly-duplicated call sites.
+// drawTotals used:       vatBase + vatAmount + dunningFee
 // generateOfferPdf used: subtotal + shippingFee + vatAmount + dunningFee
 // Both are algebraically equivalent since vatBase = subtotal + shippingFee.
 // computeTotal is now the single source of truth for both.
@@ -55,7 +55,7 @@ describe('UI/QR total formula identity', () => {
     });
 });
 
-// ─── QR states always receive a defined, finite total ─────────────────────────
+// QR states always receive a defined, finite total
 
 describe('QR states — total is always well-defined', () => {
     it.each(QR_STATES)('state %s: total is finite and ≥ subtotal', (state) => {
@@ -65,7 +65,7 @@ describe('QR states — total is always well-defined', () => {
     });
 });
 
-// ─── VAT base always includes shippingFee ─────────────────────────────────────
+// VAT base always includes shippingFee
 
 describe('VAT base includes shippingFee', () => {
     it('shipping is taxed at the same rate as goods', () => {
@@ -89,7 +89,7 @@ describe('VAT base includes shippingFee', () => {
     });
 });
 
-// ─── Dunning fee isolation ────────────────────────────────────────────────────
+// Dunning fee isolation
 
 describe('dunning fee isolation', () => {
     it('dunning fee is never part of vatBase', () => {

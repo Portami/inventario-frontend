@@ -4,13 +4,16 @@ import {OfferSummaryDto} from '@/types/offerte';
 import {toErrorMessage} from '@/utils/pageUtils';
 import {useCallback, useEffect, useState} from 'react';
 
+/** State returned by the useOffers hook for the offers list page. */
 export interface UseOffersReturn {
     offers: OfferSummaryDto[];
     loading: boolean;
     error: string;
+    /** Invalidates the cache and reloads all offers from the backend. */
     refetch: () => Promise<void>;
 }
 
+/** Fetches and caches the full list of offer summaries, exposing a refetch action for post-mutation updates. */
 export function useOffers(): UseOffersReturn {
     const [offers, setOffers] = useState<OfferSummaryDto[]>([]);
     const [loading, setLoading] = useState(true);

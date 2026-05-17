@@ -22,7 +22,7 @@ function makeLine(overrides: Partial<LineItemDto> = {}): LineItemDto {
     };
 }
 
-// ─── lineSubtotal ─────────────────────────────────────────────────────────────
+// lineSubtotal
 
 describe('lineSubtotal', () => {
     it('multiplies pricePerUnit by quantity', () => {
@@ -56,7 +56,7 @@ describe('lineSubtotal', () => {
     });
 });
 
-// ─── computeTotal — baseline ──────────────────────────────────────────────────
+// computeTotal — baseline
 
 describe('computeTotal — baseline (no fees)', () => {
     it('returns zero total for empty lines', () => {
@@ -81,7 +81,7 @@ describe('computeTotal — baseline (no fees)', () => {
     });
 });
 
-// ─── computeTotal — shippingFee ───────────────────────────────────────────────
+// computeTotal — shippingFee
 
 describe('computeTotal — shippingFee', () => {
     it('adds shippingFee to vatBase', () => {
@@ -102,7 +102,7 @@ describe('computeTotal — shippingFee', () => {
     });
 });
 
-// ─── computeTotal — VAT ───────────────────────────────────────────────────────
+// computeTotal — VAT
 
 describe('computeTotal — VAT', () => {
     it('vatAmount = vatBase × vatRate', () => {
@@ -126,7 +126,7 @@ describe('computeTotal — VAT', () => {
     });
 });
 
-// ─── computeTotal — dunningFee ────────────────────────────────────────────────
+// computeTotal — dunningFee
 
 describe('computeTotal — dunningFee', () => {
     it('adds CHF 30 for SECOND_DUNNING_NOTICE', () => {
@@ -160,7 +160,7 @@ describe('computeTotal — dunningFee', () => {
     });
 });
 
-// ─── computeTotal — component invariants ─────────────────────────────────────
+// computeTotal — component invariants
 
 describe('computeTotal — component invariants', () => {
     it('vatBase = subtotal + shippingFee', () => {
