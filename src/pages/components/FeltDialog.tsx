@@ -1,5 +1,5 @@
 import {useToast} from '@/components/ToastProvider';
-import {createFelt, updateFelt} from '@/services/backend';
+import {createFelt, fetchFeltTypes, fetchSuppliers, updateFelt} from '@/services/backend';
 import {FeltDto} from '@/types/felt';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -16,14 +16,13 @@ import {
     MenuItem,
     TextField,
 } from '@mui/material';
-import {ChangeEvent, useEffect, useMemo, useState} from 'react';
+import {ChangeEvent, useEffect, useState} from 'react';
 
 type FeltDialogProps = {
     readonly open: boolean;
     readonly onClose: () => void;
     readonly onSaved: () => void;
     readonly felt?: FeltDto | null;
-    readonly felts: FeltDto[];
 };
 
 type FormState = {
@@ -52,12 +51,16 @@ const emptyForm: FormState = {
     hasBeenReordered: false,
 };
 
+type NamedOption = {id: number; name: string};
+
 const labelProps = {shrink: true, sx: {textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontWeight: 600}};
 
-export default function FeltDialog({open, onClose, onSaved, felt, felts}: FeltDialogProps) {
+export default function FeltDialog({open, onClose, onSaved, felt}: FeltDialogProps) {
     const showToast = useToast();
     const [form, setForm] = useState<FormState>(emptyForm);
     const [isSaving, setIsSaving] = useState(false);
+    const [supplierOptions, setSupplierOptions] = useState<NamedOption[]>([]);
+    const [feltTypeOptions, setFeltTypeOptions] = useState<NamedOption[]>([]);
 
     const isEdit = felt != null;
 
@@ -81,27 +84,16 @@ export default function FeltDialog({open, onClose, onSaved, felt, felts}: FeltDi
         );
     }, [open, felt]);
 
-    const supplierOptions = useMemo(() => {
-        const seen = new Set<number>();
-        return felts
-            .filter((f) => {
-                if (seen.has(f.supplierId)) return false;
-                seen.add(f.supplierId);
-                return true;
-            })
-            .map((f) => ({id: f.supplierId, name: f.supplierName}));
-    }, [felts]);
+    useEffect(() => {
+        if (!open) return;
+        void fetchSuppliers().then((suppliers) => {
+            setSupplierOptions(suppliers.map(({id, name}) => ({id, name})).sort((a, b) => a.name.localeCompare(b.name)));
+        });
 
-    const feltTypeOptions = useMemo(() => {
-        const seen = new Set<number>();
-        return felts
-            .filter((f) => {
-                if (seen.has(f.feltTypeId)) return false;
-                seen.add(f.feltTypeId);
-                return true;
-            })
-            .map((f) => ({id: f.feltTypeId, name: f.feltTypeName}));
-    }, [felts]);
+        void fetchFeltTypes().then((feltTypes) => {
+            setFeltTypeOptions(feltTypes.map(({id, name}) => ({id, name})).sort((a, b) => a.name.localeCompare(b.name)));
+        });
+    }, [open]);
 
     const setField = (field: keyof FormState) => (e: ChangeEvent<HTMLInputElement>) => setForm((prev) => ({...prev, [field]: e.target.value}));
 

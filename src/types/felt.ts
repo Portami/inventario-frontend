@@ -51,7 +51,6 @@ export type FeltDto = {
     thickness: number;
     density: number;
     price: number;
-    feltVariantId: number;
     articleNumber: string;
     supplierId: number;
     supplierName: string;
@@ -60,4 +59,9 @@ export type FeltDto = {
     feltTypeName: string;
     isLowOnSupply: boolean;
     hasBeenReordered: boolean;
+};
+
+export type FeltTypeDto = {
+    id: number;
+    name: string;
 };

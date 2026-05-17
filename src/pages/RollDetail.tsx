@@ -1,8 +1,9 @@
 import DetailPage from '@/components/DetailPage';
 import {useToast} from '@/components/ToastProvider';
-import {deleteRoll, fetchRollDetails, fetchRolls, updateRoll} from '@/services/backend';
+import {deleteRoll, fetchRollDetails, fetchRolls, splitRoll, updateRoll} from '@/services/backend';
 import {FeltRollDto} from '@/types/roll';
 import {toErrorMessage} from '@/utils/pageUtils';
+import ContentCutIcon from '@mui/icons-material/ContentCut';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
@@ -59,6 +60,9 @@ export default function RollDetail() {
     const [form, setForm] = useState<FormState>({length: '', width: '', batchId: '', storageId: ''});
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isSplitOpen, setIsSplitOpen] = useState(false);
+    const [isSplitting, setIsSplitting] = useState(false);
+    const [splitWidth, setSplitWidth] = useState('');
     const [storageOptions, setStorageOptions] = useState<NamedOption[]>([]);
     const [batchOptions, setBatchOptions] = useState<NamedOption[]>([]);
 
@@ -124,6 +128,24 @@ export default function RollDetail() {
         }
     };
 
+    const handleSplit = async () => {
+        if (!roll || !id) return;
+        const width = Number.parseFloat(splitWidth);
+        if (Number.isNaN(width) || width <= 0) return;
+        setIsSplitting(true);
+        try {
+            await splitRoll(roll.id, {width});
+            setRoll(await fetchRollDetails(id));
+            setIsSplitOpen(false);
+            setSplitWidth('');
+            showToast('Rolle erfolgreich abgeschnitten.');
+        } catch (err) {
+            showToast(toErrorMessage(err, 'Rolle konnte nicht abgeschnitten werden'), 'error');
+        } finally {
+            setIsSplitting(false);
+        }
+    };
+
     const handleDelete = async () => {
         if (!id) return;
         setIsDeleting(true);
@@ -162,6 +184,9 @@ export default function RollDetail() {
                             <>
                                 <Button variant="outlined" startIcon={<EditIcon />} onClick={startEdit}>
                                     Bearbeiten
+                                </Button>
+                                <Button variant="outlined" startIcon={<ContentCutIcon />} onClick={() => setIsSplitOpen(true)}>
+                                    Abschneiden
                                 </Button>
                                 <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={() => setIsDeleteOpen(true)}>
                                     Löschen
@@ -303,6 +328,37 @@ export default function RollDetail() {
                         startIcon={isDeleting ? <CircularProgress size={16} color="inherit" /> : undefined}
                     >
                         Löschen
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={isSplitOpen} onClose={() => setIsSplitOpen(false)} maxWidth="xs" fullWidth>
+                <DialogTitle>Rolle abschneiden</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        label="Länge (cm)"
+                        value={splitWidth}
+                        onChange={(e) => setSplitWidth(e.target.value)}
+                        type="number"
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                        autoFocus
+                        sx={{mt: 1}}
+                        slotProps={{htmlInput: {min: 0.01, step: 0.1}, inputLabel: labelProps}}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsSplitOpen(false)} disabled={isSplitting}>
+                        Abbrechen
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={() => void handleSplit()}
+                        disabled={isSplitting || !splitWidth || Number.parseFloat(splitWidth) <= 0}
+                        startIcon={isSplitting ? <CircularProgress size={16} color="inherit" /> : <ContentCutIcon />}
+                    >
+                        Abschneiden
                     </Button>
                 </DialogActions>
             </Dialog>

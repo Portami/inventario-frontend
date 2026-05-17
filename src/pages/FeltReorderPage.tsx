@@ -141,8 +141,8 @@ export default function FeltReorderPage() {
                     </Typography>
                 </Box>
             </Box>{' '}
-            <FeltDialog open={selectedFelt !== null} felt={selectedFelt} felts={felts} onClose={() => setSelectedFelt(null)} onSaved={handleSaved} />
-            <FeltDialog open={isCreateOpen} felts={felts} onClose={() => setIsCreateOpen(false)} onSaved={handleCreated} />
+            <FeltDialog open={selectedFelt !== null} felt={selectedFelt} onClose={() => setSelectedFelt(null)} onSaved={handleSaved} />
+            <FeltDialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} onSaved={handleCreated} />
             <DeleteFeltDialog
                 open={feltToDelete !== null}
                 felt={feltToDelete}
