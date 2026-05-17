@@ -2,7 +2,6 @@ import logo from '@/assets/logo.svg';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
@@ -181,10 +180,6 @@ export default function NavigationLayout() {
                             </List>
                         )}
                     </Box>
-
-                    <ListItem disableGutters>
-                        <NavBtn to="/rolls" icon={<Inventory2OutlinedIcon />} label="Rollen" collapsed={collapsed} />
-                    </ListItem>
                     <ListItem disableGutters>
                         <NavBtn to="/offers" icon={<ReceiptLongOutlinedIcon />} label="Offerten" collapsed={collapsed} />
                     </ListItem>

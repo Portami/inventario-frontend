@@ -16,8 +16,8 @@ const toProduct = (roll: FeltRollDto): Product => ({
     id: roll.id,
     articleNumber: roll.articleNumber,
     name: `${roll.feltTypeName} – ${roll.color}`,
-    length: roll.length * 1000, // meters → mm
-    width: roll.width * 1000, // meters → mm
+    length: roll.length * 10, // cm → mm
+    width: roll.width * 10, // cm → mm
 });
 
 export default function LabelGeneratorPage() {

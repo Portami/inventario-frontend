@@ -27,8 +27,8 @@ export default function RollList({deletingIds, onDelete, rolls}: Readonly<RollLi
                 renderCell: ({row}) => `${row.feltTypeName} – ${row.color}`,
             },
             {field: 'articleNumber', headerName: 'Artikelnummer', flex: 1, minWidth: 130},
-            {field: 'length', headerName: 'Länge (m)', width: 100},
-            {field: 'width', headerName: 'Breite (m)', width: 100},
+            {field: 'length', headerName: 'Länge (cm)', width: 100},
+            {field: 'width', headerName: 'Breite (cm)', width: 100},
             {field: 'batchName', headerName: 'Charge', width: 120, valueGetter: (value: string | null) => value ?? '–'},
             {field: 'storageName', headerName: 'Lagerort', width: 120, valueGetter: (value: string | null) => value ?? '–'},
             {

@@ -1,6 +1,6 @@
 import DetailPage from '@/components/DetailPage';
 import {useToast} from '@/components/ToastProvider';
-import {deleteRoll, fetchRollDetails, updateRoll} from '@/services/backend';
+import {deleteRoll, fetchRollDetails, fetchRolls, updateRoll} from '@/services/backend';
 import {FeltRollDto} from '@/types/roll';
 import {toErrorMessage} from '@/utils/pageUtils';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -17,6 +17,7 @@ import {
     DialogContent,
     DialogTitle,
     Divider,
+    MenuItem,
     Stack,
     TextField,
     Typography,
@@ -42,6 +43,8 @@ type FormState = {
     storageId: string;
 };
 
+type NamedOption = {id: number; name: string};
+
 const labelProps = {shrink: true, sx: {textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontWeight: 600}};
 
 export default function RollDetail() {
@@ -56,6 +59,8 @@ export default function RollDetail() {
     const [form, setForm] = useState<FormState>({length: '', width: '', batchId: '', storageId: ''});
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [storageOptions, setStorageOptions] = useState<NamedOption[]>([]);
+    const [batchOptions, setBatchOptions] = useState<NamedOption[]>([]);
 
     useEffect(() => {
         const load = async () => {
@@ -80,6 +85,16 @@ export default function RollDetail() {
             width: String(roll.width),
             batchId: roll.batchId == null ? '' : String(roll.batchId),
             storageId: roll.storageId == null ? '' : String(roll.storageId),
+        });
+        void fetchRolls().then((allRolls) => {
+            const storageMap = new Map<number, string>();
+            const batchMap = new Map<number, string>();
+            for (const r of allRolls) {
+                if (r.storageId != null && r.storageName) storageMap.set(r.storageId, r.storageName);
+                if (r.batchId != null && r.batchName) batchMap.set(r.batchId, r.batchName);
+            }
+            setStorageOptions([...storageMap.entries()].map(([id, name]) => ({id, name})).sort((a, b) => a.name.localeCompare(b.name)));
+            setBatchOptions([...batchMap.entries()].map(([id, name]) => ({id, name})).sort((a, b) => a.name.localeCompare(b.name)));
         });
         setIsEditing(true);
     };
@@ -114,7 +129,7 @@ export default function RollDetail() {
         setIsDeleting(true);
         try {
             await deleteRoll(id);
-            navigate('/rolls');
+            navigate(-1);
         } catch (err) {
             showToast(toErrorMessage(err, 'Rolle konnte nicht gelöscht werden'), 'error');
             setIsDeleting(false);
@@ -181,31 +196,31 @@ export default function RollDetail() {
                                     <Box sx={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1}}>
                                         {isEditing ? (
                                             <TextField
-                                                label="Länge (m)"
+                                                label="Länge (cm)"
                                                 value={form.length}
                                                 onChange={setField('length')}
                                                 type="number"
                                                 variant="outlined"
                                                 size="small"
                                                 required
-                                                slotProps={{htmlInput: {min: 0.01, step: 0.01}, inputLabel: labelProps}}
+                                                slotProps={{htmlInput: {min: 1, step: 1}, inputLabel: labelProps}}
                                             />
                                         ) : (
-                                            <Field label="Länge (m)" value={roll.length} />
+                                            <Field label="Länge (cm)" value={roll.length} />
                                         )}
                                         {isEditing ? (
                                             <TextField
-                                                label="Breite (m)"
+                                                label="Breite (cm)"
                                                 value={form.width}
                                                 onChange={setField('width')}
                                                 type="number"
                                                 variant="outlined"
                                                 size="small"
                                                 required
-                                                slotProps={{htmlInput: {min: 0.01, step: 0.01}, inputLabel: labelProps}}
+                                                slotProps={{htmlInput: {min: 1, step: 1}, inputLabel: labelProps}}
                                             />
                                         ) : (
-                                            <Field label="Breite (m)" value={roll.width} />
+                                            <Field label="Breite (cm)" value={roll.width} />
                                         )}
                                         <Field label="Dicke (mm)" value={roll.thickness} />
                                         <Field label="Dichte (g/m²)" value={roll.density} />
@@ -222,27 +237,42 @@ export default function RollDetail() {
                                     <Box sx={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1}}>
                                         {isEditing ? (
                                             <TextField
-                                                label="Charge-ID"
+                                                select
+                                                label="Charge"
                                                 value={form.batchId}
                                                 onChange={setField('batchId')}
-                                                type="number"
                                                 variant="outlined"
                                                 size="small"
-                                                slotProps={{htmlInput: {min: 1}, inputLabel: labelProps}}
-                                            />
+                                                disabled
+                                                slotProps={{inputLabel: labelProps, select: {displayEmpty: true}}}
+                                            >
+                                                <MenuItem value="">–</MenuItem>
+                                                {batchOptions.map((o) => (
+                                                    <MenuItem key={o.id} value={String(o.id)}>
+                                                        {o.name}
+                                                    </MenuItem>
+                                                ))}
+                                            </TextField>
                                         ) : (
                                             <Field label="Charge" value={roll.batchName} />
                                         )}
                                         {isEditing ? (
                                             <TextField
-                                                label="Lagerort-ID"
+                                                select
+                                                label="Lagerort"
                                                 value={form.storageId}
                                                 onChange={setField('storageId')}
-                                                type="number"
                                                 variant="outlined"
                                                 size="small"
-                                                slotProps={{htmlInput: {min: 1}, inputLabel: labelProps}}
-                                            />
+                                                slotProps={{inputLabel: labelProps, select: {displayEmpty: true}}}
+                                            >
+                                                <MenuItem value="">–</MenuItem>
+                                                {storageOptions.map((o) => (
+                                                    <MenuItem key={o.id} value={String(o.id)}>
+                                                        {o.name}
+                                                    </MenuItem>
+                                                ))}
+                                            </TextField>
                                         ) : (
                                             <Field label="Lagerort" value={roll.storageName} />
                                         )}
