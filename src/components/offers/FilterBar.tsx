@@ -1,8 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
-import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import SearchIcon from '@mui/icons-material/Search';
-import {Box, Button, Card, CardContent, IconButton, InputAdornment, MenuItem, TextField, ToggleButton, ToggleButtonGroup} from '@mui/material';
+import {Box, Card, CardContent, IconButton, InputAdornment, MenuItem, TextField, ToggleButton, ToggleButtonGroup} from '@mui/material';
 
 export type SortOption = 'created_desc' | 'created_asc' | 'due_asc' | 'total_desc' | 'customer';
 export type DateRange = 'all' | '10d' | '30d' | 'overdue';
@@ -75,14 +74,6 @@ export default function FilterBar({q, setQ, sort, setSort, dateRange, setDateRan
                         <MenuItem value="total_desc">Betrag ↓</MenuItem>
                         <MenuItem value="customer">Kunde A–Z</MenuItem>
                     </TextField>
-                    <Button
-                        variant="outlined"
-                        size="small"
-                        startIcon={<FileDownloadOutlinedIcon sx={{fontSize: 18}} />}
-                        sx={{textTransform: 'none', height: 40}}
-                    >
-                        Export
-                    </Button>
                 </Box>
             </CardContent>
         </Card>

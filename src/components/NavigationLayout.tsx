@@ -11,7 +11,7 @@ import PrintIcon from '@mui/icons-material/Print';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import {AppBar, Box, Button, Container, Drawer, IconButton, List, ListItem, Toolbar, Tooltip, Typography, useTheme} from '@mui/material';
-import {useState} from 'react';
+import React, {useState} from 'react';
 import {NavLink, Outlet, useLocation} from 'react-router';
 
 const NAV_EXPANDED = 240;

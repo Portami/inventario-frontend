@@ -1,3 +1,4 @@
+import BulkStateDialog from '@/components/offers/BulkStateDialog';
 import CreateOfferDialog from '@/components/offers/CreateOfferDialog';
 import CustomerCell from '@/components/offers/CustomerCell';
 import DueCell from '@/components/offers/DueCell';
@@ -8,6 +9,8 @@ import StatTile from '@/components/offers/StatTile';
 import {useToast} from '@/components/ToastProvider';
 import {useOffers} from '@/hooks/useOffers';
 import {daysFromNow, fmtCHF, fmtDate, OFFER_STATE, OFFER_STATE_META, PAGE_SIZE} from '@/pages/constants/offerConstants';
+import {changeOfferState, fetchOffer} from '@/services/backend';
+import {generateOfferPdf} from '@/services/invoicePdfService';
 import {OfferState} from '@/types/offerte';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
@@ -44,7 +47,7 @@ export default function OffersPage() {
     const navigate = useNavigate();
     const showToast = useToast();
 
-    const {offers, loading} = useOffers();
+    const {offers, loading, refetch} = useOffers();
 
     const [q, setQ] = useState('');
     const [stateFilter, setStateFilter] = useState<StateFilter>('ALL');
@@ -53,6 +56,8 @@ export default function OffersPage() {
     const [page, setPage] = useState(1);
     const [selected, setSelected] = useState<string[]>([]);
     const [createDlgOpen, setCreateDlgOpen] = useState(false);
+    const [bulkStateDlgOpen, setBulkStateDlgOpen] = useState(false);
+    const [bulkLoading, setBulkLoading] = useState(false);
 
     const stats = useMemo(() => {
         const open = offers.filter((o) => o.state !== OFFER_STATE.COMPLETED);
@@ -140,6 +145,36 @@ export default function OffersPage() {
 
     const toggleOne = (id: string) => {
         setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+    };
+
+    const handleBulkStateChange = async (state: OfferState) => {
+        setBulkLoading(true);
+        try {
+            await Promise.all(selected.map((id) => changeOfferState(id, state)));
+            showToast(`${selected.length} Offerten auf »${OFFER_STATE_META[state].label}« gesetzt`);
+            setSelected([]);
+            setBulkStateDlgOpen(false);
+            await refetch();
+        } catch {
+            showToast('Status konnte nicht geändert werden', 'error');
+        } finally {
+            setBulkLoading(false);
+        }
+    };
+
+    const handleBulkPdf = async () => {
+        setBulkLoading(true);
+        try {
+            for (const id of selected) {
+                const offer = await fetchOffer(id);
+                await generateOfferPdf(offer);
+            }
+            showToast(`${selected.length} PDF${selected.length > 1 ? 's' : ''} generiert`);
+        } catch {
+            showToast('PDF konnte nicht generiert werden', 'error');
+        } finally {
+            setBulkLoading(false);
+        }
     };
 
     const cellPad = '8px 12px';
@@ -246,7 +281,8 @@ export default function OffersPage() {
                         <Button
                             size="small"
                             startIcon={<PictureAsPdfIcon sx={{fontSize: 16}} />}
-                            onClick={() => showToast('PDFs werden erzeugt (noch nicht implementiert)', 'info')}
+                            disabled={bulkLoading}
+                            onClick={() => void handleBulkPdf()}
                             sx={{textTransform: 'none', color: primary}}
                         >
                             PDFs erzeugen
@@ -254,7 +290,8 @@ export default function OffersPage() {
                         <Button
                             size="small"
                             startIcon={<ForwardIcon sx={{fontSize: 16}} />}
-                            onClick={() => showToast('Status ändern (noch nicht implementiert)', 'info')}
+                            disabled={bulkLoading}
+                            onClick={() => setBulkStateDlgOpen(true)}
                             sx={{textTransform: 'none', color: primary}}
                         >
                             Status ändern
@@ -417,6 +454,13 @@ export default function OffersPage() {
                     setCreateDlgOpen(false);
                     navigate(`/offers/${id}`);
                 }}
+            />
+            <BulkStateDialog
+                open={bulkStateDlgOpen}
+                count={selected.length}
+                loading={bulkLoading}
+                onClose={() => setBulkStateDlgOpen(false)}
+                onConfirm={(state) => void handleBulkStateChange(state)}
             />
         </Box>
     );
