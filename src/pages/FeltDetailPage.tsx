@@ -323,7 +323,7 @@ export default function FeltDetailPage() {
                 </Stack>
             )}
 
-            <FeltDialog open={isEditOpen} felt={felt} felts={allFelts} onClose={() => setIsEditOpen(false)} onSaved={handleFeltSaved} />
+            <FeltDialog open={isEditOpen} felt={felt} onClose={() => setIsEditOpen(false)} onSaved={handleFeltSaved} />
             <DeleteFeltDialog
                 open={feltToDelete !== null}
                 felt={feltToDelete}

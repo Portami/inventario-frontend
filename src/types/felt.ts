@@ -60,3 +60,8 @@ export type FeltDto = {
     isLowOnSupply: boolean;
     hasBeenReordered: boolean;
 };
+
+export type FeltTypeDto = {
+    id: number;
+    name: string;
+};

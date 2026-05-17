@@ -1,10 +1,13 @@
 import {del, get, patch, post} from './api';
 import {cacheGet, cacheInvalidate, cacheSet} from './cache';
 import {getMockProductById, getMockProducts} from './mock/backendMock.ts';
-import {CreateFeltRequest, FeltDto} from '@/types/felt';
+import {CreateFeltRequest, FeltDto, FeltTypeDto} from '@/types/felt';
 import {Product, ProductDto, ProductId} from '@/types/product';
 import {CreateFeltRollRequest, FeltRollDto, UpdateFeltRollRequest} from '@/types/roll';
 import {ScanResult} from '@/types/scanner';
+import {Storage} from '@/types/storage';
+import {Batch} from '@/types/batches.ts';
+import {Supplier} from '@/types/supplier.ts';
 
 /**
  * Lookup a roll or scrap piece by Data Matrix code.
@@ -68,6 +71,40 @@ export const fetchFelts = async (): Promise<FeltDto[]> => {
         const result = await get<FeltDto[]>('/felts', {signal: controller.signal});
         clearTimeout(timeoutId);
         cacheSet('felts', result);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchSuppliers = async (): Promise<Supplier[]> => {
+    const cached = cacheGet<FeltTypeDto[]>('suppliers');
+    if (cached) return cached;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<Supplier[]>('/felts/suppliers', {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheSet('suppliers', result);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchFeltTypes = async (): Promise<FeltTypeDto[]> => {
+    const cached = cacheGet<FeltTypeDto[]>('feltTypes');
+    if (cached) return cached;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<FeltTypeDto[]>('/felts/types', {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheSet('feltTypes', result);
         return result;
     } catch (error) {
         clearTimeout(timeoutId);
@@ -144,7 +181,19 @@ export const fetchRollsByFelt = async (feltId: number): Promise<FeltRollDto[]> =
     try {
         const result = await get<FeltRollDto[]>(`/felts/${feltId}/rolls`, {signal: controller.signal});
         clearTimeout(timeoutId);
-        cacheSet('rolls', result);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchBatchesByFelt = async (feltId: number): Promise<Batch[]> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<Batch[]>(`/felts/${feltId}/batches`, {signal: controller.signal});
+        clearTimeout(timeoutId);
         return result;
     } catch (error) {
         clearTimeout(timeoutId);
@@ -262,6 +311,19 @@ export const fetchScrapDetails = async (scrapId: ProductId): Promise<Product> =>
     } catch (error) {
         clearTimeout(timeoutId);
         console.warn(`Failed to fetch scrap details from backend: ${error}`);
+        throw error;
+    }
+};
+
+export const fetchStorages = async (): Promise<Storage[]> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<Storage[]>('/storages', {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
         throw error;
     }
 };

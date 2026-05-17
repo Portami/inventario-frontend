@@ -370,7 +370,7 @@ export default function FeltPage() {
                 </Box>
             )}
 
-            <FeltDialog open={isCreateOpen} felts={felts} onClose={() => setIsCreateOpen(false)} onSaved={handleCreated} />
+            <FeltDialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} onSaved={handleCreated} />
             <DeleteFeltDialog
                 open={feltToDelete !== null}
                 felt={feltToDelete}
