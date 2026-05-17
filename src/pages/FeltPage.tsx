@@ -53,9 +53,9 @@ export default function FeltPage() {
     const rollsByFeltId = useMemo(() => {
         const map = new Map<number, FeltRollDto[]>();
         for (const roll of rolls) {
-            const list = map.get(roll.feltColorVariantId) ?? [];
+            const list = map.get(roll.feltId) ?? [];
             list.push(roll);
-            map.set(roll.feltColorVariantId, list);
+            map.set(roll.feltId, list);
         }
         return map;
     }, [rolls]);
@@ -370,7 +370,7 @@ export default function FeltPage() {
                 </Box>
             )}
 
-            <FeltDialog open={isCreateOpen} felts={felts} onClose={() => setIsCreateOpen(false)} onSaved={handleCreated} />
+            <FeltDialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} onSaved={handleCreated} />
             <DeleteFeltDialog
                 open={feltToDelete !== null}
                 felt={feltToDelete}

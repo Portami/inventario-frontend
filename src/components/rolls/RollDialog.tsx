@@ -1,5 +1,5 @@
 import {useToast} from '@/components/ToastProvider.tsx';
-import {createRoll, fetchRolls, updateRoll} from '@/services/backend.ts';
+import {createRoll, fetchBatchesByFelt, fetchStorages, updateRoll} from '@/services/backend.ts';
 import {FeltDto} from '@/types/felt.ts';
 import {FeltRollDto} from '@/types/roll.ts';
 import CloseIcon from '@mui/icons-material/Close';
@@ -55,16 +55,14 @@ export default function RollDialog({open, onClose, onSaved, roll, felts, default
 
     useEffect(() => {
         if (!open) return;
-        void fetchRolls().then((allRolls) => {
-            const storageMap = new Map<number, string>();
-            const batchMap = new Map<number, string>();
-            for (const r of allRolls) {
-                if (r.storageId != null && r.storageName) storageMap.set(r.storageId, r.storageName);
-                if (r.batchId != null && r.batchName) batchMap.set(r.batchId, r.batchName);
-            }
-            setStorageOptions([...storageMap.entries()].map(([id, name]) => ({id, name})).sort((a, b) => a.name.localeCompare(b.name)));
-            setBatchOptions([...batchMap.entries()].map(([id, name]) => ({id, name})).sort((a, b) => a.name.localeCompare(b.name)));
+        void fetchStorages().then((allStorages) => {
+            setStorageOptions(allStorages.map(({id, name}) => ({id, name})).sort((a, b) => a.name.localeCompare(b.name)));
         });
+        if (defaultFeltId != undefined) {
+            void fetchBatchesByFelt(defaultFeltId).then((relevantBatches) => {
+                setBatchOptions(relevantBatches.map(({id, name}) => ({id, name})).sort((a, b) => a.name.localeCompare(b.name)));
+            });
+        }
     }, [open]);
 
     const setField = (field: keyof FormState) => (e: ChangeEvent<HTMLInputElement>) => setForm((prev) => ({...prev, [field]: e.target.value}));
@@ -202,7 +200,6 @@ export default function RollDialog({open, onClose, onSaved, roll, felts, default
                             variant="outlined"
                             size="small"
                             fullWidth
-                            disabled
                             slotProps={{inputLabel: labelProps, select: {displayEmpty: true}}}
                         >
                             <MenuItem value="">–</MenuItem>

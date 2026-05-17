@@ -34,10 +34,8 @@ export type FeltRollDto = {
     articleNumber: string;
     length: number; // cm
     width: number; // cm
-    feltColorVariantId: number;
     color: string;
     supplierColor: string;
-    feltVariantId: number;
     thickness: number;
     density: number;
     price: number;

@@ -3,7 +3,7 @@ import DeleteFeltDialog from '@/components/felts/DeleteFeltDialog';
 import FeltDialog from '@/components/felts/FeltDialog';
 import RollDialog from '@/components/rolls/RollDialog';
 import {useToast} from '@/components/ToastProvider';
-import {deleteFelt, deleteRoll, fetchFelts, fetchRolls, fetchScrapsByFelt} from '@/services/backend';
+import {deleteFelt, deleteRoll, fetchFelts, fetchRolls, fetchRollsByFelt, fetchScrapsByFelt} from '@/services/backend';
 import {FeltDto} from '@/types/felt';
 import {Product} from '@/types/product';
 import {FeltRollDto} from '@/types/roll';
@@ -77,7 +77,7 @@ export default function FeltDetailPage() {
             setRolls([]);
             setScraps([]);
             try {
-                const [allFeltsResult, allRolls, scrapList] = await Promise.all([fetchFelts(), fetchRolls(), fetchScrapsByFelt(feltId)]);
+                const [allFeltsResult, allRolls, scrapList] = await Promise.all([fetchFelts(), fetchRollsByFelt(feltId), fetchScrapsByFelt(feltId)]);
                 const found = allFeltsResult.find((f) => f.id === feltId);
                 if (!found) {
                     setError('Filz nicht gefunden');
@@ -85,7 +85,7 @@ export default function FeltDetailPage() {
                 }
                 setFelt(found);
                 setAllFelts(allFeltsResult);
-                setRolls(allRolls.filter((r) => r.feltColorVariantId === feltId));
+                setRolls(allRolls.filter((r) => r.feltId === feltId));
                 setScraps(scrapList);
             } catch (err) {
                 setError(toErrorMessage(err, 'Daten konnten nicht geladen werden'));
@@ -114,7 +114,7 @@ export default function FeltDetailPage() {
         if (feltId == null) return;
         try {
             const allRolls = await fetchRolls();
-            setRolls(allRolls.filter((r) => r.feltColorVariantId === feltId));
+            setRolls(allRolls.filter((r) => r.feltId === feltId));
         } catch (err) {
             setError(toErrorMessage(err, 'Rollen konnten nicht geladen werden'));
         }
@@ -323,7 +323,7 @@ export default function FeltDetailPage() {
                 </Stack>
             )}
 
-            <FeltDialog open={isEditOpen} felt={felt} felts={allFelts} onClose={() => setIsEditOpen(false)} onSaved={handleFeltSaved} />
+            <FeltDialog open={isEditOpen} felt={felt} onClose={() => setIsEditOpen(false)} onSaved={handleFeltSaved} />
             <DeleteFeltDialog
                 open={feltToDelete !== null}
                 felt={feltToDelete}

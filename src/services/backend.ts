@@ -1,7 +1,8 @@
 import {del, get, patch, post} from './api';
 import {cacheGet, cacheInvalidate, cacheSet} from './cache';
 import {ALL_BACKEND_STATES, computeInitialPath, daysFromNow, VAT_RATE} from '@/pages/constants/offerConstants';
-import {CreateFeltRequest, FeltDto} from '@/types/felt';
+import {Batch} from '@/types/batches.ts';
+import {CreateFeltRequest, FeltDto, FeltTypeDto} from '@/types/felt';
 import {
     BackendCreateOfferItemDto,
     BackendFullCustomerDto,
@@ -19,6 +20,8 @@ import {
 import {Product, ProductDto, ProductId} from '@/types/product';
 import {CreateFeltRollRequest, FeltRollDto, UpdateFeltRollRequest} from '@/types/roll';
 import {ScanResult} from '@/types/scanner';
+import {Storage} from '@/types/storage';
+import {Supplier} from '@/types/supplier.ts';
 
 const toDateISO = (s?: string | null): string => (s ?? new Date().toISOString()).substring(0, 10);
 
@@ -170,6 +173,40 @@ export const fetchFelts = async (): Promise<FeltDto[]> => {
     }
 };
 
+export const fetchSuppliers = async (): Promise<Supplier[]> => {
+    const cached = cacheGet<FeltTypeDto[]>('suppliers');
+    if (cached) return cached;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<Supplier[]>('/felts/suppliers', {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheSet('suppliers', result);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchFeltTypes = async (): Promise<FeltTypeDto[]> => {
+    const cached = cacheGet<FeltTypeDto[]>('feltTypes');
+    if (cached) return cached;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<FeltTypeDto[]>('/felts/types', {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheSet('feltTypes', result);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
 export const createFelt = async (payload: CreateFeltRequest): Promise<FeltDto> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -233,6 +270,32 @@ export const fetchRolls = async (): Promise<FeltRollDto[]> => {
     }
 };
 
+export const fetchRollsByFelt = async (feltId: number): Promise<FeltRollDto[]> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<FeltRollDto[]>(`/felts/${feltId}/rolls`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchBatchesByFelt = async (feltId: number): Promise<Batch[]> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<Batch[]>(`/felts/${feltId}/batches`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
 export const createRoll = async (payload: CreateFeltRollRequest): Promise<FeltRollDto> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -258,6 +321,20 @@ export const updateRoll = async (rollId: ProductId, payload: UpdateFeltRollReque
     } catch (error) {
         clearTimeout(timeoutId);
         console.warn(`Failed to update roll: ${error}`);
+        throw error;
+    }
+};
+
+export const splitRoll = async (rollId: ProductId, payload: {width: number}): Promise<FeltRollDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<FeltRollDto>(`/rolls/${rollId}/split`, payload, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheInvalidate('rolls');
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
         throw error;
     }
 };
@@ -332,6 +409,19 @@ export const fetchProducts = async (): Promise<ProductDto[]> => {
         const result = await get<ProductDto[]>('/products', {signal: controller.signal});
         clearTimeout(timeoutId);
         cacheSet('products', result);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchStorages = async (): Promise<Storage[]> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<Storage[]>('/storages', {signal: controller.signal});
+        clearTimeout(timeoutId);
         return result;
     } catch (error) {
         clearTimeout(timeoutId);
