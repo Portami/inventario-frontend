@@ -1,29 +1,14 @@
-import {A4, C, CONTENT_W, createA4, fitText, hRule, MM, setFont, txt} from './pdfFactory';
+import {PORTAMI} from '@/constants/companyConstants';
 import {fmtCHF, fmtDate, fmtNum, lineSubtotal, OFFER_STATE_META} from '@/pages/constants/offerConstants';
 import {LineItemDto, OfferDto, OfferState} from '@/types/offerte';
 
 export interface InvoiceOptions {
-    liefergebuehren?: number;
+    shippingFee?: number;
     vatRate?: number;
 }
+import {A4, C, CONTENT_W, createA4, fitText, hRule, MM, setFont, txt} from './pdfFactory';
 import jsPDF from 'jspdf';
 import {SwissQRBill} from 'swissqrbill/svg';
-
-// ─── Company constants (from Rechnung.xlsx) ─────────────────────────────────
-
-const PORTAMI = {
-    name: 'PORTAMI - Manufaktur & Filz',
-    owners: 'Flurina & Nicola Vitali',
-    street: 'Gäuggelistrasse 49',
-    zip: '7000',
-    city: 'Chur',
-    country: 'CH',
-    phone: 'Tel/Fax +41 81 253 07 73',
-    email: 'info@portami.ch',
-    web: 'www.portami.ch',
-    iban: 'CH9600774110105191101', // GKB Chur – 21 chars, no spaces
-    uid: 'CHE-116.212.904',
-} as const;
 
 // ─── Document metadata ───────────────────────────────────────────────────────
 
@@ -44,7 +29,8 @@ const DOC_SUBTITLE: Record<OfferState, string> = {
     ORDER_CONFIRMATION: 'Gerne bestätigen wir Ihren geschätzen Auftrag. Wir freuen uns, diesen Auftrag für Sie auszuführen.',
     INVOICE: 'Für die bei uns bestellten Artikel stellen wir Ihnen wie folgt Rechnung:',
     PAYMENT_REMINDER:
-        'Verlegt oder vergessen, beides kann passieren. Darum erlauben wir uns, Ihnen einen neuen Einzahlungsschein zuzustellen, mit der Bitte den ausstehenden Betrag zu begleichen.',
+        'Verlegt oder vergessen, beides kann passieren. Darum erlauben wir uns,' +
+        ' Ihnen einen neuen Einzahlungsschein zuzustellen, mit der Bitte den ausstehenden Betrag zu begleichen.',
     FIRST_DUNNING_NOTICE: 'Leider haben wir den ausstehenden Betrag trotz Zahlungserinnerung nicht erhalten.',
     SECOND_DUNNING_NOTICE: 'Wir bitten Sie, die Einzahlung inkl. Mahngebühren von CHF 30.00 jetzt nachzuholen.',
     COMPLETED: 'Für die bei uns bestellten Artikel stellen wir Ihnen wie folgt Rechnung:',
@@ -222,10 +208,10 @@ function drawLineItemsTable(pdf: jsPDF, lines: LineItemDto[], y: number): number
 
 function drawTotals(pdf: jsPDF, lines: LineItemDto[], y: number, state: OfferState, options?: InvoiceOptions): number {
     const subtotal = lines.reduce((s, l) => s + lineSubtotal(l), 0);
-    const liefergebuehren = options?.liefergebuehren ?? 0;
+    const shippingFee = options?.shippingFee ?? 0;
     const vatRate = options?.vatRate ?? 0;
     const dunningFee = state === 'SECOND_DUNNING_NOTICE' ? 30 : 0;
-    const vatBase = subtotal + liefergebuehren;
+    const vatBase = subtotal + shippingFee;
     const vatAmount = vatBase * vatRate;
     const total = vatBase + vatAmount + dunningFee;
     const labelX = COL.cut.x;
@@ -240,11 +226,11 @@ function drawTotals(pdf: jsPDF, lines: LineItemDto[], y: number, state: OfferSta
     txt(pdf, fmtCHF(subtotal), RIGHT, y, {align: 'right'});
     y += 6;
 
-    if (liefergebuehren > 0) {
+    if (shippingFee > 0) {
         setFont(pdf, 'normal', 9, C.dim);
         txt(pdf, 'Liefergebühren', labelX, y);
         setFont(pdf, 'normal', 9, C.ink);
-        txt(pdf, fmtCHF(liefergebuehren), RIGHT, y, {align: 'right'});
+        txt(pdf, fmtCHF(shippingFee), RIGHT, y, {align: 'right'});
         y += 6;
     }
 
@@ -420,11 +406,11 @@ export async function generateOfferPdf(offer: OfferDto, options?: InvoiceOptions
     y = drawTotals(pdf, offer.lines, y, offer.state, options);
     drawFooter(pdf, offer.state, y);
 
-    const liefergebuehren = options?.liefergebuehren ?? 0;
+    const shippingFee = options?.shippingFee ?? 0;
     const vatRate = options?.vatRate ?? 0;
     const subtotal = offer.lines.reduce((s, l) => s + lineSubtotal(l), 0);
-    const vatAmount = (subtotal + liefergebuehren) * vatRate;
-    const total = subtotal + liefergebuehren + vatAmount + (offer.state === 'SECOND_DUNNING_NOTICE' ? 30 : 0);
+    const vatAmount = (subtotal + shippingFee) * vatRate;
+    const total = subtotal + shippingFee + vatAmount + (offer.state === 'SECOND_DUNNING_NOTICE' ? 30 : 0);
     if (QR_STATES.includes(offer.state)) {
         await addQRBill(pdf, offer, total);
     }

@@ -6,17 +6,17 @@ import {Box, Button, Card, Divider, InputAdornment, TextField, Typography} from 
 
 interface InvoicePreviewCardProps {
     lines: LineItemDto[];
-    liefergebuehren: number;
+    shippingFee: number;
     vatPct: number;
-    onLiefergebuehrenChange: (v: number) => void;
+    onShippingFeeChange: (v: number) => void;
     onVatPctChange: (v: number) => void;
     onGeneratePdf: () => void;
 }
 
-export default function InvoicePreviewCard({lines, liefergebuehren, vatPct, onLiefergebuehrenChange, onVatPctChange, onGeneratePdf}: InvoicePreviewCardProps) {
+export default function InvoicePreviewCard({lines, shippingFee, vatPct, onShippingFeeChange, onVatPctChange, onGeneratePdf}: InvoicePreviewCardProps) {
     const subtotal = lines.reduce((s, l) => s + lineSubtotal(l), 0);
-    const vatAmount = (subtotal + liefergebuehren) * (vatPct / 100);
-    const total = subtotal + liefergebuehren + vatAmount;
+    const vatAmount = (subtotal + shippingFee) * (vatPct / 100);
+    const total = subtotal + shippingFee + vatAmount;
 
     return (
         <Card variant="outlined" sx={{borderColor: 'rgba(0,0,0,0.08)', overflow: 'hidden'}}>
@@ -46,8 +46,8 @@ export default function InvoicePreviewCard({lines, liefergebuehren, vatPct, onLi
                         <TextField
                             size="small"
                             type="number"
-                            value={liefergebuehren}
-                            onChange={(e) => onLiefergebuehrenChange(Math.max(0, Number(e.target.value)))}
+                            value={shippingFee}
+                            onChange={(e) => onShippingFeeChange(Math.max(0, Number(e.target.value)))}
                             slotProps={{
                                 input: {endAdornment: <InputAdornment position="end">CHF</InputAdornment>},
                                 htmlInput: {min: 0, step: 0.5, style: {textAlign: 'right', width: 56}},
@@ -83,13 +83,13 @@ export default function InvoicePreviewCard({lines, liefergebuehren, vatPct, onLi
                         {fmtCHF(subtotal)}
                     </Typography>
                 </Box>
-                {liefergebuehren > 0 && (
+                {shippingFee > 0 && (
                     <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', mb: 0.5}}>
                         <Typography variant="body2" color="text.secondary">
                             Liefergebühren
                         </Typography>
                         <Typography variant="body2" sx={{fontVariantNumeric: 'tabular-nums'}}>
-                            {fmtCHF(liefergebuehren)}
+                            {fmtCHF(shippingFee)}
                         </Typography>
                     </Box>
                 )}

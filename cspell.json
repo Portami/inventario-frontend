@@ -28,9 +28,11 @@
     "typescript"
   ],
   "words": [
+    "Auftragsnr",
     "BWIP",
     "Einh",
     "Flurina",
+    "Graubündner",
     "Gäuggelistrasse",
     "Handgefertigte",
     "Lieferantenfarbe",
@@ -56,6 +58,7 @@
     "offerte",
     "offerten",
     "portami",
+    "signoff",
     "scss",
     "swissqrbill",
     "testid",

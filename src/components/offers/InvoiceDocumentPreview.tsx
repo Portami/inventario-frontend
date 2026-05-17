@@ -1,15 +1,7 @@
+import {PORTAMI} from '@/constants/companyConstants';
 import {fmtCHF, fmtDate, fmtNum, lineSubtotal} from '@/pages/constants/offerConstants';
 import {LineItemDto, OfferDto} from '@/types/offerte';
 import {Box, Divider, Typography} from '@mui/material';
-
-const PORTAMI = {
-    name: 'PORTAMI - Manufaktur & Filz',
-    owners: 'Flurina & Nicola Vitali',
-    addr: 'Gäuggelistrasse 49, CH-7000 Chur',
-    phone: 'Tel/Fax +41 81 253 07 73',
-    email: 'info@portami.ch · www.portami.ch',
-    uid: 'CHE-116.212.904',
-} as const;
 
 const TEXT = {
     subtitle: 'Für die bei uns bestellten Artikel stellen wir Ihnen wie folgt Rechnung:',
@@ -22,7 +14,7 @@ const TEXT = {
 
 interface Props {
     offer: OfferDto;
-    liefergebuehren: number;
+    shippingFee: number;
     vatRate: number;
 }
 
@@ -44,10 +36,10 @@ function CondRow({label, value}: {label: string; value: string}) {
     );
 }
 
-export default function InvoiceDocumentPreview({offer, liefergebuehren, vatRate}: Props) {
+export default function InvoiceDocumentPreview({offer, shippingFee, vatRate}: Props) {
     const {customer, lines} = offer;
     const subtotal = lines.reduce((s, l) => s + lineSubtotal(l), 0);
-    const vatBase = subtotal + liefergebuehren;
+    const vatBase = subtotal + shippingFee;
     const vatAmount = vatBase * vatRate;
     const total = vatBase + vatAmount;
 
@@ -68,7 +60,7 @@ export default function InvoiceDocumentPreview({offer, liefergebuehren, vatRate}
                 <Typography sx={{fontSize: 11.5, color: 'text.secondary', mt: 0.5}}>{PORTAMI.owners}</Typography>
                 <Typography sx={{fontSize: 11.5, color: 'text.secondary'}}>{PORTAMI.addr}</Typography>
                 <Typography sx={{fontSize: 11.5, color: 'text.secondary'}}>{PORTAMI.phone}</Typography>
-                <Typography sx={{fontSize: 11.5, color: 'text.secondary'}}>{PORTAMI.email}</Typography>
+                <Typography sx={{fontSize: 11.5, color: 'text.secondary'}}>{PORTAMI.emailWeb}</Typography>
             </Box>
 
             {/* Customer + order info — two columns */}
@@ -186,7 +178,7 @@ export default function InvoiceDocumentPreview({offer, liefergebuehren, vatRate}
                 <Box sx={{minWidth: 260}}>
                     <Divider sx={{mb: 1.5}} />
                     <SmLine label="Zwischensumme" value={fmtCHF(subtotal)} dim />
-                    {liefergebuehren > 0 && <SmLine label="Liefergebühren" value={fmtCHF(liefergebuehren)} dim />}
+                    {shippingFee > 0 && <SmLine label="Liefergebühren" value={fmtCHF(shippingFee)} dim />}
                     {vatRate > 0 && <SmLine label={`MWST (${fmtNum(vatRate * 100, 1)} %)`} value={fmtCHF(vatAmount)} dim />}
                     <Divider sx={{my: 1}} />
                     <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline'}}>
