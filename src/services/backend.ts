@@ -230,6 +230,20 @@ export const updateRoll = async (rollId: ProductId, payload: UpdateFeltRollReque
     }
 };
 
+export const splitRoll = async (rollId: ProductId, payload: {width: number}): Promise<FeltRollDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<FeltRollDto>(`/rolls/${rollId}/split`, payload, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheInvalidate('rolls');
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
 /**
  * Delete a roll. Calls DELETE /api/rolls/{id}.
  */
