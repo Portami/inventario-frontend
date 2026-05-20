@@ -63,7 +63,7 @@ export default function NavigationLayout() {
             <AppBar position="fixed" sx={{zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: theme.palette.primary.main}}>
                 <Toolbar>
                     <Box component={NavLink} to="/" sx={{display: 'inline-flex', lineHeight: 0}}>
-                        <Box component="img" src={logo} alt="Logo" sx={{height: (theme) => theme.mixins.toolbar.minHeight}} />
+                        <Box component="img" src={logo} alt="Logo" sx={{height: (theme) => theme.mixins.toolbar.minHeight, filter: 'invert(1)'}} />
                     </Box>
                     <Box sx={{flexGrow: 1}} />
                     <IconButton size="large" sx={{color: theme.palette.background.paper}}>
