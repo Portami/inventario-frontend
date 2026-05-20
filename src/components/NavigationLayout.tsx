@@ -107,9 +107,64 @@ export default function NavigationLayout() {
                 )}
 
                 <List component="nav" sx={{px: collapsed ? 1 : 3, flex: 1}}>
-                    <ListItem disableGutters>
-                        <NavBtn to="/products" icon={<CategoryOutlinedIcon />} label="Produkte" collapsed={collapsed} />
-                    </ListItem>
+                    <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                        <ListItem disableGutters>
+                            <NavBtn to="/products" icon={<CategoryOutlinedIcon />} label="Produkte" collapsed={collapsed} />
+                        </ListItem>
+                        {!collapsed && (
+                            <List component="div" disablePadding sx={{width: '100%'}}>
+                                <ListItem
+                                    disableGutters
+                                    sx={{
+                                        ml: 1.5,
+                                        pl: 2,
+                                        borderLeft:
+                                            location.pathname === '/products'
+                                                ? `3px solid ${theme.palette.primary.main}`
+                                                : `3px solid ${theme.palette.divider}`,
+                                    }}
+                                >
+                                    <Button
+                                        component={NavLink}
+                                        to="/products"
+                                        end
+                                        sx={{
+                                            justifyContent: 'flex-start',
+                                            width: '100%',
+                                            color: theme.palette.text.primary,
+                                            '&.active': {color: theme.palette.primary.main, fontWeight: 600},
+                                        }}
+                                    >
+                                        Übersicht
+                                    </Button>
+                                </ListItem>
+                                <ListItem
+                                    disableGutters
+                                    sx={{
+                                        ml: 1.5,
+                                        pl: 2,
+                                        borderLeft:
+                                            location.pathname === '/products/categories'
+                                                ? `3px solid ${theme.palette.primary.main}`
+                                                : `3px solid ${theme.palette.divider}`,
+                                    }}
+                                >
+                                    <Button
+                                        component={NavLink}
+                                        to="/products/categories"
+                                        sx={{
+                                            justifyContent: 'flex-start',
+                                            width: '100%',
+                                            color: theme.palette.text.primary,
+                                            '&.active': {color: theme.palette.primary.main, fontWeight: 600},
+                                        }}
+                                    >
+                                        Kategorien
+                                    </Button>
+                                </ListItem>
+                            </List>
+                        )}
+                    </Box>
                     <ListItem disableGutters>
                         <NavBtn to="/scan" icon={<QrCodeIcon />} label="Scannen" collapsed={collapsed} />
                     </ListItem>
