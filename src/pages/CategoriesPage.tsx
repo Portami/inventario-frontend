@@ -47,9 +47,10 @@ function CategoryDialog({open, onClose, onSaved, category}: CategoryDialogProps)
 
     const handleSave = async () => {
         if (!name.trim()) return;
+        if (isEdit && !category) return;
         setIsSaving(true);
         try {
-            if (isEdit) {
+            if (isEdit && category) {
                 await patchProductCategory(category.id, name.trim());
                 showToast('Kategorie gespeichert.');
             } else {

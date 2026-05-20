@@ -37,15 +37,25 @@ export default function EditVariantDialog({open, onClose, onSaved, productId, va
         }
         setAttrValues(initial);
 
-        void fetchStorages().then((all) => {
-            setStorages(all);
-            const qty: Record<number, string> = {};
-            for (const s of all) {
-                const entry = variant.inventory.find((inv) => inv.storageId === s.id);
-                qty[s.id] = entry ? String(entry.quantity) : '0';
-            }
-            setQuantities(qty);
-        });
+        let active = true;
+        fetchStorages()
+            .then((all) => {
+                if (!active) return;
+                setStorages(all);
+                const qty: Record<number, string> = {};
+                for (const s of all) {
+                    const entry = variant.inventory.find((inv) => inv.storageId === s.id);
+                    qty[s.id] = entry ? String(entry.quantity) : '0';
+                }
+                setQuantities(qty);
+            })
+            .catch(() => {
+                if (!active) return;
+                showToast('Lagerorte konnten nicht geladen werden.', 'error');
+            });
+        return () => {
+            active = false;
+        };
     }, [open, variant, productAttributes]);
 
     const setAttr = (attrId: number) => (e: ChangeEvent<HTMLInputElement>) => setAttrValues((prev) => ({...prev, [attrId]: e.target.value}));
@@ -72,11 +82,12 @@ export default function EditVariantDialog({open, onClose, onSaved, productId, va
             const inventoryChanges = storages
                 .map((s) => {
                     const current = variant.inventory.find((inv) => inv.storageId === s.id)?.quantity ?? 0;
-                    const desired = Number.parseInt(quantities[s.id] ?? '0', 10);
+                    const parsed = Number.parseInt(quantities[s.id] ?? '0', 10);
+                    const desired = Number.isFinite(parsed) ? parsed : 0;
                     const delta = desired - current;
                     return {productVariantId: variant.id, storageId: s.id, quantityChange: delta};
                 })
-                .filter((c) => c.quantityChange !== 0);
+                .filter((c) => Number.isFinite(c.quantityChange) && c.quantityChange !== 0);
 
             if (inventoryChanges.length > 0) {
                 await changeInventory(inventoryChanges);

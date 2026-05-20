@@ -648,6 +648,7 @@ export const patchProductCategory = async (id: number, name: string): Promise<Pr
     try {
         const result = await patch<ProductCategoryDto>(`/products/categories/${id}`, {name}, {signal: controller.signal});
         clearTimeout(timeoutId);
+        cacheInvalidate('products');
         return result;
     } catch (error) {
         clearTimeout(timeoutId);
@@ -661,6 +662,7 @@ export const deleteProductCategory = async (id: number): Promise<void> => {
     try {
         await del<void>(`/products/categories/${id}`, {signal: controller.signal});
         clearTimeout(timeoutId);
+        cacheInvalidate('products');
     } catch (error) {
         clearTimeout(timeoutId);
         throw error;
@@ -673,6 +675,7 @@ export const createProductCategory = async (name: string): Promise<ProductCatego
     try {
         const result = await post<ProductCategoryDto>('/products/categories', {name}, {signal: controller.signal});
         clearTimeout(timeoutId);
+        cacheInvalidate('products');
         return result;
     } catch (error) {
         clearTimeout(timeoutId);
