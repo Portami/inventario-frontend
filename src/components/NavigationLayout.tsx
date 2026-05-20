@@ -102,7 +102,7 @@ export default function NavigationLayout() {
                             <CropFreeIcon />
                         </IconButton>
                     </Tooltip>
-                    <IconButton size="large" sx={{color: theme.palette.background.paper}}>
+                    <IconButton size="large" sx={{color: theme.palette.background.paper, display: 'none'}}>
                         <NotificationsNoneIcon />
                     </IconButton>
                 </Toolbar>
@@ -241,7 +241,7 @@ export default function NavigationLayout() {
                 </List>
 
                 {/* Logout */}
-                <Box sx={{px: collapsed ? 1 : 3, pb: 2}}>
+                <Box sx={{px: collapsed ? 1 : 3, pb: 2, display: 'none'}}>
                     <Tooltip title={collapsed ? 'Abmelden' : ''} placement="right">
                         <Button
                             startIcon={<LogoutIcon />}
