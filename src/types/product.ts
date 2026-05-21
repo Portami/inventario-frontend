@@ -30,11 +30,28 @@ export type ProductVariantAttributeDto = {
     readonly value: string;
 };
 
+export type ProductInventoryDto = {
+    readonly storageId: number;
+    readonly storageName: string;
+    readonly quantity: number;
+};
+
 export type ProductVariantDto = {
     readonly id: number;
     readonly name: string;
     readonly price: number;
+    readonly inventory: ProductInventoryDto[];
     readonly attributes: ProductVariantAttributeDto[];
+};
+
+export type CreateProductVariantDto = {
+    name: string;
+    price: number;
+};
+
+export type CreateProductDto = {
+    name: string;
+    categoryId: number;
 };
 
 export type ProductDto = {

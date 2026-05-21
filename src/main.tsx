@@ -3,6 +3,7 @@ import App from './App';
 import theme from './theme';
 import NavigationLayout from '@/components/NavigationLayout.tsx';
 import {ToastProvider} from '@/components/ToastProvider';
+import CategoriesPage from '@/pages/CategoriesPage.tsx';
 import CustomersPage from '@/pages/CustomersPage.tsx';
 import FeltDetailPage from '@/pages/FeltDetailPage.tsx';
 import FeltPage from '@/pages/FeltPage.tsx';
@@ -40,6 +41,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <Route path="/shopping" element={<ShoppingPage />} />
                         <Route path="/products" element={<ProductsPage />} />
                         <Route path="/product/:id" element={<ProductDetailView />} />
+                        <Route path="/products/categories" element={<CategoriesPage />} />
                         <Route path="/roll/:id" element={<RollDetail />} />
                         <Route path="/offers" element={<OffersPage />} />
                         <Route path="/offers/:id" element={<OfferDetailPage />} />

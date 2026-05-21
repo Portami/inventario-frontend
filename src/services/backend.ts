@@ -17,7 +17,7 @@ import {
     OfferSummaryDto,
     ProductCatalogItem,
 } from '@/types/offerte';
-import {Product, ProductDto, ProductId} from '@/types/product';
+import {CreateProductDto, Product, ProductCategoryDto, ProductDto, ProductId, ProductInventoryDto, ProductVariantDto} from '@/types/product';
 import {CreateFeltRollRequest, FeltRollDto, UpdateFeltRollRequest} from '@/types/roll';
 import {ScanResult} from '@/types/scanner';
 import {Storage} from '@/types/storage';
@@ -484,22 +484,6 @@ export const markOfferSent = async (id: string, sent: boolean): Promise<void> =>
     }
 };
 
-export const patchOfferLine = async (offerId: string, lineId: string, changes: Partial<LineItemDto>): Promise<void> => {
-    const itemUpdate: Record<string, unknown> = {id: Number(lineId)};
-    if (changes.quantity !== undefined) itemUpdate.quantity = changes.quantity;
-    if (changes.pricePerUnit !== undefined) itemUpdate.unitPrice = changes.pricePerUnit;
-    if (changes.description !== undefined) itemUpdate.description = changes.description;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-    try {
-        await patch(`/offers/${encodeURIComponent(offerId)}`, {items: [itemUpdate]}, {signal: controller.signal});
-        clearTimeout(timeoutId);
-    } catch (error) {
-        clearTimeout(timeoutId);
-        throw error;
-    }
-};
-
 export const deleteOfferLine = async (offerId: string, lineId: string): Promise<void> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -645,12 +629,157 @@ export const createOffer = async (customerName: string, items: BackendCreateOffe
     }
 };
 
-export const deleteOffer = async (id: string): Promise<void> => {
+export const fetchProductCategories = async (): Promise<ProductCategoryDto[]> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-        await del(`/offers/${encodeURIComponent(id)}`, {signal: controller.signal});
+        const result = await get<ProductCategoryDto[]>('/products/categories', {signal: controller.signal});
         clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const patchProductCategory = async (id: number, name: string): Promise<ProductCategoryDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await patch<ProductCategoryDto>(`/products/categories/${id}`, {name}, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheInvalidate('products');
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const deleteProductCategory = async (id: number): Promise<void> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        await del<void>(`/products/categories/${id}`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheInvalidate('products');
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const createProductCategory = async (name: string): Promise<ProductCategoryDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<ProductCategoryDto>('/products/categories', {name}, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheInvalidate('products');
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const createProduct = async (payload: CreateProductDto): Promise<ProductDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<ProductDto>('/products', payload, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheInvalidate('products');
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const patchProduct = async (id: number, payload: {name?: string; categoryId?: number}): Promise<ProductDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await patch<ProductDto>(`/products/${id}`, payload, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheInvalidate('products');
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const deleteProduct = async (id: number): Promise<void> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        await del<void>(`/products/${id}`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheInvalidate('products');
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const deleteProductVariant = async (productId: number, variantId: number): Promise<void> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        await del<void>(`/products/${productId}/variants/${variantId}`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheInvalidate('products');
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const createProductVariant = async (
+    productId: number,
+    payload: {name: string; price: number; attributes?: {attributeId: number; value: string}[]},
+): Promise<ProductVariantDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<ProductVariantDto>(`/products/${productId}/variants`, payload, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheInvalidate('products');
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const changeInventory = async (changes: {productVariantId: number; storageId: number; quantityChange: number}[]): Promise<ProductInventoryDto[]> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<ProductInventoryDto[]>('/products/inventory/changes', changes, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheInvalidate('products');
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const patchProductVariant = async (
+    productId: number,
+    variantId: number,
+    payload: {name?: string; price?: number; attributes?: {attributeId: number; value: string}[]},
+): Promise<ProductVariantDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await patch<ProductVariantDto>(`/products/${productId}/variants/${variantId}`, payload, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheInvalidate('products');
+        return result;
     } catch (error) {
         clearTimeout(timeoutId);
         throw error;
