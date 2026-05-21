@@ -1,4 +1,4 @@
-import RollLabel from '@/components/RollLabel';
+import RollLabel from '@/components/rolls/RollLabel';
 import {A4_HEIGHT_MM, A4_WIDTH_MM} from '@/pages/constants/labelConstants';
 import {Product} from '@/types/product';
 import html2canvas from 'html2canvas';

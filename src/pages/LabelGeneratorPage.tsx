@@ -1,7 +1,7 @@
-import LabelDimensionControls from './components/LabelDimensionControls';
-import LabelsPreview from './components/LabelsPreview';
-import ProductSelectionTable from './components/ProductSelectionTable';
 import {DEFAULT_LABEL_HEIGHT_MM, DEFAULT_LABEL_WIDTH_MM} from './constants/labelConstants';
+import LabelDimensionControls from '@/components/labels/LabelDimensionControls';
+import LabelsPreview from '@/components/labels/LabelsPreview';
+import ProductSelectionTable from '@/components/labels/ProductSelectionTable';
 import ListPage from '@/components/ListPage';
 import {useToast} from '@/components/ToastProvider';
 import {fetchRolls} from '@/services/backend';
@@ -16,8 +16,8 @@ const toProduct = (roll: FeltRollDto): Product => ({
     id: roll.id,
     articleNumber: roll.articleNumber,
     name: `${roll.feltTypeName} – ${roll.color}`,
-    length: roll.length * 1000, // meters → mm
-    width: roll.width * 1000, // meters → mm
+    length: roll.length * 10, // cm → mm
+    width: roll.width * 10, // cm → mm
 });
 
 export default function LabelGeneratorPage() {

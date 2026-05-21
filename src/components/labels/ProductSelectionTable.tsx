@@ -1,4 +1,4 @@
-import {FeltRollDto} from '@/types/roll';
+import {FeltRollDto} from '@/types/roll.ts';
 import {DataGrid, GridColDef, GridRowId, GridRowSelectionModel} from '@mui/x-data-grid';
 
 const columns: GridColDef<FeltRollDto>[] = [
@@ -9,8 +9,8 @@ const columns: GridColDef<FeltRollDto>[] = [
         renderCell: ({row}) => `${row.feltTypeName} – ${row.color}`,
     },
     {field: 'articleNumber', headerName: 'Artikelnummer', flex: 1},
-    {field: 'length', headerName: 'Länge (m)', width: 110},
-    {field: 'width', headerName: 'Breite (m)', width: 110},
+    {field: 'length', headerName: 'Länge (cm)', width: 110},
+    {field: 'width', headerName: 'Breite (cm)', width: 110},
     {field: 'id', headerName: 'ID', width: 100, renderCell: ({value}) => <span style={{fontFamily: 'monospace'}}>{String(value)}</span>},
 ];
 

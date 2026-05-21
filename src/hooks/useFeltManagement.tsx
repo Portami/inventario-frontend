@@ -81,13 +81,13 @@ export const useFeltManagement = (filterFn?: (felts: FeltDto[]) => FeltDto[]): U
 
     const columns = useMemo<GridColDef<FeltDto>[]>(
         () => [
+            {field: 'articleNumber', headerName: 'Art.-Nr.', width: 100},
             {
                 field: 'color',
                 headerName: 'Farbe / Typ',
                 flex: 1,
                 renderCell: ({row}: GridRenderCellParams<FeltDto>) => `${row.feltTypeName} – ${row.color}`,
             },
-            {field: 'articleNumber', headerName: 'Artikelnummer', flex: 1},
             {field: 'supplierName', headerName: 'Lieferant', flex: 1},
             {field: 'thickness', headerName: 'Dicke (mm)', width: 110},
             {field: 'density', headerName: 'Dichte (g/m²)', width: 130},
