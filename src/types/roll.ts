@@ -1,18 +1,3 @@
-import {Felt} from './felt';
-import {ProductId} from './product';
-
-export type Roll = {
-    id: ProductId;
-    name?: string;
-    articleNumber: string;
-    batch: string;
-    quantity: number;
-    location: string;
-    width?: number; // Width in mm
-    lengthM?: number; // Length in meters
-    felt?: Felt;
-};
-
 export type CreateFeltRollRequest = {
     feltId: number;
     length: number; // cm
