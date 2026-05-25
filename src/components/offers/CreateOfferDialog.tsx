@@ -7,6 +7,7 @@ import {createCustomer, createOffer, fetchCustomers, fetchFeltCatalog, fetchProd
 import {BackendCreateOfferItemDto, CustomerWithIdDto, FeltCatalogItem, LineItemDto, ProductCatalogItem} from '@/types/offerte';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import CloseIcon from '@mui/icons-material/Close';
+import ContentCut from '@mui/icons-material/ContentCut';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import SearchIcon from '@mui/icons-material/Search';
@@ -391,6 +392,17 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
                                 </Button>
                                 <Button size="small" variant="outlined" onClick={() => setProductDlgOpen(true)} sx={{textTransform: 'none'}}>
                                     Produkt
+                                </Button>
+                                <Button
+                                    size="small"
+                                    variant="outlined"
+                                    startIcon={<ContentCut sx={{fontSize: 16}} />}
+                                    onClick={() => {
+                                        /* TODO */
+                                    }}
+                                    sx={{textTransform: 'none'}}
+                                >
+                                    Schnittassistant
                                 </Button>
                                 {stagedLines.length === 0 && (
                                     <Typography variant="caption" color="error" sx={{ml: 0.5}}>

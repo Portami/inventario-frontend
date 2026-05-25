@@ -14,6 +14,7 @@ import {generateOfferPdf} from '@/services/invoicePdfService';
 import {OfferState} from '@/types/offerte';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
+import ContentCut from '@mui/icons-material/ContentCut';
 import ForwardIcon from '@mui/icons-material/Forward';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
@@ -216,14 +217,26 @@ export default function OffersPage() {
                         Offerten
                     </Typography>
                 </Box>
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon sx={{fontSize: 18}} />}
-                    onClick={() => setCreateDlgOpen(true)}
-                    sx={{textTransform: 'none', boxShadow: 'none', '&:hover': {boxShadow: 'none'}}}
-                >
-                    Neue Offerte
-                </Button>
+                <Box sx={{display: 'flex', gap: 1.5}}>
+                    <Button
+                        variant="contained"
+                        startIcon={<ContentCut sx={{fontSize: 18}} />}
+                        onClick={() => {
+                            /* TODO */
+                        }}
+                        sx={{textTransform: 'none', boxShadow: 'none', '&:hover': {boxShadow: 'none'}}}
+                    >
+                        Schnittassistant
+                    </Button>
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon sx={{fontSize: 18}} />}
+                        onClick={() => setCreateDlgOpen(true)}
+                        sx={{textTransform: 'none', boxShadow: 'none', '&:hover': {boxShadow: 'none'}}}
+                    >
+                        Neue Offerte
+                    </Button>
+                </Box>
             </Box>
 
             {/* Stat tiles */}
