@@ -2,6 +2,7 @@ import {del, get, patch, post} from './api';
 import {cacheGet, cacheInvalidate, cacheSet} from './cache';
 import {ALL_BACKEND_STATES, computeInitialPath, daysFromNow, VAT_RATE} from '@/pages/constants/offerConstants';
 import {Batch} from '@/types/batches.ts';
+import {CutProposalDto, RequestCutProposalsDto} from '@/types/cutAssistant.ts';
 import {CreateFeltRequest, FeltDto, FeltTypeDto} from '@/types/felt';
 import {
     BackendCreateOfferItemDto,
@@ -791,6 +792,32 @@ export const fetchProductById = async (id: number | string): Promise<ProductDto>
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
         const result = await get<ProductDto>(`/products/${id}`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const requestCutProposals = async (request: RequestCutProposalsDto): Promise<CutProposalDto | null> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    try {
+        const result = await post<CutProposalDto>('/cut-assistant/proposals', request, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const acceptCutProposal = async (offerId: string, proposalId: string): Promise<OfferDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    try {
+        const result = await post<OfferDto>(`/cut-assistant/offers/${offerId}/proposals/accept`, {proposalId}, {signal: controller.signal});
         clearTimeout(timeoutId);
         return result;
     } catch (error) {

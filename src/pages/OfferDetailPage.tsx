@@ -1,5 +1,6 @@
 import CustomerCard from '@/components/offers/CustomerCard';
 import CustomerCompactCard from '@/components/offers/CustomerCompactCard';
+import CutAssistantDialog from '@/components/offers/CutAssistantDialog';
 import DunningDocumentPreview from '@/components/offers/DunningDocumentPreview';
 import DunningSidebarCard from '@/components/offers/DunningSidebarCard';
 import EditCustomerDialog from '@/components/offers/EditCustomerDialog';
@@ -31,6 +32,7 @@ export default function OfferDetailPage() {
 
     const [feltDlgOpen, setFeltDlgOpen] = useState(false);
     const [productDlgOpen, setProductDlgOpen] = useState(false);
+    const [cutAssistantOpen, setCutAssistantOpen] = useState(false);
     const [editCustomerOpen, setEditCustomerOpen] = useState(false);
     const [shippingFee, setShippingFee] = useState(0);
     const [vatPct, setVatPct] = useState(0);
@@ -42,6 +44,7 @@ export default function OfferDetailPage() {
         productCatalog,
         loading,
         error,
+        refetch,
         patchLine,
         deleteLine,
         addFeltLine,
@@ -156,6 +159,7 @@ export default function OfferDetailPage() {
                         onDelete={deleteLine}
                         onAddFelt={() => setFeltDlgOpen(true)}
                         onAddProduct={() => setProductDlgOpen(true)}
+                        onOpenCutAssistant={() => setCutAssistantOpen(true)}
                         locked={false}
                     />
                 </Box>
@@ -183,6 +187,15 @@ export default function OfferDetailPage() {
 
             <FeltSearchDialog open={feltDlgOpen} catalog={feltCatalog} onClose={() => setFeltDlgOpen(false)} onPick={handleAddFelt} />
             <ProductSearchDialog open={productDlgOpen} catalog={productCatalog} onClose={() => setProductDlgOpen(false)} onPick={handleAddProduct} />
+            <CutAssistantDialog 
+                open={cutAssistantOpen} 
+                onClose={() => setCutAssistantOpen(false)} 
+                offerId={offer.id} 
+                onAccepted={() => {
+                    setCutAssistantOpen(false);
+                    refetch();
+                }}
+            />
             {offer && <EditCustomerDialog open={editCustomerOpen} customer={offer.customer} onClose={() => setEditCustomerOpen(false)} onSave={editCustomer} />}
         </Box>
     );

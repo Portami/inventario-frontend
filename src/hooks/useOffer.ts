@@ -26,6 +26,8 @@ export interface UseOfferReturn {
     productCatalog: ProductCatalogItem[];
     loading: boolean;
     error: string;
+    /** Re-fetches the offer data from the backend. */
+    refetch: () => void;
     /** Optimistically updates a line item by deleting and re-adding it via the API. Rolls back on failure. */
     patchLine: (lineId: string, changes: Partial<LineItemDto>) => void;
     deleteLine: (lineId: string) => void;
@@ -54,20 +56,30 @@ export function useOffer(id: string | undefined): UseOfferReturn {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    useEffect(() => {
+    const loadOffer = useCallback(async () => {
         if (!id) return;
         setLoading(true);
-        Promise.all([fetchOffer(id), fetchFeltCatalog(), fetchProductCatalog()])
-            .then(([offerData, feltData, productData]) => {
-                setOffer(offerData);
-                setStatePath(offerData.path); // path = computeInitialPath(state)
+        try {
+            const offerData = await fetchOffer(id);
+            setOffer(offerData);
+            setStatePath(offerData.path);
+            setError('');
+        } catch (err) {
+            setError(toErrorMessage(err, 'Offerte konnte nicht geladen werden'));
+        } finally {
+            setLoading(false);
+        }
+    }, [id]);
+
+    useEffect(() => {
+        if (!id) return;
+        Promise.all([loadOffer(), fetchFeltCatalog(), fetchProductCatalog()])
+            .then(([, feltData, productData]) => {
                 setFeltCatalog(feltData);
                 setProductCatalog(productData);
-                setError('');
             })
-            .catch((err) => setError(toErrorMessage(err, 'Offerte konnte nicht geladen werden')))
-            .finally(() => setLoading(false));
-    }, [id]);
+            .catch((err) => setError(toErrorMessage(err, 'Kataloge konnten nicht geladen werden')));
+    }, [id, loadOffer]);
 
     const prevState = statePath.length > 1 ? statePath[statePath.length - 2] : null;
 
@@ -232,6 +244,7 @@ export function useOffer(id: string | undefined): UseOfferReturn {
         productCatalog,
         loading,
         error,
+        refetch: loadOffer,
         patchLine,
         deleteLine,
         addFeltLine,

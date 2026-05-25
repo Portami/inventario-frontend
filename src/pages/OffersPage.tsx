@@ -1,5 +1,6 @@
 import BulkStateDialog from '@/components/offers/BulkStateDialog';
 import CreateOfferDialog from '@/components/offers/CreateOfferDialog';
+import CutAssistantDialog from '@/components/offers/CutAssistantDialog';
 import CustomerCell from '@/components/offers/CustomerCell';
 import DueCell from '@/components/offers/DueCell';
 import FilterBar, {DateRange, SortOption} from '@/components/offers/FilterBar';
@@ -60,6 +61,7 @@ export default function OffersPage() {
     const [page, setPage] = useState(1);
     const [selected, setSelected] = useState<Set<string>>(new Set());
     const [createDlgOpen, setCreateDlgOpen] = useState(false);
+    const [cutAssistantOpen, setCutAssistantOpen] = useState(false);
     const [bulkStateDlgOpen, setBulkStateDlgOpen] = useState(false);
     const [bulkLoading, setBulkLoading] = useState(false);
 
@@ -221,9 +223,7 @@ export default function OffersPage() {
                     <Button
                         variant="contained"
                         startIcon={<ContentCut sx={{fontSize: 18}} />}
-                        onClick={() => {
-                            /* TODO */
-                        }}
+                        onClick={() => setCutAssistantOpen(true)}
                         sx={{textTransform: 'none', boxShadow: 'none', '&:hover': {boxShadow: 'none'}}}
                     >
                         Schnittassistant
@@ -478,6 +478,14 @@ export default function OffersPage() {
                 onCreated={(id) => {
                     setCreateDlgOpen(false);
                     navigate(`/offers/${id}`);
+                }}
+            />
+            <CutAssistantDialog
+                open={cutAssistantOpen}
+                onClose={() => setCutAssistantOpen(false)}
+                onAccepted={() => {
+                    setCutAssistantOpen(false);
+                    showToast('Schnittvorschlag wird nach Erstellung der Offerte hinzugefügt.', 'info');
                 }}
             />
             <BulkStateDialog

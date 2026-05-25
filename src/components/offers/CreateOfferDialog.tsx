@@ -1,3 +1,4 @@
+import CutAssistantDialog from '@/components/offers/CutAssistantDialog';
 import FeltSearchDialog from '@/components/offers/FeltSearchDialog';
 import KindChip from '@/components/offers/KindChip';
 import ProductSearchDialog from '@/components/offers/ProductSearchDialog';
@@ -197,6 +198,7 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
     const [stagedLines, setStagedLines] = useState<StagedLine[]>([]);
     const [feltDlgOpen, setFeltDlgOpen] = useState(false);
     const [productDlgOpen, setProductDlgOpen] = useState(false);
+    const [cutAssistantOpen, setCutAssistantOpen] = useState(false);
 
     const [customers, setCustomers] = useState<CustomerWithIdDto[]>([]);
     const [feltCatalog, setFeltCatalog] = useState<FeltCatalogItem[]>([]);
@@ -397,9 +399,7 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
                                     size="small"
                                     variant="outlined"
                                     startIcon={<ContentCut sx={{fontSize: 16}} />}
-                                    onClick={() => {
-                                        /* TODO */
-                                    }}
+                                    onClick={() => setCutAssistantOpen(true)}
                                     sx={{textTransform: 'none'}}
                                 >
                                     Schnittassistant
@@ -484,6 +484,18 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
 
             <FeltSearchDialog open={feltDlgOpen} catalog={feltCatalog} onClose={() => setFeltDlgOpen(false)} onPick={handleAddFelt} />
             <ProductSearchDialog open={productDlgOpen} catalog={productCatalog} onClose={() => setProductDlgOpen(false)} onPick={handleAddProduct} />
+            <CutAssistantDialog 
+                open={cutAssistantOpen} 
+                onClose={() => setCutAssistantOpen(false)} 
+                onAccepted={() => {
+                    // This flow doesn't have a persistent offer ID yet, so we can't auto-add lines.
+                    // The user must accept the proposal, and then the lines will be added manually
+                    // once the offer is created. A more advanced implementation could stage the cuts
+                    // and add them upon offer creation.
+                    setCutAssistantOpen(false);
+                    showToast('Schnittvorschlag wird nach Erstellung der Offerte hinzugefügt.', 'info');
+                }} 
+            />
         </>
     );
 }

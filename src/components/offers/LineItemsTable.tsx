@@ -4,6 +4,7 @@ import ReservationChip from './ReservationChip';
 import {fmtCHF, lineSubtotal} from '@/pages/constants/offerConstants';
 import {LineItemDto} from '@/types/offerte';
 import AddIcon from '@mui/icons-material/Add';
+import ContentCut from '@mui/icons-material/ContentCut';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import SearchIcon from '@mui/icons-material/Search';
@@ -15,10 +16,11 @@ interface LineItemsTableProps {
     onDelete: (id: string) => void;
     onAddFelt: () => void;
     onAddProduct: () => void;
+    onOpenCutAssistant: () => void;
     locked?: boolean;
 }
 
-export default function LineItemsTable({lines, onPatch, onDelete, onAddFelt, onAddProduct, locked = false}: LineItemsTableProps) {
+export default function LineItemsTable({lines, onPatch, onDelete, onAddFelt, onAddProduct, onOpenCutAssistant, locked = false}: LineItemsTableProps) {
     const theme = useTheme();
     const cellPad = '12px 12px';
 
@@ -35,6 +37,15 @@ export default function LineItemsTable({lines, onPatch, onDelete, onAddFelt, onA
                 </Box>
                 {!locked && (
                     <Box sx={{display: 'flex', gap: 1}}>
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={<ContentCut sx={{fontSize: 18}} />}
+                            onClick={onOpenCutAssistant}
+                            sx={{textTransform: 'none'}}
+                        >
+                            Schnittassistant
+                        </Button>
                         <Button variant="outlined" size="small" startIcon={<SearchIcon sx={{fontSize: 18}} />} onClick={onAddFelt} sx={{textTransform: 'none'}}>
                             Filz suchen
                         </Button>
