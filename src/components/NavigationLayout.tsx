@@ -1,4 +1,5 @@
 import logo from '@/assets/logo.svg';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -179,6 +180,9 @@ export default function NavigationLayout() {
                             </List>
                         )}
                     </Box>
+                    <ListItem disableGutters>
+                        <NavBtn to="/inventory" icon={<AssessmentIcon />} label="Inventur" collapsed={collapsed} />
+                    </ListItem>
                     <ListItem disableGutters>
                         <NavBtn to="/offers" icon={<ReceiptLongOutlinedIcon />} label="Offerten" collapsed={collapsed} />
                     </ListItem>

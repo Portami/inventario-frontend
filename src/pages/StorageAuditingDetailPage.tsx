@@ -1,0 +1,60 @@
+import StorageAuditingCard from '@/components/inventoryAuditing/StorageAuditingCard.tsx';
+import {fetchStocktakeById} from '@/services/backend.ts';
+import {FeltStocktakeDto, FeltStocktakeListInfoDto} from '@/types/inventoryAuditing.ts';
+import {toErrorMessage} from '@/utils/pageUtils.ts';
+import {Alert, Box, CircularProgress} from '@mui/material';
+import {useEffect, useState} from 'react';
+import {useParams} from 'react-router';
+
+export default function StorageAuditingDetailPage() {
+    const {inventoryId, id} = useParams<{inventoryId: string; id: string}>();
+
+    const [inventoryAuditing, setInventoryAuditing] = useState<FeltStocktakeDto>();
+    const [storageAuditing, setStorageAuditing] = useState<FeltStocktakeListInfoDto>();
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    if (!inventoryId) {
+        setError('Bestandsprüfung nicht gefunden.');
+        setIsLoading(false);
+        return;
+    }
+
+    if (!id) {
+        setError('Lager nicht gefunden.');
+        setIsLoading(false);
+        return;
+    }
+
+    useEffect(() => {
+        const load = async () => {
+            try {
+                setInventoryAuditing(await fetchStocktakeById(inventoryId));
+                setStorageAuditing(inventoryAuditing?.storageLists.find((storage) => storage.storageId === Number(id)));
+            } catch (err) {
+                setError(toErrorMessage(err, 'Lager konnte nicht gefunden werden.'));
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        void load();
+    }, [inventoryId, id]);
+
+    return (
+        <Box sx={{py: 4}}>
+            <StorageAuditingCard inventoryId={inventoryId} storage={storageAuditing} />
+
+            {error && (
+                <Alert severity="error" onClose={() => setError('')}>
+                    {error}
+                </Alert>
+            )}
+
+            {isLoading && (
+                <Box sx={{display: 'flex', justifyContent: 'center', py: 4}}>
+                    <CircularProgress />
+                </Box>
+            )}
+        </Box>
+    );
+}

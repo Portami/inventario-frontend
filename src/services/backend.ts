@@ -4,6 +4,15 @@ import {ALL_BACKEND_STATES, computeInitialPath, daysFromNow, VAT_RATE} from '@/p
 import {Batch} from '@/types/batches.ts';
 import {CreateFeltRequest, FeltDto, FeltTypeDto} from '@/types/felt';
 import {
+    CreateFeltStocktakeDto,
+    CreateFeltStocktakeScanDto,
+    ExtendStocktakeDto,
+    FeltStocktakeDto,
+    FeltStocktakeItemDto,
+    FeltStocktakeScanDto,
+    ResolveFeltStocktakeProblemDto,
+} from '@/types/inventoryAuditing.ts';
+import {
     BackendCreateOfferItemDto,
     BackendFullCustomerDto,
     BackendOfferDto,
@@ -664,6 +673,209 @@ export const fetchProductById = async (id: number | string): Promise<ProductDto>
         const result = await get<ProductDto>(`/products/${id}`, {signal: controller.signal});
         clearTimeout(timeoutId);
         return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const createStocktake = async (dto: CreateFeltStocktakeDto): Promise<FeltStocktakeDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<FeltStocktakeDto>('/stocktakes', {dto: dto}, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchStocktakes = async (): Promise<FeltStocktakeDto[]> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<FeltStocktakeDto[]>('/stocktakes', {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchStocktakeById = async (id: string): Promise<FeltStocktakeDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<FeltStocktakeDto>(`/stocktakes/${id}`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const deleteStocktake = async (id: string): Promise<void> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        await del(`/stocktakes/${id}`, {signal: controller.signal});
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const extendStocktake = async (id: string, dto: ExtendStocktakeDto): Promise<FeltStocktakeDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<FeltStocktakeDto>(`/stocktakes/${id}/extend`, dto, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const completeStocktake = async (id: string): Promise<FeltStocktakeDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<FeltStocktakeDto>(`/stocktakes/${id}/complete`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchStocktakeItems = async (stocktakeId: string, storageId: string): Promise<FeltStocktakeItemDto[]> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<FeltStocktakeItemDto[]>(`/stocktakes/${stocktakeId}/items?storageId=${storageId}`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchStocktakeItemById = async (stocktakeId: string, id: string): Promise<FeltStocktakeItemDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<FeltStocktakeItemDto>(`/stocktakes/${stocktakeId}/items/${id}`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const resolveStocktakeItem = async (stocktakeId: string, id: string, dto: ResolveFeltStocktakeProblemDto): Promise<FeltStocktakeItemDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<FeltStocktakeItemDto>(`/stocktakes/${stocktakeId}/items/${id}/resolve`, dto, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const unresolveStocktakeItem = async (stocktakeId: string, id: string): Promise<FeltStocktakeItemDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<FeltStocktakeItemDto>(`/stocktakes/${stocktakeId}/items/${id}/unresolve`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const createFeltStocktakeScan = async (stocktakeId: string, dto: CreateFeltStocktakeScanDto): Promise<FeltStocktakeScanDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<FeltStocktakeScanDto>(`/stocktakes/${stocktakeId}/scans`, dto, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchStocktakeScans = async (stocktakeId: string): Promise<FeltStocktakeScanDto[]> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<FeltStocktakeScanDto[]>(`/stocktakes/${stocktakeId}/scans`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const fetchStocktakeScanById = async (stocktakeId: string, id: string): Promise<FeltStocktakeScanDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<FeltStocktakeScanDto>(`/stocktakes/${stocktakeId}/scans/${id}`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const voidStocktakeScan = async (stocktakeId: string, id: string): Promise<void> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        await post<void>(`/stocktakes/${stocktakeId}/scans/${id}/void`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const closeStocktakeStorage = async (stocktakeId: string, id: string): Promise<void> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        await post<void>(`/stocktakes/${stocktakeId}/storages/${id}/close`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+export const reopenStocktakeStorage = async (stocktakeId: string, id: string): Promise<void> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        await post<void>(`/stocktakes/${stocktakeId}/storages/${id}/reopen`, {signal: controller.signal});
+        clearTimeout(timeoutId);
     } catch (error) {
         clearTimeout(timeoutId);
         throw error;
