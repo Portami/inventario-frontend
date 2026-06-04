@@ -27,7 +27,7 @@ export interface OfferSummaryDto {
     taggedRolls: number;
 }
 
-export type LineItemKind = 'RESTSTUECK' | 'ROLLE' | 'PRODUKT';
+export type LineItemKind = 'SCRAP' | 'ROLL' | 'PRODUCT';
 
 export type ReservationKind = 'RESERVED' | 'TAGGED';
 
@@ -143,6 +143,7 @@ export interface BackendFullCustomerDto {
 
 export interface BackendOfferItemDto {
     id: number;
+    kind: LineItemKind;
     productVariantId: number;
     description: string | null;
     quantity: number;
@@ -161,6 +162,7 @@ export interface BackendOfferDto {
 }
 
 export interface BackendCreateOfferItemDto {
+    kind: LineItemKind;
     productVariantId: number;
     description?: string;
     quantity: number;

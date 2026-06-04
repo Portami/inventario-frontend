@@ -116,7 +116,7 @@ export function useOffer(id: string | undefined): UseOfferReturn {
         async (felt: FeltCatalogItem) => {
             if (!id) return;
             const line: Omit<LineItemDto, 'id'> = {
-                kind: LINE_KIND.ROLLE,
+                kind: LINE_KIND.ROLL,
                 articleNumber: felt.articleNumber,
                 feltTypeName: felt.feltTypeName,
                 color: felt.color,
@@ -144,7 +144,7 @@ export function useOffer(id: string | undefined): UseOfferReturn {
         async (p: ProductCatalogItem) => {
             if (!id) return;
             const line: Omit<LineItemDto, 'id'> = {
-                kind: LINE_KIND.PRODUKT,
+                kind: LINE_KIND.PRODUCT,
                 articleNumber: p.articleNumber,
                 feltTypeName: p.name,
                 color: null,

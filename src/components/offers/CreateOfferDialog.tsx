@@ -234,7 +234,7 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Readonly<P
             {
                 stageKey: crypto.randomUUID(),
                 productVariantId: felt.id,
-                kind: LINE_KIND.ROLLE,
+                kind: LINE_KIND.ROLL,
                 articleNumber: felt.articleNumber,
                 feltTypeName: felt.feltTypeName,
                 color: felt.color,
@@ -258,7 +258,7 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Readonly<P
             {
                 stageKey: crypto.randomUUID(),
                 productVariantId: p.id,
-                kind: LINE_KIND.PRODUKT,
+                kind: LINE_KIND.PRODUCT,
                 articleNumber: p.articleNumber,
                 feltTypeName: p.name,
                 color: null,
@@ -288,6 +288,7 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Readonly<P
             }
             const customerName = customerMode === 'existing' ? selectedCustomer!.name : newCustomer.name.trim();
             const backendItems: BackendCreateOfferItemDto[] = stagedLines.map((line) => ({
+                kind: line.kind,
                 productVariantId: line.productVariantId,
                 description: line.description || undefined,
                 quantity: line.quantity,

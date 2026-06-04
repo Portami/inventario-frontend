@@ -53,9 +53,9 @@ export const OFFER_STATE = {
 export const OFFER_CLOSE_STATES: OfferState[] = ['CANCELLED', 'NO_RESPONSE'];
 
 export const LINE_KIND = {
-    RESTSTUECK: 'RESTSTUECK',
-    ROLLE: 'ROLLE',
-    PRODUKT: 'PRODUKT',
+    SCRAP: 'SCRAP',
+    ROLL: 'ROLL',
+    PRODUCT: 'PRODUCT',
 } as const;
 
 export const RESERVATION_KIND = {
@@ -115,9 +115,9 @@ export const RESERVATION_DAYS = 10;
 export const PAGE_SIZE = 10;
 
 export const KIND_CHIP_STYLES: Record<LineItemKind, {label: string; color: string; bg: string}> = {
-    RESTSTUECK: {label: 'Reststück', color: '#7a4ec9', bg: '#7a4ec914'},
-    ROLLE: {label: 'Rolle', color: '#1565c0', bg: '#1565c014'},
-    PRODUKT: {label: 'Produkt', color: '#2e7d32', bg: '#2e7d3214'},
+    SCRAP: {label: 'Reststück', color: '#7a4ec9', bg: '#7a4ec914'},
+    ROLL: {label: 'Rolle', color: '#1565c0', bg: '#1565c014'},
+    PRODUCT: {label: 'Produkt', color: '#2e7d32', bg: '#2e7d3214'},
 };
 
 export const ALL_BACKEND_STATES: OfferState[] = [

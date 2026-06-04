@@ -53,7 +53,7 @@ const CUSTOMER: CustomerDto = {
 function makeLine(overrides: Partial<LineItemDto> = {}): LineItemDto {
     return {
         id: '1',
-        kind: 'PRODUKT',
+        kind: 'PRODUCT',
         articleNumber: 'ART-1',
         feltTypeName: 'Wool',
         color: null,
