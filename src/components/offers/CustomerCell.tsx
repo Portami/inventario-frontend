@@ -6,7 +6,7 @@ interface CustomerCellProps {
     city: string;
 }
 
-export default function CustomerCell({customer, contact, city}: CustomerCellProps) {
+export default function CustomerCell({customer, contact, city}: Readonly<CustomerCellProps>) {
     const theme = useTheme();
     const primary = theme.palette.primary.main;
     const initials = customer

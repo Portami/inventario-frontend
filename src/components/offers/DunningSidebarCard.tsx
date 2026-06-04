@@ -15,7 +15,7 @@ interface Props {
 
 const LATE_FEE = 30;
 
-export default function DunningSidebarCard({offer, state, onGeneratePdf}: Props) {
+export default function DunningSidebarCard({offer, state, onGeneratePdf}: Readonly<Props>) {
     const meta = OFFER_STATE_META[state];
     const color = meta.color;
     const subtotal = offer.lines.reduce((s, l) => s + lineSubtotal(l), 0);

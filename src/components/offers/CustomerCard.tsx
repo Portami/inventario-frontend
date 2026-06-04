@@ -9,7 +9,7 @@ interface CustomerCardProps {
     onEdit: () => void;
 }
 
-export default function CustomerCard({customer, onEdit}: CustomerCardProps) {
+export default function CustomerCard({customer, onEdit}: Readonly<CustomerCardProps>) {
     const theme = useTheme();
     const primary = theme.palette.primary.main;
     return (

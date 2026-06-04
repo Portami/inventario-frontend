@@ -9,7 +9,7 @@ interface ChartCardProps {
     sx?: SxProps;
 }
 
-export default function ChartCard({title, subtitle, children, sx}: ChartCardProps) {
+export default function ChartCard({title, subtitle, children, sx}: Readonly<ChartCardProps>) {
     return (
         <Card variant="outlined" sx={{borderColor: 'rgba(0,0,0,0.08)', ...sx}}>
             <CardContent sx={{p: 3, '&:last-child': {pb: 3}}}>

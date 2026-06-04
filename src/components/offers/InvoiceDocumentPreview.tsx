@@ -18,7 +18,7 @@ interface Props {
     vatRate: number;
 }
 
-function SmLine({label, value, dim}: {label: string; value: string; dim?: boolean}) {
+function SmLine({label, value, dim}: Readonly<{label: string; value: string; dim?: boolean}>) {
     return (
         <Box sx={{display: 'flex', justifyContent: 'space-between', mb: 0.25}}>
             <Typography sx={{fontSize: 12, color: dim ? 'text.secondary' : 'text.primary'}}>{label}</Typography>
@@ -27,7 +27,7 @@ function SmLine({label, value, dim}: {label: string; value: string; dim?: boolea
     );
 }
 
-function CondRow({label, value}: {label: string; value: string}) {
+function CondRow({label, value}: Readonly<{label: string; value: string}>) {
     return (
         <Box sx={{display: 'flex', gap: 1, mb: 0.25}}>
             <Typography sx={{fontSize: 11, fontWeight: 600, color: 'text.secondary', minWidth: 100, flexShrink: 0}}>{label}</Typography>
@@ -36,7 +36,7 @@ function CondRow({label, value}: {label: string; value: string}) {
     );
 }
 
-export default function InvoiceDocumentPreview({offer, shippingFee, vatRate}: Props) {
+export default function InvoiceDocumentPreview({offer, shippingFee, vatRate}: Readonly<Props>) {
     const {customer, lines} = offer;
     const subtotal = lines.reduce((s, l) => s + lineSubtotal(l), 0);
     const vatBase = subtotal + shippingFee;
@@ -143,7 +143,7 @@ export default function InvoiceDocumentPreview({offer, shippingFee, vatRate}: Pr
                         </tr>
                     )}
                     {lines.map((l: LineItemDto, i: number) => {
-                        const descPart = l.description !== l.feltTypeName ? l.description : null;
+                        const descPart = l.description === l.feltTypeName ? null : l.description;
                         const secondary = [l.articleNumber, descPart].filter(Boolean).join(' · ');
                         return (
                             <tr key={l.id} style={{backgroundColor: i % 2 === 1 ? 'rgba(0,0,0,0.015)' : undefined}}>

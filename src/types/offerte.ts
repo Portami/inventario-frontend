@@ -115,8 +115,6 @@ export interface HistoryEntry {
     what: string;
 }
 
-export type BackendOfferState = OfferState;
-
 export interface BackendCustomerDto {
     id: number;
     name: string;
@@ -154,7 +152,7 @@ export interface BackendOfferItemDto {
 export interface BackendOfferDto {
     id: number;
     customerDto: BackendCustomerDto;
-    state: BackendOfferState;
+    state: OfferState;
     createdAt: string;
     updatedAt: string;
     dueAt?: string;

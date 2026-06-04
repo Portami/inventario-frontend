@@ -9,7 +9,7 @@ interface StatTileProps {
     onClick: () => void;
 }
 
-export default function StatTile({label, value, sub, color, active, onClick}: StatTileProps) {
+export default function StatTile({label, value, sub, color, active, onClick}: Readonly<StatTileProps>) {
     const theme = useTheme();
     const primary = theme.palette.primary.main;
     return (

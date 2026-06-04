@@ -2,7 +2,7 @@ import StatTile from '@/components/offers/StatTile';
 import ChartCard from '@/components/statistics/ChartCard';
 import {useOffers} from '@/hooks/useOffers';
 import {ALL_BACKEND_STATES, fmtCHF, OFFER_STATE_META} from '@/pages/constants/offerConstants';
-import type {OfferState} from '@/types/offerte';
+import type {OfferState, OfferSummaryDto} from '@/types/offerte';
 import {Alert, Box, CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from '@mui/material';
 import {useMemo} from 'react';
 import {Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
@@ -18,132 +18,144 @@ function fmtMonthLong(key: string) {
     return new Date(key + '-01').toLocaleDateString('de-CH', {month: 'long', year: 'numeric'});
 }
 
+function accumulateOffer(
+    o: OfferSummaryDto,
+    now: Date,
+    acc: {
+        totals: {totalRevenue: number; pipelineValue: number; completedCount: number; closedCount: number; overdueCount: number; overdueValue: number};
+        monthBuckets: Map<string, {paid: number; open: number}>;
+        stateCounts: Map<OfferState, number>;
+        customerRevenue: Map<string, {revenue: number; count: number}>;
+        customerLoss: Map<string, {lostCount: number; lostValue: number}>;
+        overdueByState: Map<OfferState, {value: number; count: number}>;
+        volumeCreated: Map<string, number>;
+        volumeCompleted: Map<string, number>;
+    },
+) {
+    const isClosed = o.state === 'CANCELLED' || o.state === 'NO_RESPONSE';
+    const isCompleted = o.state === 'COMPLETED';
+    const isActive = !isClosed && !isCompleted;
+    const {totals, monthBuckets, stateCounts, customerRevenue, customerLoss, overdueByState, volumeCreated, volumeCompleted} = acc;
+
+    if (isCompleted) {
+        totals.totalRevenue += o.total;
+        totals.completedCount++;
+    } else if (isClosed) {
+        totals.closedCount++;
+    } else {
+        totals.pipelineValue += o.total;
+    }
+
+    if (o.overdue > 0 && isActive) {
+        totals.overdueCount++;
+        totals.overdueValue += o.total;
+        const g = overdueByState.get(o.state) ?? {value: 0, count: 0};
+        overdueByState.set(o.state, {value: g.value + o.total, count: g.count + 1});
+    }
+
+    const monthKey = o.createdISO.substring(0, 7);
+    const bucket = monthBuckets.get(monthKey) ?? {paid: 0, open: 0};
+    monthBuckets.set(monthKey, bucket);
+    if (isCompleted) {
+        bucket.paid += o.total;
+    } else if (isActive) {
+        bucket.open += o.total;
+    }
+
+    stateCounts.set(o.state, (stateCounts.get(o.state) ?? 0) + 1);
+
+    if (isClosed) {
+        const e = customerLoss.get(o.customer) ?? {lostCount: 0, lostValue: 0};
+        customerLoss.set(o.customer, {lostCount: e.lostCount + 1, lostValue: e.lostValue + o.total});
+    } else {
+        const e = customerRevenue.get(o.customer) ?? {revenue: 0, count: 0};
+        customerRevenue.set(o.customer, {revenue: e.revenue + o.total, count: e.count + 1});
+    }
+
+    const created = new Date(o.createdISO + 'T00:00:00');
+    const monthsDiff = (now.getFullYear() - created.getFullYear()) * 12 + (now.getMonth() - created.getMonth());
+    if (monthsDiff < 12) {
+        volumeCreated.set(monthKey, (volumeCreated.get(monthKey) ?? 0) + 1);
+        if (isCompleted) {
+            volumeCompleted.set(monthKey, (volumeCompleted.get(monthKey) ?? 0) + 1);
+        }
+    }
+}
+
+function computeStats(offers: OfferSummaryDto[]) {
+    const now = new Date();
+    const totals = {totalRevenue: 0, pipelineValue: 0, completedCount: 0, closedCount: 0, overdueCount: 0, overdueValue: 0};
+    const monthBuckets = new Map<string, {paid: number; open: number}>();
+    const stateCounts = new Map<OfferState, number>();
+    const customerRevenue = new Map<string, {revenue: number; count: number}>();
+    const customerLoss = new Map<string, {lostCount: number; lostValue: number}>();
+    const overdueByState = new Map<OfferState, {value: number; count: number}>();
+    const volumeCreated = new Map<string, number>();
+    const volumeCompleted = new Map<string, number>();
+    const acc = {totals, monthBuckets, stateCounts, customerRevenue, customerLoss, overdueByState, volumeCreated, volumeCompleted};
+
+    for (const o of offers) accumulateOffer(o, now, acc);
+
+    const {totalRevenue, pipelineValue, completedCount, closedCount, overdueCount, overdueValue} = totals;
+    const conversionRate = completedCount + closedCount > 0 ? Math.round((completedCount / (completedCount + closedCount)) * 100) : 0;
+    const avgValue = offers.length > 0 ? offers.reduce((s, o) => s + o.total, 0) / offers.length : 0;
+
+    const monthlyData = [...monthBuckets.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([key, v]) => ({month: key, label: fmtMonth(key), ...v}));
+
+    const statePieData = ALL_BACKEND_STATES.filter((s) => (stateCounts.get(s) ?? 0) > 0).map((s) => ({
+        name: OFFER_STATE_META[s].label,
+        value: stateCounts.get(s) ?? 0,
+        color: OFFER_STATE_META[s].color,
+    }));
+
+    const top5Customers = [...customerRevenue.entries()]
+        .sort(([, a], [, b]) => b.revenue - a.revenue)
+        .slice(0, 5)
+        .map(([customer, v]) => ({customer, ...v}));
+
+    const overdueData = DUNNING_STATES.filter((s) => overdueByState.has(s)).map((s) => {
+        const entry = overdueByState.get(s) ?? {value: 0, count: 0};
+        return {label: OFFER_STATE_META[s].label, value: entry.value, count: entry.count, color: OFFER_STATE_META[s].color};
+    });
+
+    const last12Months: string[] = [];
+    for (let i = 11; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        last12Months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+    }
+    const volumeTrendData = last12Months.map((key) => ({
+        label: fmtMonth(key),
+        created: volumeCreated.get(key) ?? 0,
+        completed: volumeCompleted.get(key) ?? 0,
+    }));
+
+    const topCompletedCustomers = [...customerRevenue.entries()]
+        .sort(([, a], [, b]) => b.revenue - a.revenue)
+        .slice(0, 8)
+        .map(([customer, v]) => ({customer, completedRevenue: v.revenue, completedCount: v.count, lostCount: customerLoss.get(customer)?.lostCount ?? 0}));
+
+    const riskCustomers = [...customerLoss.entries()]
+        .sort(([, a], [, b]) => b.lostCount - a.lostCount)
+        .slice(0, 8)
+        .map(([customer, v]) => ({customer, lostCount: v.lostCount, lostValue: v.lostValue, completedCount: customerRevenue.get(customer)?.count ?? 0}));
+
+    return {
+        kpis: {totalRevenue, pipelineValue, conversionRate, overdueCount, overdueValue, avgValue},
+        monthlyData,
+        statePieData,
+        top5Customers,
+        overdueData,
+        overdueCount,
+        totalOffers: offers.length,
+        volumeTrendData,
+        topCompletedCustomers,
+        riskCustomers,
+    };
+}
+
 export default function StatisticsPage() {
     const {offers, loading} = useOffers();
-
-    const stats = useMemo(() => {
-        let totalRevenue = 0;
-        let pipelineValue = 0;
-        let completedCount = 0;
-        let closedCount = 0;
-        let overdueCount = 0;
-        let overdueValue = 0;
-
-        const monthBuckets = new Map<string, {paid: number; open: number}>();
-        const stateCounts = new Map<OfferState, number>();
-        const customerRevenue = new Map<string, {revenue: number; count: number}>();
-        const customerLoss = new Map<string, {lostCount: number; lostValue: number}>();
-        const overdueByState = new Map<OfferState, {value: number; count: number}>();
-        const volumeCreated = new Map<string, number>();
-        const volumeCompleted = new Map<string, number>();
-
-        const now = new Date();
-
-        for (const o of offers) {
-            const isClosed = o.state === 'CANCELLED' || o.state === 'NO_RESPONSE';
-            const isCompleted = o.state === 'COMPLETED';
-            const isActive = !isClosed && !isCompleted;
-
-            if (isCompleted) {
-                totalRevenue += o.total;
-                completedCount++;
-            } else if (isClosed) {
-                closedCount++;
-            } else {
-                pipelineValue += o.total;
-            }
-
-            if (o.overdue > 0 && isActive) {
-                overdueCount++;
-                overdueValue += o.total;
-                const g = overdueByState.get(o.state) ?? {value: 0, count: 0};
-                overdueByState.set(o.state, {value: g.value + o.total, count: g.count + 1});
-            }
-
-            const monthKey = o.createdISO.substring(0, 7);
-
-            if (!monthBuckets.has(monthKey)) monthBuckets.set(monthKey, {paid: 0, open: 0});
-            const bucket = monthBuckets.get(monthKey)!;
-            if (isCompleted) bucket.paid += o.total;
-            else if (isActive) bucket.open += o.total;
-
-            stateCounts.set(o.state, (stateCounts.get(o.state) ?? 0) + 1);
-
-            if (!isClosed) {
-                const existing = customerRevenue.get(o.customer) ?? {revenue: 0, count: 0};
-                customerRevenue.set(o.customer, {revenue: existing.revenue + o.total, count: existing.count + 1});
-            }
-            if (isClosed) {
-                const existing = customerLoss.get(o.customer) ?? {lostCount: 0, lostValue: 0};
-                customerLoss.set(o.customer, {lostCount: existing.lostCount + 1, lostValue: existing.lostValue + o.total});
-            }
-
-            const created = new Date(o.createdISO + 'T00:00:00');
-            const monthsDiff = (now.getFullYear() - created.getFullYear()) * 12 + (now.getMonth() - created.getMonth());
-            if (monthsDiff < 12) {
-                volumeCreated.set(monthKey, (volumeCreated.get(monthKey) ?? 0) + 1);
-                if (isCompleted) volumeCompleted.set(monthKey, (volumeCompleted.get(monthKey) ?? 0) + 1);
-            }
-        }
-
-        const conversionRate = completedCount + closedCount > 0 ? Math.round((completedCount / (completedCount + closedCount)) * 100) : 0;
-
-        const avgValue = offers.length > 0 ? offers.reduce((s, o) => s + o.total, 0) / offers.length : 0;
-
-        const monthlyData = [...monthBuckets.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([key, v]) => ({month: key, label: fmtMonth(key), ...v}));
-
-        const statePieData = ALL_BACKEND_STATES.filter((s) => (stateCounts.get(s) ?? 0) > 0).map((s) => ({
-            name: OFFER_STATE_META[s].label,
-            value: stateCounts.get(s)!,
-            color: OFFER_STATE_META[s].color,
-        }));
-
-        const top5Customers = [...customerRevenue.entries()]
-            .sort(([, a], [, b]) => b.revenue - a.revenue)
-            .slice(0, 5)
-            .map(([customer, v]) => ({customer, ...v}));
-
-        const overdueData = DUNNING_STATES.filter((s) => overdueByState.has(s)).map((s) => ({
-            label: OFFER_STATE_META[s].label,
-            value: overdueByState.get(s)!.value,
-            count: overdueByState.get(s)!.count,
-            color: OFFER_STATE_META[s].color,
-        }));
-
-        const last12Months: string[] = [];
-        for (let i = 11; i >= 0; i--) {
-            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            last12Months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
-        }
-        const volumeTrendData = last12Months.map((key) => ({
-            label: fmtMonth(key),
-            created: volumeCreated.get(key) ?? 0,
-            completed: volumeCompleted.get(key) ?? 0,
-        }));
-
-        const topCompletedCustomers = [...customerRevenue.entries()]
-            .sort(([, a], [, b]) => b.revenue - a.revenue)
-            .slice(0, 8)
-            .map(([customer, v]) => ({customer, completedRevenue: v.revenue, completedCount: v.count, lostCount: customerLoss.get(customer)?.lostCount ?? 0}));
-
-        const riskCustomers = [...customerLoss.entries()]
-            .sort(([, a], [, b]) => b.lostCount - a.lostCount)
-            .slice(0, 8)
-            .map(([customer, v]) => ({customer, lostCount: v.lostCount, lostValue: v.lostValue, completedCount: customerRevenue.get(customer)?.count ?? 0}));
-
-        return {
-            kpis: {totalRevenue, pipelineValue, conversionRate, overdueCount, overdueValue, avgValue},
-            monthlyData,
-            statePieData,
-            top5Customers,
-            overdueData,
-            overdueCount,
-            totalOffers: offers.length,
-            volumeTrendData,
-            topCompletedCustomers,
-            riskCustomers,
-        };
-    }, [offers]);
+    const stats = useMemo(() => computeStats(offers), [offers]);
 
     if (loading) {
         return (

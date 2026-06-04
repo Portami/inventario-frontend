@@ -20,7 +20,7 @@ const CHIP_PALETTE = ['#1565C0', '#2E7D32', '#C62828', '#E65100', '#00695C', '#5
 function rollColorToChipBg(color: string): string {
     let hash = 0;
     for (let i = 0; i < color.length; i++) {
-        hash = color.charCodeAt(i) + ((hash << 5) - hash);
+        hash = (color.codePointAt(i) ?? 0) + ((hash << 5) - hash);
     }
     return CHIP_PALETTE[Math.abs(hash) % CHIP_PALETTE.length];
 }
@@ -98,7 +98,9 @@ export default function FeltPage() {
                     <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5, py: 0.75, alignContent: 'center'}}>
                         {visible.map((roll) => {
                             const bg = roll.storageName ? storageColorMap.get(roll.storageName) : undefined;
-                            const widthBorder = roll.width === 180 ? '2px solid #FF8F00' : roll.width === 100 ? '2px solid #0277BD' : undefined;
+                            let widthBorder: string | undefined;
+                            if (roll.width === 180) widthBorder = '2px solid #FF8F00';
+                            else if (roll.width === 100) widthBorder = '2px solid #0277BD';
                             return (
                                 <Tooltip key={roll.id} title={roll.storageName ?? 'Kein Lagerort'} arrow>
                                     <Chip
@@ -189,10 +191,7 @@ export default function FeltPage() {
             if (densityFilter && felt.density !== Number(densityFilter)) {
                 return false;
             }
-            if (thicknessFilter && felt.thickness !== Number(thicknessFilter)) {
-                return false;
-            }
-            return true;
+            return !(thicknessFilter && felt.thickness !== Number(thicknessFilter));
         });
     }, [feltsByDimension, searchQuery, densityFilter, thicknessFilter]);
 

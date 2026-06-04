@@ -8,7 +8,7 @@ type RollLabelProps = {
     height?: number;
 };
 
-function InfoRow({label, value}: {label: string; value: string}) {
+function InfoRow({label, value}: Readonly<{label: string; value: string}>) {
     return (
         <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 1, minWidth: 0}}>
             <Typography sx={{fontSize: '0.6rem', color: 'text.secondary', flexShrink: 0, textTransform: 'uppercase', letterSpacing: '0.04em'}}>
@@ -77,8 +77,8 @@ export default function RollLabel({product, width, height}: Readonly<RollLabelPr
                 <Box sx={{flex: 1, display: 'flex', flexDirection: 'column', gap: 0.6, minWidth: 0}}>
                     <InfoRow label="Filztyp" value={product.feltTypeName ?? '-'} />
                     <InfoRow label="Farbe" value={product.color ?? '-'} />
-                    <InfoRow label="Stärke" value={product.thickness != null ? `${product.thickness} mm` : '-'} />
-                    <InfoRow label="Dichte" value={product.density != null ? `${product.density} g/m²` : '-'} />
+                    <InfoRow label="Stärke" value={product.thickness == null ? '-' : `${product.thickness} mm`} />
+                    <InfoRow label="Dichte" value={product.density == null ? '-' : `${product.density} g/m²`} />
                     <InfoRow label="Lieferant" value={product.supplierName ?? '-'} />
                 </Box>
             </Box>

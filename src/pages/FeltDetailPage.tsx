@@ -61,7 +61,7 @@ export default function FeltDetailPage() {
     const navigate = useNavigate();
     const showToast = useToast();
 
-    const parsed = id != null ? Number.parseInt(id, 10) : NaN;
+    const parsed = id == null ? Number.NaN : Number.parseInt(id, 10);
     const feltId = Number.isNaN(parsed) ? null : parsed;
 
     const [felt, setFelt] = useState<FeltDto | null>(null);
@@ -187,11 +187,11 @@ export default function FeltDetailPage() {
             const newRoll = await splitRoll(rollToSplit.id, {width});
             setRollToSplit(null);
             setSplitWidthInput('');
-            if (newRoll.id !== rollToSplit.id) {
-                navigate(`/roll/${newRoll.id}`);
-            } else {
+            if (newRoll.id === rollToSplit.id) {
                 void refetchRolls();
                 showToast('Rolle erfolgreich abgeschnitten.');
+            } else {
+                navigate(`/roll/${newRoll.id}`);
             }
         } catch (err) {
             showToast(toErrorMessage(err, 'Rolle konnte nicht abgeschnitten werden'), 'error');
@@ -243,7 +243,7 @@ export default function FeltDetailPage() {
 
                                 <div>
                                     <Typography variant="overline" color="textSecondary">
-                                        Maße & Eigenschaften
+                                        Masse & Eigenschaften
                                     </Typography>
                                     <Box sx={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1}}>
                                         <Field label="Dicke (mm)" value={felt.thickness} />

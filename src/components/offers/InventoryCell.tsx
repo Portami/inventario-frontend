@@ -7,7 +7,7 @@ interface InventoryCellProps {
     tagged: number;
 }
 
-export default function InventoryCell({reserved, tagged}: InventoryCellProps) {
+export default function InventoryCell({reserved, tagged}: Readonly<InventoryCellProps>) {
     const theme = useTheme();
     const primary = theme.palette.primary.main;
 

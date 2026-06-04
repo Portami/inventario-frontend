@@ -2,7 +2,7 @@ import {fmtCHF, fmtNum, lineSubtotal, VAT_RATE} from '@/pages/constants/offerCon
 import {LineItemDto} from '@/types/offerte';
 import {Box, Card, CardContent, Divider, Stack, Typography, useTheme} from '@mui/material';
 
-function TotalsRow({label, value, strong, muted}: {label: string; value: string; strong?: boolean; muted?: boolean}) {
+function TotalsRow({label, value, strong, muted}: Readonly<{label: string; value: string; strong?: boolean; muted?: boolean}>) {
     return (
         <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', py: 0.5}}>
             <Typography
@@ -28,7 +28,7 @@ function TotalsRow({label, value, strong, muted}: {label: string; value: string;
     );
 }
 
-export default function TotalsCard({lines}: {lines: LineItemDto[]}) {
+export default function TotalsCard({lines}: Readonly<{lines: LineItemDto[]}>) {
     const theme = useTheme();
     const primary = theme.palette.primary.main;
     const subtotal = lines.reduce((s, l) => s + lineSubtotal(l), 0);

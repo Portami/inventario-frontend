@@ -1,4 +1,4 @@
-import type {BackendOfferState, LineItemDto, LineItemKind, OfferState} from '@/types/offerte';
+import type {LineItemDto, LineItemKind, OfferState} from '@/types/offerte';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
@@ -120,7 +120,7 @@ export const KIND_CHIP_STYLES: Record<LineItemKind, {label: string; color: strin
     PRODUKT: {label: 'Produkt', color: '#2e7d32', bg: '#2e7d3214'},
 };
 
-export const ALL_BACKEND_STATES: BackendOfferState[] = [
+export const ALL_BACKEND_STATES: OfferState[] = [
     'OFFER',
     'ORDER_CONFIRMATION',
     'INVOICE',

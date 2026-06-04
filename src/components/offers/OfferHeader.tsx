@@ -22,7 +22,7 @@ interface OfferHeaderProps {
     onToggleSent?: () => void;
 }
 
-export default function OfferHeader({offer, prevState, onChangeState, onRegen, onBack, onEditDueDate, onToggleSent}: OfferHeaderProps) {
+export default function OfferHeader({offer, prevState, onChangeState, onRegen, onBack, onEditDueDate, onToggleSent}: Readonly<OfferHeaderProps>) {
     const [editingDue, setEditingDue] = useState(false);
 
     const isCompleted = offer.state === OFFER_STATE.COMPLETED;

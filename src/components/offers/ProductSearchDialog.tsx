@@ -26,7 +26,7 @@ interface ProductSearchDialogProps {
     onPick: (p: ProductCatalogItem) => void;
 }
 
-export default function ProductSearchDialog({open, catalog, onClose, onPick}: ProductSearchDialogProps) {
+export default function ProductSearchDialog({open, catalog, onClose, onPick}: Readonly<ProductSearchDialogProps>) {
     const theme = useTheme();
     const primary = theme.palette.primary.main;
     const [q, setQ] = useState('');

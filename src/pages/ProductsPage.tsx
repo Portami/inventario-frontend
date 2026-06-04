@@ -84,7 +84,7 @@ export default function ProductsPage() {
                 const first = row.parent.variants[0];
                 return first ? first.price : '';
             },
-            valueFormatter: (value) => (value !== '' ? `CHF ${Number(value).toFixed(2)}` : ''),
+            valueFormatter: (value) => (value === '' ? '' : `CHF ${Number(value).toFixed(2)}`),
         },
         {
             field: 'actions',

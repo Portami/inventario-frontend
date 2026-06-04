@@ -27,7 +27,7 @@ interface NavBtnProps {
     collapsed: boolean;
 }
 
-function NavBtn({to, icon, label, collapsed}: NavBtnProps) {
+function NavBtn({to, icon, label, collapsed}: Readonly<NavBtnProps>) {
     const theme = useTheme();
     const btn = (
         <Button

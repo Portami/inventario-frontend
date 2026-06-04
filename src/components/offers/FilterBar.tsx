@@ -15,7 +15,7 @@ interface FilterBarProps {
     setDateRange: (v: DateRange) => void;
 }
 
-export default function FilterBar({q, setQ, sort, setSort, dateRange, setDateRange}: FilterBarProps) {
+export default function FilterBar({q, setQ, sort, setSort, dateRange, setDateRange}: Readonly<FilterBarProps>) {
     return (
         <Card variant="outlined" sx={{borderColor: 'rgba(0,0,0,0.08)', mb: 3}}>
             <CardContent sx={{p: 2, '&:last-child': {pb: 2}}}>
