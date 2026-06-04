@@ -1,24 +1,24 @@
 import DataMatrix from '../DataMatrix.tsx';
 import {Product} from '@/types/product.ts';
-import {Box, Card, CardContent, Stack, Typography, useTheme} from '@mui/material';
+import {Box, Card, Divider, Typography, useTheme} from '@mui/material';
 
 type RollLabelProps = {
     product: Product;
-    width?: number; // Width in mm
-    height?: number; // Height in mm
+    width?: number;
+    height?: number;
 };
 
-/**
- * Roll Label Component
- * Displays printable label with product information and Data Matrix code
- * Format:
- * - Name
- * - Farbe (Color)
- * - Dicke (Type/Material)
- * - Länge (Article Number as reference)
- * - Breite (ID)
- * - Data Matrix code based on ID
- */
+function InfoRow({label, value}: {label: string; value: string}) {
+    return (
+        <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 1, minWidth: 0}}>
+            <Typography sx={{fontSize: '0.6rem', color: 'text.secondary', flexShrink: 0, textTransform: 'uppercase', letterSpacing: '0.04em'}}>
+                {label}
+            </Typography>
+            <Typography sx={{fontSize: '0.72rem', fontWeight: 700, color: 'text.primary', textAlign: 'right', wordBreak: 'break-word'}}>{value}</Typography>
+        </Box>
+    );
+}
+
 export default function RollLabel({product, width, height}: Readonly<RollLabelProps>) {
     const theme = useTheme();
 
@@ -29,95 +29,74 @@ export default function RollLabel({product, width, height}: Readonly<RollLabelPr
                 height: height ? `${height}mm` : 'auto',
                 maxWidth: 400,
                 mx: 'auto',
-                p: 2,
                 display: 'flex',
                 flexDirection: 'column',
                 backgroundColor: theme.palette.background.paper,
-                // Add border for PDF generation and visual definition
                 border: `1px solid ${theme.palette.divider}`,
-                '@media print': {
-                    boxShadow: 'none',
-                    pageBreakInside: 'avoid',
-                },
-                // Enable shadow by default (for PDF generation via html2canvas)
                 boxShadow: theme.shadows[2],
+                overflow: 'hidden',
+                '@media print': {boxShadow: 'none', pageBreakInside: 'avoid'},
             }}
         >
-            <CardContent
+            {/* Header */}
+            <Box
                 sx={{
-                    '@media print': {
-                        padding: 1,
-                    },
+                    px: 1.5,
+                    py: 0.75,
+                    bgcolor: theme.palette.text.primary,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                 }}
             >
-                <Stack spacing={2}>
-                    {/* Header */}
-                    <Box sx={{textAlign: 'center', borderBottom: `2px solid ${theme.palette.text.primary}`, pb: 1}}>
-                        <Typography
-                            variant="subtitle2"
-                            sx={{
-                                fontWeight: 'bold',
-                                fontSize: '0.75rem',
-                                textTransform: 'uppercase',
-                                letterSpacing: 1,
-                                color: theme.palette.text.primary,
-                            }}
-                        >
-                            {product.name ? product.name.toUpperCase() : 'ROLL LABEL'}
-                        </Typography>
-                    </Box>
+                <Typography
+                    sx={{
+                        fontSize: '0.7rem',
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.1em',
+                        color: theme.palette.background.paper,
+                        textAlign: 'center',
+                        lineHeight: 1.2,
+                    }}
+                >
+                    {product.name ?? 'ROLL LABEL'}
+                </Typography>
+            </Box>
 
-                    {/* Product Information */}
-                    <Stack spacing={1}>
-                        <Box>
-                            <Typography variant="caption" sx={{fontSize: '0.65rem', color: theme.palette.text.secondary}}>
-                                Länge:
-                            </Typography>
-                            <Typography variant="body2" sx={{fontWeight: 600, fontSize: '0.9rem', color: theme.palette.text.primary}}>
-                                {product.length ? `${product.length / 10} cm` : '-'}
-                            </Typography>
-                        </Box>
+            {/* Body: barcode left, info right */}
+            <Box sx={{display: 'flex', flex: 1, p: 1, gap: 1.25, alignItems: 'center'}}>
+                {/* DataMatrix */}
+                <Box sx={{flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                    <DataMatrix id={String(product.id)} width={90} height={90} />
+                </Box>
 
-                        <Box>
-                            <Typography variant="caption" sx={{fontSize: '0.65rem', color: theme.palette.text.secondary}}>
-                                Breite:
-                            </Typography>
-                            <Typography variant="body2" sx={{fontWeight: 600, fontSize: '0.9rem', color: theme.palette.text.primary}}>
-                                {product.width ? `${product.width / 10} cm` : '-'}
-                            </Typography>
-                        </Box>
+                <Divider orientation="vertical" flexItem />
 
-                        <Box>
-                            <Typography variant="caption" sx={{fontSize: '0.65rem', color: theme.palette.text.secondary}}>
-                                Artikelnummer:
-                            </Typography>
-                            <Typography variant="body2" sx={{fontWeight: 600, fontSize: '0.9rem', fontFamily: 'monospace', color: theme.palette.text.primary}}>
-                                {product.articleNumber}
-                            </Typography>
-                        </Box>
-                    </Stack>
+                {/* Info fields */}
+                <Box sx={{flex: 1, display: 'flex', flexDirection: 'column', gap: 0.6, minWidth: 0}}>
+                    <InfoRow label="Filztyp" value={product.feltTypeName ?? '—'} />
+                    <InfoRow label="Farbe" value={product.color ?? '—'} />
+                    <InfoRow label="Stärke" value={product.thickness != null ? `${product.thickness} mm` : '—'} />
+                    <InfoRow label="Dichte" value={product.density != null ? `${product.density} g/m²` : '—'} />
+                    <InfoRow label="Lieferant" value={product.supplierName ?? '—'} />
+                </Box>
+            </Box>
 
-                    {/* Data Matrix Code */}
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            py: 1,
-                            borderTop: `1px solid ${theme.palette.divider}`,
-                            borderBottom: `1px solid ${theme.palette.divider}`,
-                        }}
-                    >
-                        <DataMatrix id={String(product.id)} width={120} height={120} />
-                    </Box>
-
-                    {/* Footer */}
-                    <Box sx={{textAlign: 'center', pt: 1}}>
-                        <Typography variant="caption" sx={{fontSize: '0.6rem', color: theme.palette.text.secondary}}>
-                            ID: {product.id}
-                        </Typography>
-                    </Box>
-                </Stack>
-            </CardContent>
+            {/* Footer */}
+            <Box
+                sx={{
+                    px: 1.5,
+                    py: 0.4,
+                    borderTop: `1px solid ${theme.palette.divider}`,
+                    display: 'flex',
+                    justifyContent: 'center',
+                }}
+            >
+                <Typography sx={{fontSize: '0.55rem', color: 'text.disabled', letterSpacing: '0.05em'}}>
+                    ID {product.id} · {product.articleNumber}
+                </Typography>
+            </Box>
         </Card>
     );
 }
