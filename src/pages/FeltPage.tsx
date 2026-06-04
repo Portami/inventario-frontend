@@ -128,7 +128,7 @@ export default function FeltPage() {
         [rollsByFeltId, storageColorMap],
     );
 
-    // Felts that pass the dimension (length/width) filters only — used to derive dropdown options
+    // Felts that pass the dimension (length/width) filters only - used to derive dropdown options
     const feltsByDimension = useMemo(() => {
         const lengthActive = activeLengthFilter[0] !== rollLengthBounds[0] || activeLengthFilter[1] !== rollLengthBounds[1];
         const widthActive = widthFilter[0] !== 0 || widthFilter[1] !== 500;

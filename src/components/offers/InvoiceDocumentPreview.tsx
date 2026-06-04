@@ -54,7 +54,7 @@ export default function InvoiceDocumentPreview({offer, shippingFee, vatRate}: Pr
                 fontFamily: 'Helvetica, Arial, sans-serif',
             }}
         >
-            {/* Company header — right-aligned */}
+            {/* Company header - right-aligned */}
             <Box sx={{textAlign: 'right', mb: 4}}>
                 <Typography sx={{fontSize: 13, fontWeight: 700, color: 'text.primary'}}>{PORTAMI.name}</Typography>
                 <Typography sx={{fontSize: 11.5, color: 'text.secondary', mt: 0.5}}>{PORTAMI.owners}</Typography>
@@ -63,7 +63,7 @@ export default function InvoiceDocumentPreview({offer, shippingFee, vatRate}: Pr
                 <Typography sx={{fontSize: 11.5, color: 'text.secondary'}}>{PORTAMI.emailWeb}</Typography>
             </Box>
 
-            {/* Customer + order info — two columns */}
+            {/* Customer + order info - two columns */}
             <Box sx={{display: 'flex', justifyContent: 'space-between', gap: 3, mb: 3}}>
                 <Box>
                     <Typography sx={{fontSize: 13, fontWeight: 700}}>{customer.name}</Typography>
@@ -164,7 +164,7 @@ export default function InvoiceDocumentPreview({offer, shippingFee, vatRate}: Pr
                                 </td>
                                 <td style={{textAlign: 'right', fontVariantNumeric: 'tabular-nums'}}>{fmtCHF(l.pricePerUnit)}</td>
                                 <td style={{textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: l.cutSurcharge > 0 ? 'inherit' : 'rgba(0,0,0,0.3)'}}>
-                                    {l.cutSurcharge > 0 ? fmtCHF(l.cutSurcharge) : '—'}
+                                    {l.cutSurcharge > 0 ? fmtCHF(l.cutSurcharge) : '-'}
                                 </td>
                                 <td style={{textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 600}}>{fmtCHF(lineSubtotal(l))}</td>
                             </tr>
@@ -173,7 +173,7 @@ export default function InvoiceDocumentPreview({offer, shippingFee, vatRate}: Pr
                 </tbody>
             </Box>
 
-            {/* Totals — right-aligned block */}
+            {/* Totals - right-aligned block */}
             <Box sx={{display: 'flex', justifyContent: 'flex-end', mt: 1, mb: 4}}>
                 <Box sx={{minWidth: 260}}>
                     <Divider sx={{mb: 1.5}} />

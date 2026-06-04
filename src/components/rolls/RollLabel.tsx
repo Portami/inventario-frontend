@@ -75,11 +75,11 @@ export default function RollLabel({product, width, height}: Readonly<RollLabelPr
 
                 {/* Info fields */}
                 <Box sx={{flex: 1, display: 'flex', flexDirection: 'column', gap: 0.6, minWidth: 0}}>
-                    <InfoRow label="Filztyp" value={product.feltTypeName ?? '—'} />
-                    <InfoRow label="Farbe" value={product.color ?? '—'} />
-                    <InfoRow label="Stärke" value={product.thickness != null ? `${product.thickness} mm` : '—'} />
-                    <InfoRow label="Dichte" value={product.density != null ? `${product.density} g/m²` : '—'} />
-                    <InfoRow label="Lieferant" value={product.supplierName ?? '—'} />
+                    <InfoRow label="Filztyp" value={product.feltTypeName ?? '-'} />
+                    <InfoRow label="Farbe" value={product.color ?? '-'} />
+                    <InfoRow label="Stärke" value={product.thickness != null ? `${product.thickness} mm` : '-'} />
+                    <InfoRow label="Dichte" value={product.density != null ? `${product.density} g/m²` : '-'} />
+                    <InfoRow label="Lieferant" value={product.supplierName ?? '-'} />
                 </Box>
             </Box>
 

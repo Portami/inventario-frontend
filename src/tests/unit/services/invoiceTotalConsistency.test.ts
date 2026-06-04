@@ -57,7 +57,7 @@ describe('UI/QR total formula identity', () => {
 
 // QR states always receive a defined, finite total
 
-describe('QR states — total is always well-defined', () => {
+describe('QR states - total is always well-defined', () => {
     it.each(QR_STATES)('state %s: total is finite and ≥ subtotal', (state) => {
         const {total, subtotal} = computeTotal([makeLine({pricePerUnit: 100})], state);
         expect(isFinite(total)).toBe(true);

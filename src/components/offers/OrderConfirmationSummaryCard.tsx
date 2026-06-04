@@ -110,7 +110,7 @@ export default function OrderConfirmationSummaryCard({offer}: Props) {
                     {[
                         ['Auftragsnummer', number],
                         ['Erstellt', fmtDate(createdISO)],
-                        ['Fällig bis', dueISO ? fmtDate(dueISO) : '—'],
+                        ['Fällig bis', dueISO ? fmtDate(dueISO) : '-'],
                         ['Versandart', 'Economy'],
                         ['Liefertermin', 'ca. 10–12 Arbeitstage'],
                     ].map(([label, value]) => (

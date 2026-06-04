@@ -126,7 +126,7 @@ export default function OfferHeader({offer, prevState, onChangeState, onRegen, o
             {/* Status card: diagram + actions */}
             <Card variant="outlined" sx={{borderColor: 'rgba(0,0,0,0.08)'}}>
                 <CardContent sx={{py: 2.5, px: 3, '&:last-child': {pb: 2}}}>
-                    {/* Flow diagram — topmost */}
+                    {/* Flow diagram - topmost */}
                     <OfferFlowDiagram visitedPath={offer.path} currentState={offer.state} />
 
                     <Divider sx={{my: 2}} />
@@ -217,7 +217,7 @@ export default function OfferHeader({offer, prevState, onChangeState, onRegen, o
                                 </Button>
                             )}
 
-                            {/* Close-state buttons (Absage / Keine Rückmeldung) — only from OFFER */}
+                            {/* Close-state buttons (Absage / Keine Rückmeldung) - only from OFFER */}
                             {offer.state === OFFER_STATE.OFFER &&
                                 OFFER_CLOSE_STATES.map((key) => {
                                     const m = OFFER_STATE_META[key];

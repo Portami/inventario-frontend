@@ -14,7 +14,7 @@ export default function InventoryCell({reserved, tagged}: InventoryCellProps) {
     if (!reserved && !tagged) {
         return (
             <Typography variant="caption" color="text.disabled">
-                —
+                -
             </Typography>
         );
     }

@@ -295,7 +295,7 @@ export default function StatisticsPage() {
             <ChartCard title="Offerten mit Zahlungsverzug" subtitle="Ausstehender Betrag nach Mahnstufe" sx={{mb: 2}}>
                 {overdueCount === 0 ? (
                     <Alert severity="success" sx={{fontSize: 13}}>
-                        Keine überfälligen Offerten — alles im grünen Bereich.
+                        Keine überfälligen Offerten - alles im grünen Bereich.
                     </Alert>
                 ) : (
                     <ResponsiveContainer width="100%" height={Math.max(120, overdueData.length * 52)}>
@@ -377,7 +377,7 @@ export default function StatisticsPage() {
                     <ChartCard title="Kunden mit Vorsicht" subtitle="Meiste Absagen und keine Rückmeldungen">
                         {riskCustomers.length === 0 ? (
                             <Alert severity="success" sx={{fontSize: 13}}>
-                                Keine problematischen Kunden — alle laufen gut.
+                                Keine problematischen Kunden - alle laufen gut.
                             </Alert>
                         ) : (
                             <TableContainer>

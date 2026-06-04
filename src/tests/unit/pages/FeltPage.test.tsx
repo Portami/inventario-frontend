@@ -4,7 +4,7 @@ import React from 'react';
 import {MemoryRouter} from 'react-router';
 import {vi} from 'vitest';
 
-// Mock backend — Daten werden INSIDE der Factory erstellt, damit hoisting kein Problem ist.
+// Mock backend - Daten werden INSIDE der Factory erstellt, damit hoisting kein Problem ist.
 vi.mock('@/services/backend', () => {
     const mockFelts = [
         {

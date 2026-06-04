@@ -362,7 +362,7 @@ export default function RollDetail() {
                 </DialogActions>
             </Dialog>
 
-            {/* Cut / split dialog — shared by both cut buttons */}
+            {/* Cut / split dialog - shared by both cut buttons */}
             <Dialog open={isSplitOpen} onClose={() => setIsSplitOpen(false)} maxWidth="xs" fullWidth>
                 <DialogTitle>
                     <Box sx={{display: 'flex', alignItems: 'center', gap: 1.5}}>

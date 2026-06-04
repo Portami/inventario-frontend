@@ -56,9 +56,9 @@ describe('lineSubtotal', () => {
     });
 });
 
-// computeTotal — baseline
+// computeTotal - baseline
 
-describe('computeTotal — baseline (no fees)', () => {
+describe('computeTotal - baseline (no fees)', () => {
     it('returns zero total for empty lines', () => {
         expect(computeTotal([], 'INVOICE').total).toBe(0);
     });
@@ -81,9 +81,9 @@ describe('computeTotal — baseline (no fees)', () => {
     });
 });
 
-// computeTotal — shippingFee
+// computeTotal - shippingFee
 
-describe('computeTotal — shippingFee', () => {
+describe('computeTotal - shippingFee', () => {
     it('adds shippingFee to vatBase', () => {
         const {vatBase} = computeTotal([makeLine({pricePerUnit: 100})], 'INVOICE', {shippingFee: 15});
         expect(vatBase).toBe(115);
@@ -102,9 +102,9 @@ describe('computeTotal — shippingFee', () => {
     });
 });
 
-// computeTotal — VAT
+// computeTotal - VAT
 
-describe('computeTotal — VAT', () => {
+describe('computeTotal - VAT', () => {
     it('vatAmount = vatBase × vatRate', () => {
         const {vatBase, vatAmount, vatRate} = computeTotal([makeLine({pricePerUnit: 1000})], 'INVOICE', {vatRate: 0.081});
         expect(vatAmount).toBeCloseTo(vatBase * vatRate, 10);
@@ -126,9 +126,9 @@ describe('computeTotal — VAT', () => {
     });
 });
 
-// computeTotal — dunningFee
+// computeTotal - dunningFee
 
-describe('computeTotal — dunningFee', () => {
+describe('computeTotal - dunningFee', () => {
     it('adds CHF 30 for SECOND_DUNNING_NOTICE', () => {
         const {dunningFee, total} = computeTotal([makeLine({pricePerUnit: 100})], 'SECOND_DUNNING_NOTICE');
         expect(dunningFee).toBe(30);
@@ -136,7 +136,7 @@ describe('computeTotal — dunningFee', () => {
     });
 
     it('dunning fee is NOT part of vatBase', () => {
-        // vatBase = subtotal + shippingFee — dunning is not in vatBase
+        // vatBase = subtotal + shippingFee - dunning is not in vatBase
         const {vatBase} = computeTotal([makeLine({pricePerUnit: 100})], 'SECOND_DUNNING_NOTICE');
         expect(vatBase).toBe(100);
     });
@@ -160,9 +160,9 @@ describe('computeTotal — dunningFee', () => {
     });
 });
 
-// computeTotal — component invariants
+// computeTotal - component invariants
 
-describe('computeTotal — component invariants', () => {
+describe('computeTotal - component invariants', () => {
     it('vatBase = subtotal + shippingFee', () => {
         const c = computeTotal([makeLine({pricePerUnit: 100})], 'INVOICE', {shippingFee: 20, vatRate: 0.1});
         expect(c.vatBase).toBeCloseTo(c.subtotal + c.shippingFee, 10);

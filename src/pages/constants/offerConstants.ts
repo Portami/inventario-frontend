@@ -49,7 +49,7 @@ export const OFFER_STATE = {
     NO_RESPONSE: 'NO_RESPONSE',
 } as const;
 
-/** Terminal "close" states reachable from OFFER only — not part of the standard forward flow. */
+/** Terminal "close" states reachable from OFFER only - not part of the standard forward flow. */
 export const OFFER_CLOSE_STATES: OfferState[] = ['CANCELLED', 'NO_RESPONSE'];
 
 export const LINE_KIND = {

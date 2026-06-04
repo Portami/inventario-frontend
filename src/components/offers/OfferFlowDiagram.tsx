@@ -138,10 +138,10 @@ export default function OfferFlowDiagram({visitedPath, currentState}: Props) {
                 {/* Current node */}
                 <Node state={currentState} cx={curCx} cy={TOP_Y} labelY={LBL_TOP} kind="current" theme={theme} />
 
-                {/* Next0 — top row */}
+                {/* Next0 - top row */}
                 {next0 && <Node state={next0} cx={n0Cx} cy={TOP_Y} labelY={LBL_TOP} kind="next" theme={theme} />}
 
-                {/* Next1 — lower branch */}
+                {/* Next1 - lower branch */}
                 {next1 && <Node state={next1} cx={n0Cx} cy={BOT_Y} labelY={LBL_BOT} kind="next" theme={theme} />}
             </svg>
         </Box>

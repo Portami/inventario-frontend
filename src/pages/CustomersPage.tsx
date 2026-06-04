@@ -87,7 +87,7 @@ export default function CustomersPage() {
                         Kunden
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{mt: 0.5}}>
-                        Alle Kunden — Stammdaten einsehen und bearbeiten.
+                        Alle Kunden - Stammdaten einsehen und bearbeiten.
                     </Typography>
                 </Box>
             </Box>
@@ -172,13 +172,13 @@ export default function CustomersPage() {
                                                     {c.name}
                                                 </Box>
                                             </TableCell>
-                                            <TableCell sx={{color: 'text.secondary'}}>{c.contactPerson || '—'}</TableCell>
-                                            <TableCell sx={{color: 'text.secondary'}}>{c.email || '—'}</TableCell>
-                                            <TableCell sx={{color: 'text.secondary'}}>{c.phone || '—'}</TableCell>
-                                            <TableCell sx={{color: 'text.secondary'}}>{c.city || '—'}</TableCell>
-                                            <TableCell sx={{color: 'text.secondary'}}>{c.country || '—'}</TableCell>
+                                            <TableCell sx={{color: 'text.secondary'}}>{c.contactPerson || '-'}</TableCell>
+                                            <TableCell sx={{color: 'text.secondary'}}>{c.email || '-'}</TableCell>
+                                            <TableCell sx={{color: 'text.secondary'}}>{c.phone || '-'}</TableCell>
+                                            <TableCell sx={{color: 'text.secondary'}}>{c.city || '-'}</TableCell>
+                                            <TableCell sx={{color: 'text.secondary'}}>{c.country || '-'}</TableCell>
                                             <TableCell sx={{color: 'text.secondary', fontFamily: "'JetBrains Mono', monospace", fontSize: 12}}>
-                                                {c.vatNumber || '—'}
+                                                {c.vatNumber || '-'}
                                             </TableCell>
                                             <TableCell align="right">
                                                 {lostCount > 0 ? (
@@ -190,7 +190,7 @@ export default function CustomersPage() {
                                                     </Box>
                                                 ) : (
                                                     <Typography component="span" sx={{fontSize: 13, color: 'text.disabled'}}>
-                                                        —
+                                                        -
                                                     </Typography>
                                                 )}
                                             </TableCell>
