@@ -1,4 +1,13 @@
-export type OfferState = 'OFFER' | 'ORDER_CONFIRMATION' | 'INVOICE' | 'PAYMENT_REMINDER' | 'FIRST_DUNNING_NOTICE' | 'SECOND_DUNNING_NOTICE' | 'COMPLETED';
+export type OfferState =
+    | 'OFFER'
+    | 'ORDER_CONFIRMATION'
+    | 'INVOICE'
+    | 'PAYMENT_REMINDER'
+    | 'FIRST_DUNNING_NOTICE'
+    | 'SECOND_DUNNING_NOTICE'
+    | 'COMPLETED'
+    | 'CANCELLED'
+    | 'NO_RESPONSE';
 
 /** Lightweight list-view snapshot of an offer, returned by the offers collection endpoint. */
 export interface OfferSummaryDto {

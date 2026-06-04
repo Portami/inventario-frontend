@@ -1,7 +1,9 @@
 import type {BackendOfferState, LineItemDto, LineItemKind, OfferState} from '@/types/offerte';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutlined';
 import MailOutlinedIcon from '@mui/icons-material/MailOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
@@ -31,6 +33,8 @@ export const OFFER_STATE_META: Record<OfferState, OfferStateMeta> = {
     FIRST_DUNNING_NOTICE: {label: 'Mahnung 1', doc: 'Mahnung 1.pdf', color: '#e64a19', bg: '#e64a1914', Icon: WarningAmberOutlinedIcon},
     SECOND_DUNNING_NOTICE: {label: 'Mahnung 2', doc: 'Mahnung 2.pdf', color: '#c62828', bg: '#c6282814', Icon: ReportProblemOutlinedIcon},
     COMPLETED: {label: 'Bezahlt', doc: 'Rechnung.pdf', color: '#2e7d32', bg: '#2e7d3214', Icon: CheckCircleOutlinedIcon},
+    CANCELLED: {label: 'Absage', doc: 'Offerte.pdf', color: '#9E9E9E', bg: '#9E9E9E14', Icon: CancelOutlinedIcon},
+    NO_RESPONSE: {label: 'Keine Rückmeldung', doc: 'Offerte.pdf', color: '#EF6C00', bg: '#EF6C0014', Icon: HelpOutlineIcon},
 };
 
 export const OFFER_STATE = {
@@ -41,7 +45,12 @@ export const OFFER_STATE = {
     FIRST_DUNNING_NOTICE: 'FIRST_DUNNING_NOTICE',
     SECOND_DUNNING_NOTICE: 'SECOND_DUNNING_NOTICE',
     COMPLETED: 'COMPLETED',
+    CANCELLED: 'CANCELLED',
+    NO_RESPONSE: 'NO_RESPONSE',
 } as const;
+
+/** Terminal "close" states reachable from OFFER only — not part of the standard forward flow. */
+export const OFFER_CLOSE_STATES: OfferState[] = ['CANCELLED', 'NO_RESPONSE'];
 
 export const LINE_KIND = {
     RESTSTUECK: 'RESTSTUECK',
@@ -82,6 +91,8 @@ export const OFFER_TRANSITIONS: Record<OfferState, OfferState[]> = {
     FIRST_DUNNING_NOTICE: ['SECOND_DUNNING_NOTICE', 'COMPLETED'],
     SECOND_DUNNING_NOTICE: ['COMPLETED'],
     COMPLETED: [],
+    CANCELLED: [],
+    NO_RESPONSE: [],
 };
 
 /**
@@ -92,8 +103,9 @@ export function computeInitialPath(state: OfferState): OfferState[] {
     const short: OfferState[] = ['OFFER', 'INVOICE', 'PAYMENT_REMINDER', 'FIRST_DUNNING_NOTICE', 'SECOND_DUNNING_NOTICE', 'COMPLETED'];
     const idx = short.indexOf(state);
     if (idx >= 0) return short.slice(0, idx + 1);
-    // ORDER_CONFIRMATION: path is OFFER → ORDER_CONFIRMATION
     if (state === 'ORDER_CONFIRMATION') return ['OFFER', 'ORDER_CONFIRMATION'];
+    if (state === 'CANCELLED') return ['OFFER', 'CANCELLED'];
+    if (state === 'NO_RESPONSE') return ['OFFER', 'NO_RESPONSE'];
     return [state];
 }
 
@@ -116,6 +128,8 @@ export const ALL_BACKEND_STATES: BackendOfferState[] = [
     'FIRST_DUNNING_NOTICE',
     'SECOND_DUNNING_NOTICE',
     'COMPLETED',
+    'CANCELLED',
+    'NO_RESPONSE',
 ];
 
 /** Formats a number as a Swiss franc currency string (e.g. "CHF 1'234.50"). */

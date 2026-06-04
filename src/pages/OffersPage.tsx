@@ -71,12 +71,13 @@ export default function OffersPage() {
             paid = 0,
             paidSum = 0;
         for (const o of offers) {
-            if (o.state !== OFFER_STATE.COMPLETED) {
-                open++;
-                openSum += o.total;
-            } else {
+            const isClosed = o.state === OFFER_STATE.CANCELLED || o.state === OFFER_STATE.NO_RESPONSE;
+            if (o.state === OFFER_STATE.COMPLETED) {
                 paid++;
                 paidSum += o.total;
+            } else if (!isClosed) {
+                open++;
+                openSum += o.total;
             }
             if (o.overdue > 0) overdue++;
             if (o.state === OFFER_STATE.OFFER) quotes++;
@@ -98,7 +99,7 @@ export default function OffersPage() {
             );
         }
         if (stateFilter === 'OPEN') {
-            rows = rows.filter((o) => o.state !== OFFER_STATE.COMPLETED);
+            rows = rows.filter((o) => o.state !== OFFER_STATE.COMPLETED && o.state !== OFFER_STATE.CANCELLED && o.state !== OFFER_STATE.NO_RESPONSE);
         } else if (stateFilter === 'OVERDUE') {
             rows = rows.filter((o) => o.overdue > 0);
         } else if (stateFilter !== 'ALL') {

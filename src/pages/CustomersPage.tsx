@@ -1,7 +1,9 @@
 import EditCustomerDialog from '@/components/offers/EditCustomerDialog';
 import {useToast} from '@/components/ToastProvider';
+import {useOffers} from '@/hooks/useOffers';
 import {fetchCustomers, updateCustomer} from '@/services/backend';
 import {CustomerDto, CustomerWithIdDto} from '@/types/offerte';
+import FlagIcon from '@mui/icons-material/Flag';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import {
@@ -25,6 +27,7 @@ export default function CustomersPage() {
     const theme = useTheme();
     const showToast = useToast();
 
+    const {offers} = useOffers();
     const [customers, setCustomers] = useState<CustomerWithIdDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [q, setQ] = useState('');
@@ -36,6 +39,16 @@ export default function CustomersPage() {
             .catch(() => showToast('Kunden konnten nicht geladen werden', 'error'))
             .finally(() => setLoading(false));
     }, [showToast]);
+
+    const problematicCounts = useMemo(() => {
+        const map = new Map<string, number>();
+        for (const o of offers) {
+            if (o.state === 'CANCELLED' || o.state === 'NO_RESPONSE') {
+                map.set(o.customer, (map.get(o.customer) ?? 0) + 1);
+            }
+        }
+        return map;
+    }, [offers]);
 
     const filtered = useMemo(() => {
         if (!q.trim()) return customers;
@@ -127,12 +140,13 @@ export default function CustomersPage() {
                                     <TableCell>Ort</TableCell>
                                     <TableCell>Land</TableCell>
                                     <TableCell>MWST-Nr.</TableCell>
+                                    <TableCell align="right">Verloren</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {filtered.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={7} sx={{textAlign: 'center', py: 8, color: 'text.secondary'}}>
+                                        <TableCell colSpan={8} sx={{textAlign: 'center', py: 8, color: 'text.secondary'}}>
                                             <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5}}>
                                                 <PeopleOutlinedIcon sx={{fontSize: 48, color: 'rgba(0,0,0,0.18)'}} />
                                                 <Typography variant="body2">Keine Kunden gefunden.</Typography>
@@ -140,27 +154,49 @@ export default function CustomersPage() {
                                         </TableCell>
                                     </TableRow>
                                 )}
-                                {filtered.map((c) => (
-                                    <TableRow
-                                        key={c.customerNumber}
-                                        hover
-                                        onClick={() => setSelected(c)}
-                                        sx={{
-                                            cursor: 'pointer',
-                                            '& td': {padding: cellPad, fontSize: 13, borderBottom: '1px solid rgba(0,0,0,0.05)'},
-                                        }}
-                                    >
-                                        <TableCell sx={{fontWeight: 600}}>{c.name}</TableCell>
-                                        <TableCell sx={{color: 'text.secondary'}}>{c.contactPerson || '—'}</TableCell>
-                                        <TableCell sx={{color: 'text.secondary'}}>{c.email || '—'}</TableCell>
-                                        <TableCell sx={{color: 'text.secondary'}}>{c.phone || '—'}</TableCell>
-                                        <TableCell sx={{color: 'text.secondary'}}>{c.city || '—'}</TableCell>
-                                        <TableCell sx={{color: 'text.secondary'}}>{c.country || '—'}</TableCell>
-                                        <TableCell sx={{color: 'text.secondary', fontFamily: "'JetBrains Mono', monospace", fontSize: 12}}>
-                                            {c.vatNumber || '—'}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                {filtered.map((c) => {
+                                    const lostCount = problematicCounts.get(c.name) ?? 0;
+                                    return (
+                                        <TableRow
+                                            key={c.customerNumber}
+                                            hover
+                                            onClick={() => setSelected(c)}
+                                            sx={{
+                                                cursor: 'pointer',
+                                                '& td': {padding: cellPad, fontSize: 13, borderBottom: '1px solid rgba(0,0,0,0.05)'},
+                                            }}
+                                        >
+                                            <TableCell sx={{fontWeight: 600}}>
+                                                <Box sx={{display: 'flex', alignItems: 'center', gap: 0.5}}>
+                                                    {lostCount > 0 && <FlagIcon sx={{fontSize: 14, color: '#d32f2f', flexShrink: 0}} />}
+                                                    {c.name}
+                                                </Box>
+                                            </TableCell>
+                                            <TableCell sx={{color: 'text.secondary'}}>{c.contactPerson || '—'}</TableCell>
+                                            <TableCell sx={{color: 'text.secondary'}}>{c.email || '—'}</TableCell>
+                                            <TableCell sx={{color: 'text.secondary'}}>{c.phone || '—'}</TableCell>
+                                            <TableCell sx={{color: 'text.secondary'}}>{c.city || '—'}</TableCell>
+                                            <TableCell sx={{color: 'text.secondary'}}>{c.country || '—'}</TableCell>
+                                            <TableCell sx={{color: 'text.secondary', fontFamily: "'JetBrains Mono', monospace", fontSize: 12}}>
+                                                {c.vatNumber || '—'}
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                {lostCount > 0 ? (
+                                                    <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5}}>
+                                                        <FlagIcon sx={{fontSize: 14, color: '#d32f2f'}} />
+                                                        <Typography component="span" sx={{fontSize: 13, color: '#d32f2f', fontWeight: 600}}>
+                                                            {lostCount}
+                                                        </Typography>
+                                                    </Box>
+                                                ) : (
+                                                    <Typography component="span" sx={{fontSize: 13, color: 'text.disabled'}}>
+                                                        —
+                                                    </Typography>
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
                             </TableBody>
                         </Table>
                     </TableContainer>
