@@ -28,6 +28,7 @@
     "typescript"
   ],
   "words": [
+    "Abgeschl",
     "Auftragsnr",
     "BWIP",
     "Einh",
@@ -37,6 +38,7 @@
     "Handgefertigte",
     "Lieferantenfarbe",
     "MWST",
+    "Offertenwert",
     "Offertgültigkeit",
     "Rasterizes",
     "PORTAMI",
@@ -54,6 +56,7 @@
     "iban",
     "inventar",
     "inventar",
+    "kpis",
     "mehrwertsteuerpflichtig",
     "mui",
     "nexts",

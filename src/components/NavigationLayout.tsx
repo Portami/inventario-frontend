@@ -1,6 +1,7 @@
 import logo from '@/assets/logo.svg';
 import {useHidScanner} from '@/hooks/useHidScanner';
 import {lookupRollCode} from '@/services/backend';
+import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -292,6 +293,9 @@ export default function NavigationLayout() {
                     </ListItem>
                     <ListItem disableGutters>
                         <NavBtn to="/customers" icon={<PeopleOutlinedIcon />} label="Kunden" collapsed={collapsed} />
+                    </ListItem>
+                    <ListItem disableGutters>
+                        <NavBtn to="/statistics" icon={<BarChartOutlinedIcon />} label="Statistiken" collapsed={collapsed} />
                     </ListItem>
                 </List>
 
