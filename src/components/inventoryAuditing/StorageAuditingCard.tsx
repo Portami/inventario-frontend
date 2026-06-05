@@ -28,8 +28,7 @@ export default function StorageAuditingCard({inventoryId, storage}: Readonly<Sto
     const [scanError, setScanError] = useState('');
 
     const load = async () => {
-        if (!inventoryId) return;
-        if (!storage) return;
+        if (!inventoryId || !storage) return;
 
         setIsLoading(true);
         setError('');
@@ -55,7 +54,7 @@ export default function StorageAuditingCard({inventoryId, storage}: Readonly<Sto
     }, [inventoryId, storage?.storageId]);
 
     const refetch = async () => {
-        await load();
+        void load();
     };
 
     const handleScan = async (code: string) => {

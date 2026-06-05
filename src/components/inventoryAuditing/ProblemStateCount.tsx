@@ -21,12 +21,9 @@ function getProblemStateCounts(items: FeltStocktakeItemDto[]) {
 export default function ProblemStateCounts({items}: ProblemStateCountsProps) {
     const faultyItems = items.filter((item) => !item.resolution);
     const problemCounts = getProblemStateCounts(faultyItems);
-
     const entries = Object.entries(problemCounts) as [ItemState, number][];
 
-    if (entries.length === 0) {
-        return null;
-    }
+    if (entries.length === 0) return null;
 
     return (
         <Stack direction="row" spacing={1} sx={{flexWrap: 'wrap'}} useFlexGap>

@@ -29,8 +29,8 @@ export default function StorageAuditingList({inventoryId, storages}: Readonly<St
     const [error, setError] = useState('');
 
     const load = async () => {
-        if (!inventoryId) return;
-        if (!storages) return;
+        if (!inventoryId || !storages) return;
+
         try {
             setStorageAuditings(
                 storages.map((storage) => ({
@@ -52,7 +52,7 @@ export default function StorageAuditingList({inventoryId, storages}: Readonly<St
     }, []);
 
     const refetch = async () => {
-        await load();
+        void load();
     };
 
     const columns: GridColDef<StorageAuditing>[] = [

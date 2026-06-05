@@ -55,7 +55,7 @@ export default function InventoryPage() {
     }, []);
 
     const refetch = async () => {
-        await load();
+        void load();
     };
 
     const columns: GridColDef<FeltStocktakeDto>[] = [
