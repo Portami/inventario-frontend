@@ -1,5 +1,5 @@
 import {AuditingResolveDialog} from '@/components/inventoryAuditing/AuditingResolveDialog.tsx';
-import {FeltStocktakeItemDto, ITEM_STATE_LABELS, RESOLUTION_TYPES_LABELS} from '@/types/inventoryAuditing.ts';
+import {FeltStocktakeItemDto, ITEM_STATE_LABELS, ItemState, PROBLEM_STATE_COLORS, RESOLUTION_TYPES_LABELS} from '@/types/inventoryAuditing.ts';
 import {toErrorMessage} from '@/utils/pageUtils.ts';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import {Alert, Box, CircularProgress, IconButton, SxProps} from '@mui/material';
@@ -55,6 +55,15 @@ export default function ItemAuditingList({inventoryId, items, onResolve, hideSta
             flex: 2,
             valueGetter: (value, row) => {
                 return ITEM_STATE_LABELS[row.item.status];
+            },
+            cellClassName: 'bold-cell',
+        },
+        {
+            field: 'articleNumber',
+            headerName: 'Artikelnr.',
+            flex: 2,
+            valueGetter: (value, row) => {
+                return !row.item.rollOrScrap ? '' : row.item.rollOrScrap.articleNumber;
             },
         },
         {
@@ -132,7 +141,47 @@ export default function ItemAuditingList({inventoryId, items, onResolve, hideSta
                     pageSizeOptions={[10, 25, 50]}
                     initialState={{pagination: {paginationModel: {pageSize: 10}}}}
                     localeText={{noRowsLabel: 'Keine Elemente.'}}
-                    sx={{'& .MuiDataGrid-row': {cursor: 'pointer'}}}
+                    getRowClassName={(params) => {
+                        if (params.row.item.resolution) {
+                            return 'row-resolved';
+                        }
+
+                        const hasProblemColor = PROBLEM_STATE_COLORS[params.row.item.status as ItemState];
+
+                        if (hasProblemColor) {
+                            return `row-state-${params.row.item.status}`;
+                        }
+
+                        return '';
+                    }}
+                    sx={{
+                        '& .MuiDataGrid-row': {
+                            cursor: 'pointer',
+                        },
+                        '& .bold-cell': {
+                            fontWeight: 700,
+                        },
+                        '& .row-resolved': {
+                            backgroundColor: '#e8f5e9',
+                        },
+                        '& .row-resolved:hover': {
+                            backgroundColor: '#e8f5e9',
+                        },
+
+                        ...Object.entries(PROBLEM_STATE_COLORS).reduce(
+                            (styles, [state, colors]) => ({
+                                ...styles,
+                                [`& .row-state-${state}`]: {
+                                    backgroundColor: colors.backgroundColor,
+                                    color: colors.color,
+                                },
+                                [`& .row-state-${state}:hover`]: {
+                                    backgroundColor: colors.backgroundColor,
+                                },
+                            }),
+                            {},
+                        ),
+                    }}
                 />
             )}
 

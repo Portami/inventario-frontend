@@ -59,6 +59,33 @@ export const RESOLUTION_TYPES_LABELS: Record<ResolutionType, string> = {
 
 export type ResolutionTypeLabels = (typeof RESOLUTION_TYPES_LABELS)[keyof typeof RESOLUTION_TYPES_LABELS];
 
+export const PROBLEM_STATE_COLORS: Partial<Record<ItemState, {backgroundColor: string; color: string}>> = {
+    [ITEM_STATE.MISSING]: {
+        backgroundColor: '#ffebee',
+        color: '#b71c1c',
+    },
+    [ITEM_STATE.WRONG_STORAGE]: {
+        backgroundColor: '#fff3e0',
+        color: '#e65100',
+    },
+    [ITEM_STATE.RESCAN_REQUIRED]: {
+        backgroundColor: '#e3f2fd',
+        color: '#0d47a1',
+    },
+    [ITEM_STATE.DUPLICATE_SCAN]: {
+        backgroundColor: '#f3e5f5',
+        color: '#4a148c',
+    },
+    [ITEM_STATE.NOT_IN_STOCKTAKE]: {
+        backgroundColor: '#eeeeee',
+        color: '#212121',
+    },
+    [ITEM_STATE.UNKNOWN]: {
+        backgroundColor: '#eceff1',
+        color: '#263238',
+    },
+};
+
 export type CreateFeltStocktakeDto = {
     description: string;
     includeScrap: boolean;

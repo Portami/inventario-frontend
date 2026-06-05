@@ -6,6 +6,7 @@ import {closeStocktakeStorage, createFeltStocktakeScan, fetchStocktakeItems} fro
 import {FeltStocktakeItemDto, FeltStocktakeListInfoDto, ITEM_STATE, STORAGE_STATE} from '@/types/inventoryAuditing.ts';
 import {toErrorMessage} from '@/utils/pageUtils.ts';
 import CheckIcon from '@mui/icons-material/Check';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import {Alert, Button, Snackbar, Stack, Typography} from '@mui/material';
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router';
@@ -45,7 +46,7 @@ export default function StorageAuditingCard({inventoryId, storage}: Readonly<Sto
         }
     };
 
-    useHidScanner(true, async (code: string) => {
+    useHidScanner(!storage?.isClosed, async (code: string) => {
         await handleScan(code);
     });
 
@@ -85,9 +86,13 @@ export default function StorageAuditingCard({inventoryId, storage}: Readonly<Sto
         }
     };
 
-    const actions = (
+    const actions = storage?.isClosed ? (
+        <Button disabled variant="outlined" startIcon={<VerifiedIcon />}>
+            Lager abgeschlossen
+        </Button>
+    ) : (
         <Button variant="contained" startIcon={<CheckIcon />} onClick={handleStorageClose}>
-            Lager Abschliessen
+            Lager abschliessen
         </Button>
     );
 
