@@ -8,6 +8,8 @@ import CustomersPage from '@/pages/CustomersPage.tsx';
 import FeltDetailPage from '@/pages/FeltDetailPage.tsx';
 import FeltPage from '@/pages/FeltPage.tsx';
 import FeltReorderPage from '@/pages/FeltReorderPage.tsx';
+import InvAuditingArchive from '@/pages/InvAuditingArchive.tsx';
+import InvAuditingArchiveView from '@/pages/InvAuditingArchiveView.tsx';
 import InventoryAuditingView from '@/pages/InventoryAuditingView.tsx';
 import InventoryPage from '@/pages/InventoryPage.tsx';
 import LabelGeneratorPage from '@/pages/LabelGeneratorPage.tsx';
@@ -40,6 +42,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <Route path="/felts/reorder" element={<FeltReorderPage />} />
                         <Route path="/felts/:id" element={<FeltDetailPage />} />
                         <Route path="/inventory" element={<InventoryPage />} />
+                        <Route path="/inventoryArchive" element={<InvAuditingArchive />} />
+                        <Route path="/inventoryArchive/:id" element={<InvAuditingArchiveView />} />
                         <Route path="/inventory/:id" element={<InventoryAuditingView />} />
                         <Route path="/inventory/:inventoryId/storage/:id" element={<StorageAuditingDetailPage />} />
                         <Route path="/storage" element={<StoragePage />} />

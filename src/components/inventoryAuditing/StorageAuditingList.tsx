@@ -60,6 +60,7 @@ export default function StorageAuditingList({inventoryId, storages}: Readonly<St
             field: 'status',
             headerName: 'Status',
             width: 150,
+            cellClassName: 'bold-cell',
         },
         {
             field: 'name',
@@ -70,7 +71,7 @@ export default function StorageAuditingList({inventoryId, storages}: Readonly<St
         {
             field: 'problems',
             headerName: 'Probleme',
-            flex: 1,
+            flex: 2,
             minWidth: 160,
             renderCell: ({row}) => (
                 <ProblemStateCounts
@@ -117,7 +118,14 @@ export default function StorageAuditingList({inventoryId, storages}: Readonly<St
                             pageSizeOptions={[10, 25, 50]}
                             initialState={{pagination: {paginationModel: {pageSize: 10}}}}
                             localeText={{noRowsLabel: 'Keine Lager.'}}
-                            sx={{'& .MuiDataGrid-row': {cursor: 'pointer'}}}
+                            sx={{
+                                '& .MuiDataGrid-row': {
+                                    cursor: 'pointer',
+                                },
+                                '& .bold-cell': {
+                                    fontWeight: 700,
+                                },
+                            }}
                             onRowClick={({row}) => void navigate(`/inventory/${inventoryId}/storage/${row.id}`)}
                         />
                         <Typography variant="h3" component="h3" sx={{fontWeight: 600, color: 'text.primary', pt: 3, pb: 2}}>

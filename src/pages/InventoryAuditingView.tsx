@@ -67,7 +67,7 @@ export default function InventoryAuditingView() {
             <Stack spacing={3}>
                 <Box sx={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2}}>
                     <Typography variant="h2" component="h1">
-                        {`Bestandsprüfung ${formatDate(inventoryAuditing?.createdAt)}`}
+                        {`${inventoryAuditing?.description} - ${formatDate(inventoryAuditing?.createdAt)}`}
                     </Typography>
                     <Box sx={{flexShrink: 0}}>
                         <Button variant="contained" startIcon={<CheckIcon />} onClick={handleInventoryComplete}>

@@ -284,9 +284,69 @@ export default function NavigationLayout() {
                             </List>
                         )}
                     </Box>
-                    <ListItem disableGutters>
-                        <NavBtn to="/inventory" icon={<AssessmentIcon />} label="Inventur" collapsed={collapsed} />
-                    </ListItem>
+                    <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                        <ListItem disableGutters>
+                            <NavBtn to="/inventory" icon={<AssessmentIcon />} label="Inventur" collapsed={collapsed} />
+                        </ListItem>
+                        {!collapsed && (
+                            <List component="div" disablePadding sx={{width: '100%'}}>
+                                <ListItem
+                                    disableGutters
+                                    sx={{
+                                        ml: 1.5,
+                                        pl: 2,
+                                        borderLeft:
+                                            location.pathname === '/inventory'
+                                                ? `3px solid ${theme.palette.primary.main}`
+                                                : `3px solid ${theme.palette.divider}`,
+                                    }}
+                                >
+                                    <Button
+                                        component={NavLink}
+                                        to="/inventory"
+                                        sx={{
+                                            justifyContent: 'flex-start',
+                                            width: '100%',
+                                            color: theme.palette.text.primary,
+                                            '&.active': {
+                                                color: location.pathname === '/inventory' ? theme.palette.primary.main : theme.palette.text.primary,
+                                                fontWeight: 600,
+                                            },
+                                        }}
+                                    >
+                                        Übersicht
+                                    </Button>
+                                </ListItem>
+                                <ListItem
+                                    disableGutters
+                                    sx={{
+                                        ml: 1.5,
+                                        pl: 2,
+                                        borderLeft:
+                                            location.pathname === '/inventoryArchive'
+                                                ? `3px solid ${theme.palette.primary.main}`
+                                                : `3px solid ${theme.palette.divider}`,
+                                    }}
+                                >
+                                    <Button
+                                        component={NavLink}
+                                        to="/inventoryArchive"
+                                        sx={{
+                                            justifyContent: 'flex-start',
+                                            width: '100%',
+                                            color: theme.palette.text.primary,
+                                            '&.active': {
+                                                color: location.pathname === '/inventoryArchive' ? theme.palette.primary.main : theme.palette.text.primary,
+                                                fontWeight: 600,
+                                            },
+                                        }}
+                                    >
+                                        Archiv
+                                    </Button>
+                                </ListItem>
+                            </List>
+                        )}
+                    </Box>
                     <ListItem disableGutters>
                         <NavBtn to="/offers" icon={<ReceiptLongOutlinedIcon />} label="Offerten" collapsed={collapsed} />
                     </ListItem>

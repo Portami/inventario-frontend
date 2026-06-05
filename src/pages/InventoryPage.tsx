@@ -102,7 +102,7 @@ export default function InventoryPage() {
 
     return (
         <ListPage
-            title="Bestandsverwaltung"
+            title="Inventur"
             description="Übersicht aller offenen Bestandsprüfungen"
             isLoading={isLoading}
             isEmpty={false}
