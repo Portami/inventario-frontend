@@ -6,7 +6,7 @@ interface LabeledFieldProps {
     mono?: boolean;
 }
 
-export default function LabeledField({label, value, mono}: LabeledFieldProps) {
+export default function LabeledField({label, value, mono}: Readonly<LabeledFieldProps>) {
     return (
         <Box>
             <Typography

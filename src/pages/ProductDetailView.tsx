@@ -133,7 +133,9 @@ export default function ProductDetailView() {
 
     const variantCount = product.variants.length;
     const minPrice = variantCount > 0 ? Math.min(...product.variants.map((v) => v.price)) : null;
-    const priceLabel = minPrice == null ? '–' : `CHF ${minPrice.toFixed(2)}${variantCount > 1 ? '+' : ''}`;
+    const priceSuffix = variantCount > 1 ? '+' : '';
+    const priceLabel = minPrice == null ? '–' : `CHF ${minPrice.toFixed(2)}${priceSuffix}`;
+    const variantLabel = `${variantCount} Variante${variantCount === 1 ? '' : 'n'}`;
 
     return (
         <Box sx={{minHeight: '100vh', backgroundColor: 'background.default', py: 6}}>
@@ -176,7 +178,7 @@ export default function ProductDetailView() {
                     </Typography>
                     <Chip
                         icon={<InventoryIcon sx={{fontSize: '1rem'}} />}
-                        label={`${variantCount} Variante${variantCount === 1 ? '' : 'n'}`}
+                        label={variantLabel}
                         sx={{
                             backgroundColor: variantCount > 0 ? 'success.light' : 'warning.light',
                             color: variantCount > 0 ? 'success.main' : 'warning.main',
@@ -213,45 +215,48 @@ export default function ProductDetailView() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {product.variants.map((variant) => (
-                                    <TableRow key={variant.id} hover>
-                                        <TableCell>{variant.name}</TableCell>
-                                        <TableCell>CHF {variant.price.toFixed(2)}</TableCell>
-                                        <TableCell>
-                                            {variant.inventory.length > 0 ? (
-                                                variant.inventory.reduce((sum, inv) => sum + inv.quantity, 0)
-                                            ) : (
-                                                <Typography component="span" color="text.disabled" variant="body2">
-                                                    –
-                                                </Typography>
-                                            )}
-                                        </TableCell>
-                                        {product.attributes.map((attr) => {
-                                            const val = variant.attributes.find((va) => va.attributeId === attr.id)?.value;
-                                            return (
-                                                <TableCell key={attr.id}>
-                                                    {val ?? (
-                                                        <Typography component="span" color="text.disabled" variant="body2">
-                                                            –
-                                                        </Typography>
-                                                    )}
-                                                </TableCell>
-                                            );
-                                        })}
-                                        <TableCell align="right" sx={{whiteSpace: 'nowrap'}}>
-                                            <Tooltip title="Variante bearbeiten">
-                                                <IconButton size="small" onClick={() => setEditingVariant(variant)}>
-                                                    <EditIcon fontSize="small" />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Variante löschen">
-                                                <IconButton size="small" color="error" onClick={() => setDeletingVariant(variant)}>
-                                                    <DeleteIcon fontSize="small" />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                {product.variants.map((variant) => {
+                                    const hasInventory = variant.inventory.length > 0;
+                                    return (
+                                        <TableRow key={variant.id} hover>
+                                            <TableCell>{variant.name}</TableCell>
+                                            <TableCell>CHF {variant.price.toFixed(2)}</TableCell>
+                                            <TableCell>
+                                                {hasInventory ? (
+                                                    variant.inventory.reduce((sum, inv) => sum + inv.quantity, 0)
+                                                ) : (
+                                                    <Typography component="span" color="text.disabled" variant="body2">
+                                                        –
+                                                    </Typography>
+                                                )}
+                                            </TableCell>
+                                            {product.attributes.map((attr) => {
+                                                const val = variant.attributes.find((va) => va.attributeId === attr.id)?.value;
+                                                return (
+                                                    <TableCell key={attr.id}>
+                                                        {val ?? (
+                                                            <Typography component="span" color="text.disabled" variant="body2">
+                                                                –
+                                                            </Typography>
+                                                        )}
+                                                    </TableCell>
+                                                );
+                                            })}
+                                            <TableCell align="right" sx={{whiteSpace: 'nowrap'}}>
+                                                <Tooltip title="Variante bearbeiten">
+                                                    <IconButton size="small" onClick={() => setEditingVariant(variant)}>
+                                                        <EditIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Variante löschen">
+                                                    <IconButton size="small" color="error" onClick={() => setDeletingVariant(variant)}>
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
                             </TableBody>
                         </Table>
                     </Paper>

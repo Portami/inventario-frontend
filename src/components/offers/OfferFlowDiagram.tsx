@@ -18,14 +18,14 @@ function Node({
     labelY,
     kind,
     theme,
-}: {
+}: Readonly<{
     state: OfferState;
     cx: number;
     cy: number;
     labelY: number;
     kind: 'done' | 'current' | 'next';
     theme: Theme;
-}) {
+}>) {
     const meta = OFFER_STATE_META[state];
     const primary = theme.palette.primary.main;
 
@@ -33,7 +33,10 @@ function Node({
     const stroke = kind === 'next' ? meta.color : primary;
     const dashes = kind === 'next' ? '5 3' : undefined;
     const iconClr = kind === 'next' ? meta.color : '#fff';
-    const lblClr = kind === 'current' ? primary : kind === 'done' ? '#bbb' : meta.color;
+    let lblClr: string;
+    if (kind === 'current') lblClr = primary;
+    else if (kind === 'done') lblClr = '#bbb';
+    else lblClr = meta.color;
 
     return (
         <g>
@@ -73,7 +76,7 @@ interface Props {
     currentState: OfferState;
 }
 
-export default function OfferFlowDiagram({visitedPath, currentState}: Props) {
+export default function OfferFlowDiagram({visitedPath, currentState}: Readonly<Props>) {
     const theme = useTheme();
     const primary = theme.palette.primary.main;
 
@@ -98,7 +101,7 @@ export default function OfferFlowDiagram({visitedPath, currentState}: Props) {
             <svg width={SVG_W} height={SVG_H} style={{display: 'block', overflow: 'visible'}}>
                 {/* Solid lines between consecutive done states */}
                 {done.map((_, i) =>
-                    i === 0 ? null : <line key={`dl-${i}`} x1={cx(i - 1) + R} y1={TOP_Y} x2={cx(i) - R} y2={TOP_Y} stroke={primary} strokeWidth={2} />,
+                    i === 0 ? null : <line key={done[i]} x1={cx(i - 1) + R} y1={TOP_Y} x2={cx(i) - R} y2={TOP_Y} stroke={primary} strokeWidth={2} />,
                 )}
 
                 {/* Solid line from last done → current */}
@@ -138,10 +141,10 @@ export default function OfferFlowDiagram({visitedPath, currentState}: Props) {
                 {/* Current node */}
                 <Node state={currentState} cx={curCx} cy={TOP_Y} labelY={LBL_TOP} kind="current" theme={theme} />
 
-                {/* Next0 — top row */}
+                {/* Next0 - top row */}
                 {next0 && <Node state={next0} cx={n0Cx} cy={TOP_Y} labelY={LBL_TOP} kind="next" theme={theme} />}
 
-                {/* Next1 — lower branch */}
+                {/* Next1 - lower branch */}
                 {next1 && <Node state={next1} cx={n0Cx} cy={BOT_Y} labelY={LBL_BOT} kind="next" theme={theme} />}
             </svg>
         </Box>

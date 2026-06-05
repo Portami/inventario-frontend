@@ -18,6 +18,7 @@ import RollDetail from '@/pages/RollDetail.tsx';
 import ScanPage from '@/pages/ScanPage.tsx';
 import ScrapDetail from '@/pages/ScrapDetail.tsx';
 import ShoppingPage from '@/pages/ShoppingPage.tsx';
+import StatisticsPage from '@/pages/StatisticsPage.tsx';
 import StoragePage from '@/pages/StoragePage.tsx';
 import {CssBaseline, ThemeProvider} from '@mui/material';
 import ReactDOM from 'react-dom/client';
@@ -46,6 +47,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <Route path="/offers" element={<OffersPage />} />
                         <Route path="/offers/:id" element={<OfferDetailPage />} />
                         <Route path="/customers" element={<CustomersPage />} />
+                        <Route path="/statistics" element={<StatisticsPage />} />
                     </Route>
                     <Route path="/scrap/:id" element={<ScrapDetail />} />
                 </Routes>

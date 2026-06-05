@@ -4,13 +4,13 @@ import {ReactNode, useMemo, useState} from 'react';
 
 type SearchFieldProps<T> = {
     items: T[];
-    getSearchableValues(item: T): Array<unknown>;
+    getSearchableValues(item: T): Array<string | number | boolean | null | undefined>;
     children(filteredItems: T[]): ReactNode;
     placeholder?: string;
     label?: string;
 };
 
-export default function SearchField<T>({items, getSearchableValues, children, placeholder = 'Suchen', label = 'Suchen'}: SearchFieldProps<T>) {
+export default function SearchField<T>({items, getSearchableValues, children, placeholder = 'Suchen', label = 'Suchen'}: Readonly<SearchFieldProps<T>>) {
     const [search, setSearch] = useState('');
 
     const filteredItems = useMemo(() => {

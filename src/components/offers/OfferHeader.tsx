@@ -1,5 +1,5 @@
 import OfferFlowDiagram from './OfferFlowDiagram';
-import {fmtDate, OFFER_STATE, OFFER_STATE_META, OFFER_TRANSITIONS} from '@/pages/constants/offerConstants';
+import {fmtDate, OFFER_CLOSE_STATES, OFFER_STATE, OFFER_STATE_META, OFFER_TRANSITIONS} from '@/pages/constants/offerConstants';
 import {OfferDto, OfferState} from '@/types/offerte';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -22,7 +22,7 @@ interface OfferHeaderProps {
     onToggleSent?: () => void;
 }
 
-export default function OfferHeader({offer, prevState, onChangeState, onRegen, onBack, onEditDueDate, onToggleSent}: OfferHeaderProps) {
+export default function OfferHeader({offer, prevState, onChangeState, onRegen, onBack, onEditDueDate, onToggleSent}: Readonly<OfferHeaderProps>) {
     const [editingDue, setEditingDue] = useState(false);
 
     const isCompleted = offer.state === OFFER_STATE.COMPLETED;
@@ -126,7 +126,7 @@ export default function OfferHeader({offer, prevState, onChangeState, onRegen, o
             {/* Status card: diagram + actions */}
             <Card variant="outlined" sx={{borderColor: 'rgba(0,0,0,0.08)'}}>
                 <CardContent sx={{py: 2.5, px: 3, '&:last-child': {pb: 2}}}>
-                    {/* Flow diagram — topmost */}
+                    {/* Flow diagram - topmost */}
                     <OfferFlowDiagram visitedPath={offer.path} currentState={offer.state} />
 
                     <Divider sx={{my: 2}} />
@@ -216,6 +216,29 @@ export default function OfferHeader({offer, prevState, onChangeState, onRegen, o
                                     Als bezahlt markieren
                                 </Button>
                             )}
+
+                            {/* Close-state buttons (Absage / Keine Rückmeldung) - only from OFFER */}
+                            {offer.state === OFFER_STATE.OFFER &&
+                                OFFER_CLOSE_STATES.map((key) => {
+                                    const m = OFFER_STATE_META[key];
+                                    return (
+                                        <Button
+                                            key={key}
+                                            variant="outlined"
+                                            size="small"
+                                            startIcon={<m.Icon sx={{fontSize: 16}} />}
+                                            onClick={() => onChangeState(key)}
+                                            sx={{
+                                                textTransform: 'none',
+                                                color: m.color,
+                                                borderColor: `${m.color}55`,
+                                                '&:hover': {borderColor: m.color, bgcolor: m.bg},
+                                            }}
+                                        >
+                                            {m.label}
+                                        </Button>
+                                    );
+                                })}
 
                             {/* Forward transitions */}
                             {forwardStates.map((key) => (

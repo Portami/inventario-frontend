@@ -2,7 +2,7 @@ import {KIND_CHIP_STYLES} from '@/pages/constants/offerConstants';
 import {LineItemKind} from '@/types/offerte';
 import {Chip} from '@mui/material';
 
-export default function KindChip({kind}: {kind: LineItemKind}) {
+export default function KindChip({kind}: Readonly<{kind: LineItemKind}>) {
     const c = KIND_CHIP_STYLES[kind];
     return (
         <Chip

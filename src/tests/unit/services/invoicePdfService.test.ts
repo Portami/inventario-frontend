@@ -2,7 +2,7 @@ import {generateOfferPdf} from '@/services/invoicePdfService';
 import {CustomerDto, LineItemDto, OfferDto, OfferState} from '@/types/offerte';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-// Hoisted mocks — vi.hoisted ensures initialization before vi.mock factories run.
+// Hoisted mocks - vi.hoisted ensures initialization before vi.mock factories run.
 
 const mockPdf = vi.hoisted(() => ({
     setFont: vi.fn(),
@@ -26,7 +26,7 @@ const MockQRBill = vi.hoisted(() =>
     }),
 );
 
-// Arrow functions can't be constructors — use a regular function so `new jsPDF(...)` works.
+// Arrow functions can't be constructors - use a regular function so `new jsPDF(...)` works.
 vi.mock('jspdf', () => ({
     default: vi.fn(function () {
         return mockPdf;
@@ -53,7 +53,7 @@ const CUSTOMER: CustomerDto = {
 function makeLine(overrides: Partial<LineItemDto> = {}): LineItemDto {
     return {
         id: '1',
-        kind: 'PRODUKT',
+        kind: 'PRODUCT',
         articleNumber: 'ART-1',
         feltTypeName: 'Wool',
         color: null,
@@ -134,7 +134,7 @@ afterEach(() => {
 const QR_STATES: OfferState[] = ['INVOICE', 'PAYMENT_REMINDER', 'FIRST_DUNNING_NOTICE', 'SECOND_DUNNING_NOTICE', 'COMPLETED'];
 const NON_QR_STATES: OfferState[] = ['OFFER', 'ORDER_CONFIRMATION'];
 
-describe('QR bill — generated for QR states only', () => {
+describe('QR bill - generated for QR states only', () => {
     it.each(QR_STATES)('state %s: SwissQRBill constructor is called', async (state) => {
         await generateOfferPdf(makeOffer({state}));
         expect(MockQRBill).toHaveBeenCalledOnce();
@@ -158,7 +158,7 @@ describe('QR bill — generated for QR states only', () => {
 
 // Total passed to QR bill
 
-describe('QR bill amount — matches computeTotal', () => {
+describe('QR bill amount - matches computeTotal', () => {
     it('passes correct total for INVOICE (no dunning, no VAT)', async () => {
         const offer = makeOffer({state: 'INVOICE', lines: [makeLine({pricePerUnit: 100})]});
         await generateOfferPdf(offer);
@@ -195,7 +195,7 @@ describe('QR bill amount — matches computeTotal', () => {
     });
 
     it('QR bill amount is rounded to 2 decimal places', async () => {
-        // 3 × 0.1 = 0.30000...04 in IEEE 754 — must be rounded
+        // 3 × 0.1 = 0.30000...04 in IEEE 754 - must be rounded
         const offer = makeOffer({state: 'INVOICE', lines: [makeLine({pricePerUnit: 0.1, quantity: 3})]});
         await generateOfferPdf(offer);
         const [qrData] = MockQRBill.mock.calls[0] as unknown as [{amount: number}];
@@ -216,7 +216,7 @@ describe('QR bill amount — matches computeTotal', () => {
 
 // PDF filename
 
-describe('generateOfferPdf — filename', () => {
+describe('generateOfferPdf - filename', () => {
     it('saves PDF with date-stamped filename for INVOICE', async () => {
         const offer = makeOffer({state: 'INVOICE', number: '2024-001', customer: {...CUSTOMER, name: 'Test Customer'}});
         await generateOfferPdf(offer);
@@ -241,7 +241,7 @@ describe('generateOfferPdf — filename', () => {
 
 // Page breaks
 
-describe('generateOfferPdf — page layout', () => {
+describe('generateOfferPdf - page layout', () => {
     it('does not add a new page for a 3-line OFFER (non-QR, 282mm safe bottom)', async () => {
         // OFFER uses SAFE_BOTTOM_STD=282mm. A 3-line offer produces y≈131mm + COMBINED_TAIL_H=78mm = 209mm < 282mm.
         const offer = makeOffer({

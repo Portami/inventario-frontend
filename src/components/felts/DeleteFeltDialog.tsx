@@ -9,7 +9,7 @@ interface DeleteFeltDialogProps {
     onClose: () => void;
 }
 
-export default function DeleteFeltDialog({open, felt, isDeleting, onConfirm, onClose}: DeleteFeltDialogProps) {
+export default function DeleteFeltDialog({open, felt, isDeleting, onConfirm, onClose}: Readonly<DeleteFeltDialogProps>) {
     return (
         <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
             <DialogTitle>Filz löschen</DialogTitle>

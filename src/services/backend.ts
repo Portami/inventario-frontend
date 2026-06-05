@@ -11,7 +11,6 @@ import {
     CustomerWithIdDto,
     FeltCatalogItem,
     LineItemDto,
-    LineItemKind,
     OfferDto,
     OfferState,
     OfferSummaryDto,
@@ -45,10 +44,9 @@ function mapBackendOffer(raw: BackendOfferDto): OfferDto {
             country: raw.customerDto.country ?? '',
             vatNumber: raw.customerDto.vatNumber ?? '',
         },
-        // TODO: map item kind from backend once the API exposes it
         lines: raw.items.map((item) => ({
             id: String(item.id),
-            kind: 'PRODUKT' as LineItemKind,
+            kind: item.kind,
             articleNumber: String(item.productVariantId),
             feltTypeName: item.description ?? '',
             color: null,
@@ -501,6 +499,7 @@ export const addOfferLine = async (offerId: string, productVariantId: number, li
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
         const payload: BackendCreateOfferItemDto = {
+            kind: line.kind,
             productVariantId,
             description: line.description || undefined,
             quantity: line.quantity,

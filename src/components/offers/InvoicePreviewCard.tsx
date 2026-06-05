@@ -13,7 +13,14 @@ interface InvoicePreviewCardProps {
     onGeneratePdf: () => void;
 }
 
-export default function InvoicePreviewCard({lines, shippingFee, vatPct, onShippingFeeChange, onVatPctChange, onGeneratePdf}: InvoicePreviewCardProps) {
+export default function InvoicePreviewCard({
+    lines,
+    shippingFee,
+    vatPct,
+    onShippingFeeChange,
+    onVatPctChange,
+    onGeneratePdf,
+}: Readonly<InvoicePreviewCardProps>) {
     const subtotal = lines.reduce((s, l) => s + lineSubtotal(l), 0);
     const vatAmount = (subtotal + shippingFee) * (vatPct / 100);
     const total = subtotal + shippingFee + vatAmount;

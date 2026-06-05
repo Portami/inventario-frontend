@@ -3,6 +3,7 @@ import {useToast} from '@/components/ToastProvider';
 import {deleteRoll, fetchRollDetails, fetchRolls, splitRoll, updateRoll} from '@/services/backend';
 import {FeltRollDto} from '@/types/roll';
 import {toErrorMessage} from '@/utils/pageUtils';
+import CallSplitIcon from '@mui/icons-material/CallSplit';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -10,6 +11,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import {
     Box,
     Button,
+    ButtonGroup,
     Card,
     CardContent,
     CircularProgress,
@@ -21,8 +23,10 @@ import {
     MenuItem,
     Stack,
     TextField,
+    Tooltip,
     Typography,
 } from '@mui/material';
+import {alpha} from '@mui/material/styles';
 import {ChangeEvent, useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router';
 
@@ -48,6 +52,152 @@ type NamedOption = {id: number; name: string};
 
 const labelProps = {shrink: true, sx: {textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontWeight: 600}};
 
+interface DeleteRollDialogProps {
+    open: boolean;
+    roll: FeltRollDto | null;
+    isDeleting: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+}
+
+function DeleteRollDialog({open, roll, isDeleting, onClose, onConfirm}: Readonly<DeleteRollDialogProps>) {
+    return (
+        <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+            <DialogTitle>Rolle löschen</DialogTitle>
+            <DialogContent>
+                <Typography>{`${roll?.feltTypeName ?? ''} – ${roll?.color ?? ''} wirklich löschen?`}</Typography>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose} disabled={isDeleting}>
+                    Abbrechen
+                </Button>
+                <Button
+                    color="error"
+                    variant="contained"
+                    onClick={onConfirm}
+                    disabled={isDeleting}
+                    startIcon={isDeleting ? <CircularProgress size={16} color="inherit" /> : undefined}
+                >
+                    Löschen
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+}
+
+interface SplitRollDialogProps {
+    open: boolean;
+    roll: FeltRollDto | null;
+    splitWidth: string;
+    isSplitting: boolean;
+    navigateAfterSplit: boolean;
+    onWidthChange: (v: string) => void;
+    onClose: () => void;
+    onConfirm: () => void;
+}
+
+function SplitRollDialog({open, roll, splitWidth, isSplitting, navigateAfterSplit, onWidthChange, onClose, onConfirm}: Readonly<SplitRollDialogProps>) {
+    const splitWidthNum = Number.parseFloat(splitWidth);
+    const previewLength = roll && !Number.isNaN(splitWidthNum) && splitWidthNum > 0 ? roll.length - splitWidthNum : null;
+    const hasPreview = previewLength !== null && previewLength > 0;
+    const currentDimensions = `${roll?.length ?? ''} × ${roll?.width ?? ''} cm`;
+    const decimals = hasPreview && previewLength % 1 === 0 ? 0 : 1;
+    const previewDimensions = hasPreview ? `${previewLength.toFixed(decimals)} × ${roll?.width ?? ''} cm` : `– × ${roll?.width ?? ''} cm`;
+    const baseIcon = navigateAfterSplit ? <CallSplitIcon /> : <ContentCutIcon />;
+    const splitIcon = isSplitting ? <CircularProgress size={16} color="inherit" /> : baseIcon;
+
+    return (
+        <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+            <DialogTitle>
+                <Box sx={{display: 'flex', alignItems: 'center', gap: 1.5}}>
+                    {navigateAfterSplit ? <CallSplitIcon sx={{color: 'primary.main'}} /> : <ContentCutIcon sx={{color: 'text.secondary'}} />}
+                    <Box>
+                        <Typography variant="h6" sx={{lineHeight: 1.2}}>
+                            {navigateAfterSplit ? 'Neue Rolle abschneiden' : 'Rolle abschneiden'}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                            {navigateAfterSplit ? 'Abschnitt wird als neue Rolle geöffnet' : 'Verbleibende Länge wird aktualisiert'}
+                        </Typography>
+                    </Box>
+                </Box>
+            </DialogTitle>
+            <DialogContent sx={{pt: 1}}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        p: 1.5,
+                        mb: 2.5,
+                        borderRadius: 2,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        bgcolor: (theme) => alpha(theme.palette.text.primary, 0.03),
+                    }}
+                >
+                    <Box sx={{flex: 1}}>
+                        <Typography variant="caption" color="text.secondary" sx={{display: 'block', mb: 0.25}}>
+                            Aktuelle Rolle
+                        </Typography>
+                        <Typography variant="body1" sx={{fontWeight: 700}}>
+                            {currentDimensions}
+                        </Typography>
+                    </Box>
+                    <ContentCutIcon sx={{color: 'text.disabled', fontSize: 18, flexShrink: 0}} />
+                    <Box sx={{flex: 1, textAlign: 'right'}}>
+                        <Typography variant="caption" color="text.secondary" sx={{display: 'block', mb: 0.25}}>
+                            Verbleibend
+                        </Typography>
+                        <Typography variant="body1" sx={{fontWeight: 700, ...(!hasPreview && {color: 'text.disabled'})}}>
+                            {previewDimensions}
+                        </Typography>
+                    </Box>
+                </Box>
+
+                <TextField
+                    label="Abzuschneidende Länge (cm)"
+                    value={splitWidth}
+                    onChange={(e) => onWidthChange(e.target.value)}
+                    type="number"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    autoFocus
+                    slotProps={{htmlInput: {min: 0.01, step: 0.1}, inputLabel: labelProps}}
+                />
+
+                {navigateAfterSplit && (
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            gap: 1,
+                            mt: 2,
+                            p: 1.25,
+                            borderRadius: 1.5,
+                            bgcolor: (theme) => alpha(theme.palette.primary.main, 0.06),
+                            border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                        }}
+                    >
+                        <CallSplitIcon sx={{fontSize: 16, color: 'primary.main', mt: 0.1, flexShrink: 0}} />
+                        <Typography variant="caption" color="primary.main">
+                            Der Abschnitt wird als neue Rolle angelegt und direkt geöffnet.
+                        </Typography>
+                    </Box>
+                )}
+            </DialogContent>
+            <DialogActions sx={{px: 3, pb: 2.5}}>
+                <Button onClick={onClose} disabled={isSplitting}>
+                    Abbrechen
+                </Button>
+                <Button variant="contained" onClick={onConfirm} disabled={isSplitting || !splitWidth || splitWidthNum <= 0} startIcon={splitIcon}>
+                    {navigateAfterSplit ? 'Abschneiden & öffnen' : 'Abschneiden'}
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+}
+
 export default function RollDetail() {
     const {id} = useParams<{id: string}>();
     const navigate = useNavigate();
@@ -63,6 +213,7 @@ export default function RollDetail() {
     const [isSplitOpen, setIsSplitOpen] = useState(false);
     const [isSplitting, setIsSplitting] = useState(false);
     const [splitWidth, setSplitWidth] = useState('');
+    const [navigateAfterSplit, setNavigateAfterSplit] = useState(false);
     const [storageOptions, setStorageOptions] = useState<NamedOption[]>([]);
     const [batchOptions, setBatchOptions] = useState<NamedOption[]>([]);
 
@@ -97,8 +248,8 @@ export default function RollDetail() {
                 if (r.storageId != null && r.storageName) storageMap.set(r.storageId, r.storageName);
                 if (r.batchId != null && r.batchName) batchMap.set(r.batchId, r.batchName);
             }
-            setStorageOptions([...storageMap.entries()].map(([id, name]) => ({id, name})).sort((a, b) => a.name.localeCompare(b.name)));
-            setBatchOptions([...batchMap.entries()].map(([id, name]) => ({id, name})).sort((a, b) => a.name.localeCompare(b.name)));
+            setStorageOptions([...storageMap.entries()].map(([sid, name]) => ({id: sid, name})).sort((a, b) => a.name.localeCompare(b.name)));
+            setBatchOptions([...batchMap.entries()].map(([bid, name]) => ({id: bid, name})).sort((a, b) => a.name.localeCompare(b.name)));
         });
         setIsEditing(true);
     };
@@ -128,17 +279,27 @@ export default function RollDetail() {
         }
     };
 
+    const openSplitDialog = (shouldNavigate: boolean) => {
+        setSplitWidth('');
+        setNavigateAfterSplit(shouldNavigate);
+        setIsSplitOpen(true);
+    };
+
     const handleSplit = async () => {
         if (!roll || !id) return;
         const width = Number.parseFloat(splitWidth);
         if (Number.isNaN(width) || width <= 0) return;
         setIsSplitting(true);
         try {
-            await splitRoll(roll.id, {width});
-            setRoll(await fetchRollDetails(id));
+            const newRoll = await splitRoll(roll.id, {width});
             setIsSplitOpen(false);
             setSplitWidth('');
-            showToast('Rolle erfolgreich abgeschnitten.');
+            if (navigateAfterSplit && newRoll.id !== roll.id) {
+                navigate(`/roll/${newRoll.id}`);
+            } else {
+                setRoll(await fetchRollDetails(id));
+                showToast('Rolle erfolgreich abgeschnitten.');
+            }
         } catch (err) {
             showToast(toErrorMessage(err, 'Rolle konnte nicht abgeschnitten werden'), 'error');
         } finally {
@@ -165,7 +326,7 @@ export default function RollDetail() {
         <DetailPage title={title} isLoading={isLoading} error={error} onBack={() => navigate(-1)} onErrorClose={() => setError('')}>
             {roll && (
                 <Stack spacing={2}>
-                    <Box sx={{display: 'flex', justifyContent: 'flex-end', gap: 1}}>
+                    <Box sx={{display: 'flex', justifyContent: 'flex-end', gap: 1, flexWrap: 'wrap'}}>
                         {isEditing ? (
                             <>
                                 <Button variant="outlined" onClick={() => setIsEditing(false)} disabled={isSaving}>
@@ -185,9 +346,18 @@ export default function RollDetail() {
                                 <Button variant="outlined" startIcon={<EditIcon />} onClick={startEdit}>
                                     Bearbeiten
                                 </Button>
-                                <Button variant="outlined" startIcon={<ContentCutIcon />} onClick={() => setIsSplitOpen(true)}>
-                                    Abschneiden
-                                </Button>
+                                <ButtonGroup variant="outlined">
+                                    <Tooltip title="Länge abschneiden – Rolle bleibt geöffnet" arrow>
+                                        <Button startIcon={<ContentCutIcon />} onClick={() => openSplitDialog(false)}>
+                                            Abschneiden
+                                        </Button>
+                                    </Tooltip>
+                                    <Tooltip title="Abschneiden und neue Rolle direkt öffnen" arrow>
+                                        <Button startIcon={<CallSplitIcon />} onClick={() => openSplitDialog(true)}>
+                                            Neue Rolle
+                                        </Button>
+                                    </Tooltip>
+                                </ButtonGroup>
                                 <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={() => setIsDeleteOpen(true)}>
                                     Löschen
                                 </Button>
@@ -216,7 +386,7 @@ export default function RollDetail() {
 
                                 <div>
                                     <Typography variant="overline" color="textSecondary">
-                                        Maße & Eigenschaften
+                                        Masse & Eigenschaften
                                     </Typography>
                                     <Box sx={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1}}>
                                         {isEditing ? (
@@ -271,7 +441,7 @@ export default function RollDetail() {
                                                 disabled
                                                 slotProps={{inputLabel: labelProps, select: {displayEmpty: true}}}
                                             >
-                                                <MenuItem value="">–</MenuItem>
+                                                <MenuItem value="">&ndash;</MenuItem>
                                                 {batchOptions.map((o) => (
                                                     <MenuItem key={o.id} value={String(o.id)}>
                                                         {o.name}
@@ -291,7 +461,7 @@ export default function RollDetail() {
                                                 size="small"
                                                 slotProps={{inputLabel: labelProps, select: {displayEmpty: true}}}
                                             >
-                                                <MenuItem value="">–</MenuItem>
+                                                <MenuItem value="">&ndash;</MenuItem>
                                                 {storageOptions.map((o) => (
                                                     <MenuItem key={o.id} value={String(o.id)}>
                                                         {o.name}
@@ -309,59 +479,24 @@ export default function RollDetail() {
                 </Stack>
             )}
 
-            <Dialog open={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} maxWidth="xs" fullWidth>
-                <DialogTitle>Rolle löschen</DialogTitle>
-                <DialogContent>
-                    <Typography>
-                        {roll?.feltTypeName} – {roll?.color} wirklich löschen?
-                    </Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setIsDeleteOpen(false)} disabled={isDeleting}>
-                        Abbrechen
-                    </Button>
-                    <Button
-                        color="error"
-                        variant="contained"
-                        onClick={() => void handleDelete()}
-                        disabled={isDeleting}
-                        startIcon={isDeleting ? <CircularProgress size={16} color="inherit" /> : undefined}
-                    >
-                        Löschen
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <DeleteRollDialog
+                open={isDeleteOpen}
+                roll={roll}
+                isDeleting={isDeleting}
+                onClose={() => setIsDeleteOpen(false)}
+                onConfirm={() => void handleDelete()}
+            />
 
-            <Dialog open={isSplitOpen} onClose={() => setIsSplitOpen(false)} maxWidth="xs" fullWidth>
-                <DialogTitle>Rolle abschneiden</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        label="Länge (cm)"
-                        value={splitWidth}
-                        onChange={(e) => setSplitWidth(e.target.value)}
-                        type="number"
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        autoFocus
-                        sx={{mt: 1}}
-                        slotProps={{htmlInput: {min: 0.01, step: 0.1}, inputLabel: labelProps}}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setIsSplitOpen(false)} disabled={isSplitting}>
-                        Abbrechen
-                    </Button>
-                    <Button
-                        variant="contained"
-                        onClick={() => void handleSplit()}
-                        disabled={isSplitting || !splitWidth || Number.parseFloat(splitWidth) <= 0}
-                        startIcon={isSplitting ? <CircularProgress size={16} color="inherit" /> : <ContentCutIcon />}
-                    >
-                        Abschneiden
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <SplitRollDialog
+                open={isSplitOpen}
+                roll={roll}
+                splitWidth={splitWidth}
+                isSplitting={isSplitting}
+                navigateAfterSplit={navigateAfterSplit}
+                onWidthChange={setSplitWidth}
+                onClose={() => setIsSplitOpen(false)}
+                onConfirm={() => void handleSplit()}
+            />
         </DetailPage>
     );
 }

@@ -4,7 +4,7 @@ import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlin
 import LockClockOutlinedIcon from '@mui/icons-material/LockClockOutlined';
 import {Chip, Tooltip, useTheme} from '@mui/material';
 
-export default function ReservationChip({reservation}: {reservation: ReservationDto}) {
+export default function ReservationChip({reservation}: Readonly<{reservation: ReservationDto}>) {
     const theme = useTheme();
     const primary = theme.palette.primary.main;
 

@@ -20,7 +20,7 @@ const CHIP_PALETTE = ['#1565C0', '#2E7D32', '#C62828', '#E65100', '#00695C', '#5
 function rollColorToChipBg(color: string): string {
     let hash = 0;
     for (let i = 0; i < color.length; i++) {
-        hash = color.charCodeAt(i) + ((hash << 5) - hash);
+        hash = (color.codePointAt(i) ?? 0) + ((hash << 5) - hash);
     }
     return CHIP_PALETTE[Math.abs(hash) % CHIP_PALETTE.length];
 }
@@ -87,12 +87,20 @@ export default function FeltPage() {
                             -
                         </Typography>
                     );
-                const visible = feltRolls.slice(0, 6);
+                const sorted = [...feltRolls].sort((a, b) => {
+                    const aIs180 = a.width === 180 ? 1 : 0;
+                    const bIs180 = b.width === 180 ? 1 : 0;
+                    return aIs180 - bIs180;
+                });
+                const visible = sorted.slice(0, 6);
                 const overflow = feltRolls.length - visible.length;
                 return (
                     <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5, py: 0.75, alignContent: 'center'}}>
                         {visible.map((roll) => {
                             const bg = roll.storageName ? storageColorMap.get(roll.storageName) : undefined;
+                            let widthBorder: string | undefined;
+                            if (roll.width === 180) widthBorder = '2px solid #FF8F00';
+                            else if (roll.width === 100) widthBorder = '2px solid #0277BD';
                             return (
                                 <Tooltip key={roll.id} title={roll.storageName ?? 'Kein Lagerort'} arrow>
                                     <Chip
@@ -103,6 +111,7 @@ export default function FeltPage() {
                                             color: bg ? '#fff' : 'text.secondary',
                                             fontSize: '0.7rem',
                                             height: 22,
+                                            border: widthBorder,
                                             '& .MuiChip-label': {px: 1},
                                         }}
                                     />
@@ -121,7 +130,7 @@ export default function FeltPage() {
         [rollsByFeltId, storageColorMap],
     );
 
-    // Felts that pass the dimension (length/width) filters only — used to derive dropdown options
+    // Felts that pass the dimension (length/width) filters only - used to derive dropdown options
     const feltsByDimension = useMemo(() => {
         const lengthActive = activeLengthFilter[0] !== rollLengthBounds[0] || activeLengthFilter[1] !== rollLengthBounds[1];
         const widthActive = widthFilter[0] !== 0 || widthFilter[1] !== 500;
@@ -182,10 +191,7 @@ export default function FeltPage() {
             if (densityFilter && felt.density !== Number(densityFilter)) {
                 return false;
             }
-            if (thicknessFilter && felt.thickness !== Number(thicknessFilter)) {
-                return false;
-            }
-            return true;
+            return !(thicknessFilter && felt.thickness !== Number(thicknessFilter));
         });
     }, [feltsByDimension, searchQuery, densityFilter, thicknessFilter]);
 
@@ -399,6 +405,20 @@ export default function FeltPage() {
                     ))}
                 </Box>
             )}
+            <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 2, mt: 0.5, ml: 0.5}}>
+                <Box sx={{display: 'flex', alignItems: 'center', gap: 0.75}}>
+                    <Box sx={{width: 10, height: 10, borderRadius: '50%', border: '2px solid #0277BD', flexShrink: 0}} />
+                    <Typography variant="caption" color="text.secondary">
+                        1m Breite
+                    </Typography>
+                </Box>
+                <Box sx={{display: 'flex', alignItems: 'center', gap: 0.75}}>
+                    <Box sx={{width: 10, height: 10, borderRadius: '50%', border: '2px solid #FF8F00', flexShrink: 0}} />
+                    <Typography variant="caption" color="text.secondary">
+                        1.8m Breite
+                    </Typography>
+                </Box>
+            </Box>
 
             <FeltDialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} onSaved={handleCreated} />
             <DeleteFeltDialog

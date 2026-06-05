@@ -35,7 +35,7 @@ const DOC_SUBTITLE: Record<OfferState, string> = {
     COMPLETED: 'Für die bei uns bestellten Artikel stellen wir Ihnen wie folgt Rechnung:',
 };
 
-// Table column layout — left margin 15 mm, right edge 195 mm (210 minus 15)
+// Table column layout - left margin 15 mm, right edge 195 mm (210 minus 15)
 // widths: 6 + 82 + 20 + 28 + 22 + 22 = 180 mm = CONTENT_W
 
 const COL = {
@@ -49,9 +49,9 @@ const COL = {
 
 const RIGHT = A4.w - MM.right; // 195 mm
 
-const QR_ZONE_TOP = A4.h - 105; // 192 mm — top edge of QR bill zone
-const SAFE_BOTTOM_QR = QR_ZONE_TOP - 4; // 188 mm — stop content here to leave a gap
-const SAFE_BOTTOM_STD = A4.h - MM.bottom; // 282 mm — for pages without a QR bill
+const QR_ZONE_TOP = A4.h - 105; // 192 mm - top edge of QR bill zone
+const SAFE_BOTTOM_QR = QR_ZONE_TOP - 4; // 188 mm - stop content here to leave a gap
+const SAFE_BOTTOM_STD = A4.h - MM.bottom; // 282 mm - for pages without a QR bill
 
 /** Adds a new page and returns the top-margin y position. */
 function newPage(pdf: jsPDF): number {
@@ -211,7 +211,7 @@ function drawLineItemsTable(pdf: jsPDF, lines: LineItemDto[], y: number, safeBot
         setFont(pdf, 'normal', 9, C.ink);
         txt(pdf, `${line.quantity} ${line.unit}`, COL.qty.x + COL.qty.w, b1, {align: 'right'});
         txt(pdf, fmtCHF(line.pricePerUnit), COL.price.x + COL.price.w, b1, {align: 'right'});
-        txt(pdf, line.cutSurcharge > 0 ? fmtCHF(line.cutSurcharge) : '—', COL.cut.x + COL.cut.w, b1, {align: 'right'});
+        txt(pdf, line.cutSurcharge > 0 ? fmtCHF(line.cutSurcharge) : '-', COL.cut.x + COL.cut.w, b1, {align: 'right'});
 
         setFont(pdf, 'bold', 9, C.ink);
         txt(pdf, fmtCHF(lineSubtotal(line)), COL.total.x + COL.total.w, b1, {align: 'right'});
@@ -439,7 +439,7 @@ async function addQRBill(pdf: jsPDF, offer: OfferDto, total: number): Promise<vo
 
 // Main export
 
-const COMBINED_TAIL_H = 78; // mm — actual combined height of totals + footer
+const COMBINED_TAIL_H = 78; // mm - actual combined height of totals + footer
 
 /**
  * Builds and saves a complete PDF for the given offer.
