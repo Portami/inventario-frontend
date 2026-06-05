@@ -14,9 +14,15 @@ export type Product = {
 
 // Backend product catalog types (GET /api/products)
 
+export type CategoryFieldDto = {
+    readonly id: number;
+    readonly name: string;
+};
+
 export type ProductCategoryDto = {
     readonly id: number;
     readonly name: string;
+    readonly fields: CategoryFieldDto[];
 };
 
 export type ProductAttributeDto = {
@@ -52,6 +58,7 @@ export type CreateProductVariantDto = {
 export type CreateProductDto = {
     name: string;
     categoryId: number;
+    attributes?: {name: string}[];
 };
 
 export type ProductDto = {

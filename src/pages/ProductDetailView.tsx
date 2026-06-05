@@ -3,7 +3,7 @@ import CreateVariantDialog from '@/components/products/CreateVariantDialog';
 import EditProductDialog from '@/components/products/EditProductDialog';
 import EditVariantDialog from '@/components/products/EditVariantDialog';
 import {useToast} from '@/components/ToastProvider';
-import {deleteProduct, deleteProductVariant, fetchProductById} from '@/services/backend';
+import {deleteProduct, deleteProductVariant, fetchProductById, patchProduct} from '@/services/backend';
 import {ProductDto, ProductVariantDto} from '@/types/product';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -38,6 +38,7 @@ export default function ProductDetailView() {
     const [product, setProduct] = useState<ProductDto | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const [editProductOpen, setEditProductOpen] = useState(false);
     const [deleteProductOpen, setDeleteProductOpen] = useState(false);
@@ -48,21 +49,40 @@ export default function ProductDetailView() {
     const [deletingVariant, setDeletingVariant] = useState<ProductVariantDto | null>(null);
     const [isDeletingVariant, setIsDeletingVariant] = useState(false);
 
-    const load = async () => {
-        if (!id) return;
-        setIsLoading(true);
-        try {
-            setProduct(await fetchProductById(id));
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Produkt konnte nicht geladen werden');
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const reload = () => setRefreshKey((k) => k + 1);
 
     useEffect(() => {
-        void load();
-    }, [id]);
+        if (!id) return;
+        let cancelled = false;
+
+        const run = async () => {
+            setIsLoading(true);
+            try {
+                let loaded = await fetchProductById(id);
+                if (cancelled) return;
+
+                // Approach A: stamp any category fields not yet present as product attributes.
+                const existingNames = new Set(loaded.attributes.map((a) => a.name));
+                const missing = loaded.category.fields.filter((f) => !existingNames.has(f.name));
+                if (missing.length > 0) {
+                    const allAttributes = [...loaded.attributes.map((a) => ({id: a.id, name: a.name})), ...missing.map((f) => ({name: f.name}))];
+                    loaded = await patchProduct(loaded.id, {attributes: allAttributes});
+                    if (cancelled) return;
+                }
+
+                setProduct(loaded);
+            } catch (err) {
+                if (!cancelled) setError(err instanceof Error ? err.message : 'Produkt konnte nicht geladen werden');
+            } finally {
+                if (!cancelled) setIsLoading(false);
+            }
+        };
+
+        void run();
+        return () => {
+            cancelled = true;
+        };
+    }, [id, refreshKey]);
 
     const handleDeleteProduct = async () => {
         if (!product) return;
@@ -78,13 +98,13 @@ export default function ProductDetailView() {
     };
 
     const handleDeleteVariant = async () => {
-        if (!deletingVariant) return;
+        if (!product || !deletingVariant) return;
         setIsDeletingVariant(true);
         try {
-            await deleteProductVariant(product!.id, deletingVariant.id);
+            await deleteProductVariant(product.id, deletingVariant.id);
             showToast('Variante gelöscht.');
             setDeletingVariant(null);
-            void load();
+            reload();
         } catch {
             showToast('Löschen fehlgeschlagen.', 'error');
         } finally {
@@ -113,7 +133,7 @@ export default function ProductDetailView() {
 
     const variantCount = product.variants.length;
     const minPrice = variantCount > 0 ? Math.min(...product.variants.map((v) => v.price)) : null;
-    const priceLabel = minPrice != null ? `CHF ${minPrice.toFixed(2)}${variantCount > 1 ? '+' : ''}` : '–';
+    const priceLabel = minPrice == null ? '–' : `CHF ${minPrice.toFixed(2)}${variantCount > 1 ? '+' : ''}`;
 
     return (
         <Box sx={{minHeight: '100vh', backgroundColor: 'background.default', py: 6}}>
@@ -156,7 +176,7 @@ export default function ProductDetailView() {
                     </Typography>
                     <Chip
                         icon={<InventoryIcon sx={{fontSize: '1rem'}} />}
-                        label={`${variantCount} Variante${variantCount !== 1 ? 'n' : ''}`}
+                        label={`${variantCount} Variante${variantCount === 1 ? '' : 'n'}`}
                         sx={{
                             backgroundColor: variantCount > 0 ? 'success.light' : 'warning.light',
                             color: variantCount > 0 ? 'success.main' : 'warning.main',
@@ -244,7 +264,7 @@ export default function ProductDetailView() {
                 onClose={() => setEditProductOpen(false)}
                 onSaved={() => {
                     setEditProductOpen(false);
-                    void load();
+                    reload();
                 }}
                 product={product}
             />
@@ -265,7 +285,7 @@ export default function ProductDetailView() {
                 onClose={() => setCreateVariantOpen(false)}
                 onSaved={() => {
                     setCreateVariantOpen(false);
-                    void load();
+                    reload();
                 }}
                 productId={product.id}
                 productAttributes={product.attributes}
@@ -278,7 +298,7 @@ export default function ProductDetailView() {
                     onClose={() => setEditingVariant(null)}
                     onSaved={() => {
                         setEditingVariant(null);
-                        void load();
+                        reload();
                     }}
                     productId={product.id}
                     variant={editingVariant}

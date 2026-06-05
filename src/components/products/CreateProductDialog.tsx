@@ -36,6 +36,7 @@ export default function CreateProductDialog({open, onClose, onSaved}: CreateProd
     const [newCategoryName, setNewCategoryName] = useState('');
     const [variantName, setVariantName] = useState('');
     const [variantPrice, setVariantPrice] = useState('');
+    const [attrValues, setAttrValues] = useState<Record<string, string>>({});
     const [isSaving, setIsSaving] = useState(false);
     const [categories, setCategories] = useState<ProductCategoryDto[]>([]);
 
@@ -46,10 +47,22 @@ export default function CreateProductDialog({open, onClose, onSaved}: CreateProd
         setNewCategoryName('');
         setVariantName('');
         setVariantPrice('');
+        setAttrValues({});
         void fetchProductCategories()
             .then(setCategories)
             .catch(() => setCategories([]));
     }, [open]);
+
+    const selectedCategory = categoryId === NEW_CATEGORY ? undefined : categories.find((c) => String(c.id) === categoryId);
+    const categoryFields = selectedCategory?.fields ?? [];
+
+    // Reset attribute values only when the selected category changes, not when the list re-fetches.
+    useEffect(() => {
+        const cat = categories.find((c) => String(c.id) === categoryId);
+        const initial: Record<string, string> = {};
+        for (const f of cat?.fields ?? []) initial[f.name] = '';
+        setAttrValues(initial);
+    }, [categoryId]);
 
     const handleSave = async () => {
         const price = Number.parseFloat(variantPrice);
@@ -67,11 +80,14 @@ export default function CreateProductDialog({open, onClose, onSaved}: CreateProd
             } else {
                 resolvedCategoryId = Number.parseInt(categoryId, 10);
             }
-            const created = await createProduct({
-                name: name.trim(),
-                categoryId: resolvedCategoryId,
-            });
-            await createProductVariant(created.id, {name: variantName.trim(), price});
+
+            const attributes = categoryFields.length > 0 ? categoryFields.map((f) => ({name: f.name})) : undefined;
+            const created = await createProduct({name: name.trim(), categoryId: resolvedCategoryId, attributes});
+
+            const variantAttributes =
+                created.attributes.length > 0 ? created.attributes.map((attr) => ({attributeId: attr.id, value: attrValues[attr.name] ?? ''})) : undefined;
+            await createProductVariant(created.id, {name: variantName.trim(), price, attributes: variantAttributes});
+
             showToast('Produkt erfolgreich erstellt.', 'success');
             onSaved();
         } catch {
@@ -177,6 +193,30 @@ export default function CreateProductDialog({open, onClose, onSaved}: CreateProd
                             slotProps={{htmlInput: {min: 0, step: 0.01}, inputLabel: labelProps}}
                         />
                     </Grid>
+
+                    {categoryFields.length > 0 && (
+                        <>
+                            <Grid size={12}>
+                                <Divider />
+                                <Typography variant="overline" sx={{display: 'block', mt: 2, mb: 0.5, color: 'text.secondary'}}>
+                                    Attribute
+                                </Typography>
+                            </Grid>
+                            {categoryFields.map((f) => (
+                                <Grid size={6} key={f.id}>
+                                    <TextField
+                                        label={f.name}
+                                        value={attrValues[f.name] ?? ''}
+                                        onChange={(e) => setAttrValues((prev) => ({...prev, [f.name]: e.target.value}))}
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        slotProps={{inputLabel: labelProps}}
+                                    />
+                                </Grid>
+                            ))}
+                        </>
+                    )}
                 </Grid>
             </DialogContent>
             <DialogActions sx={{px: 4, pb: 3}}>
