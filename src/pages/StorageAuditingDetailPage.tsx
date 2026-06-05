@@ -1,6 +1,6 @@
 import StorageAuditingCard from '@/components/inventoryAuditing/StorageAuditingCard.tsx';
 import {fetchStocktakeById} from '@/services/backend.ts';
-import {FeltStocktakeDto, FeltStocktakeListInfoDto} from '@/types/inventoryAuditing.ts';
+import {FeltStocktakeDto} from '@/types/inventoryAuditing.ts';
 import {toErrorMessage} from '@/utils/pageUtils.ts';
 import {Alert, Box, CircularProgress} from '@mui/material';
 import {useEffect, useState} from 'react';
@@ -10,7 +10,6 @@ export default function StorageAuditingDetailPage() {
     const {inventoryId, id} = useParams<{inventoryId: string; id: string}>();
 
     const [inventoryAuditing, setInventoryAuditing] = useState<FeltStocktakeDto>();
-    const [storageAuditing, setStorageAuditing] = useState<FeltStocktakeListInfoDto>();
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -30,7 +29,6 @@ export default function StorageAuditingDetailPage() {
         const load = async () => {
             try {
                 setInventoryAuditing(await fetchStocktakeById(inventoryId));
-                setStorageAuditing(inventoryAuditing?.storageLists.find((storage) => storage.storageId === Number(id)));
             } catch (err) {
                 setError(toErrorMessage(err, 'Lager konnte nicht gefunden werden.'));
             } finally {
@@ -41,9 +39,7 @@ export default function StorageAuditingDetailPage() {
     }, [inventoryId, id]);
 
     return (
-        <Box sx={{py: 4}}>
-            <StorageAuditingCard inventoryId={inventoryId} storage={storageAuditing} />
-
+        <Box sx={{py: 3}}>
             {error && (
                 <Alert severity="error" onClose={() => setError('')}>
                     {error}
@@ -54,6 +50,10 @@ export default function StorageAuditingDetailPage() {
                 <Box sx={{display: 'flex', justifyContent: 'center', py: 4}}>
                     <CircularProgress />
                 </Box>
+            )}
+
+            {!isLoading && (
+                <StorageAuditingCard inventoryId={inventoryId} storage={inventoryAuditing?.storageLists.find((storage) => storage.storageId == Number(id))} />
             )}
         </Box>
     );

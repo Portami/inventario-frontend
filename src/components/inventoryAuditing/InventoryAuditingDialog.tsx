@@ -1,8 +1,11 @@
 import {useToast} from '@/components/ToastProvider.tsx';
 import {createStocktake, fetchStorages} from '@/services/backend.ts';
+import {FeltStocktakeDto} from '@/types/inventoryAuditing.ts';
 import {toErrorMessage} from '@/utils/pageUtils.ts';
 import CloseIcon from '@mui/icons-material/Close';
 import {
+    Alert,
+    Box,
     Button,
     Checkbox,
     CircularProgress,
@@ -21,7 +24,7 @@ import {ChangeEvent, useEffect, useState} from 'react';
 type InventoryAuditingDialogProps = {
     readonly open: boolean;
     readonly onClose: () => void;
-    readonly onSaved: () => void;
+    readonly onCreated: (id: number) => void;
 };
 
 type StorageSelection = {
@@ -42,7 +45,7 @@ const emptyForm: FormState = {
 
 const labelProps = {shrink: true, sx: {textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontWeight: 600}};
 
-export function InventoryAuditingDialog({open, onClose, onSaved}: InventoryAuditingDialogProps) {
+export function InventoryAuditingDialog({open, onClose, onCreated}: InventoryAuditingDialogProps) {
     const showToast = useToast();
     const [storages, setStorages] = useState<StorageSelection[]>([]);
     const [form, setForm] = useState<FormState>(emptyForm);
@@ -67,13 +70,13 @@ export function InventoryAuditingDialog({open, onClose, onSaved}: InventoryAudit
 
         setIsSaving(true);
         try {
-            await createStocktake({
+            const createdStocktake: FeltStocktakeDto = await createStocktake({
                 description: form.description,
                 includeScrap: form.includeScrap,
                 storageIds: storageIds,
             });
             showToast('Bestandsprüfung erstellt.', 'success');
-            onSaved();
+            onCreated(createdStocktake.id);
         } catch {
             showToast('Erstellen fehlgeschlagen', 'error');
         } finally {
@@ -124,55 +127,76 @@ export function InventoryAuditingDialog({open, onClose, onSaved}: InventoryAudit
     ];
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-            <DialogTitle sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 4, pt: 3}}>
-                Neue Bestandsprüfung
-                <IconButton onClick={onClose} size="small" aria-label="close" disabled={isSaving}>
-                    <CloseIcon />
-                </IconButton>
-            </DialogTitle>
-            <DialogContent sx={{px: 4, pb: 3}}>
-                <Grid container spacing={3} sx={{mt: 0.5}}>
-                    <Grid size={6}>
-                        <TextField
-                            label="Beschreibung"
-                            value={form.description}
-                            onChange={setField('description')}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            slotProps={{inputLabel: labelProps}}
+        <Box>
+            {error && (
+                <Alert severity="error" onClose={() => setError('')}>
+                    {error}
+                </Alert>
+            )}
+
+            {isLoading && (
+                <Box sx={{display: 'flex', justifyContent: 'center', py: 4}}>
+                    <CircularProgress />
+                </Box>
+            )}
+
+            {!isLoading && (
+                <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+                    <DialogTitle sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 4, pt: 3}}>
+                        Neue Bestandsprüfung
+                        <IconButton onClick={onClose} size="small" aria-label="close" disabled={isSaving}>
+                            <CloseIcon />
+                        </IconButton>
+                    </DialogTitle>
+                    <DialogContent sx={{px: 4, pb: 3}}>
+                        <Grid container spacing={3} sx={{mt: 0.5}}>
+                            <Grid size={6}>
+                                <TextField
+                                    label="Beschreibung"
+                                    value={form.description}
+                                    onChange={setField('description')}
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    slotProps={{inputLabel: labelProps}}
+                                />
+                            </Grid>
+                            <Grid size={6}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={form.includeScrap}
+                                            onChange={(e) => setForm((prev) => ({...prev, includeScrap: e.target.checked}))}
+                                        />
+                                    }
+                                    label="Reststück inkludieren"
+                                />
+                            </Grid>
+                        </Grid>
+                        <DataGrid
+                            rows={storages}
+                            columns={columns}
+                            disableRowSelectionOnClick
+                            pageSizeOptions={[10, 25, 50]}
+                            initialState={{pagination: {paginationModel: {pageSize: 10}}}}
+                            localeText={{noRowsLabel: 'Keine Lager'}}
                         />
-                    </Grid>
-                    <Grid size={6}>
-                        <FormControlLabel
-                            control={<Checkbox checked={form.includeScrap} onChange={(e) => setForm((prev) => ({...prev, includeScrap: e.target.checked}))} />}
-                            label="Reststück inkludieren"
-                        />
-                    </Grid>
-                </Grid>
-                <DataGrid
-                    rows={storages}
-                    columns={columns}
-                    disableRowSelectionOnClick
-                    pageSizeOptions={[10, 25, 50]}
-                    initialState={{pagination: {paginationModel: {pageSize: 10}}}}
-                    localeText={{noRowsLabel: 'Keine Lager'}}
-                />
-            </DialogContent>
-            <DialogActions sx={{px: 4, pb: 3}}>
-                <Button variant="outlined" onClick={onClose} disabled={isSaving}>
-                    Abbrechen
-                </Button>
-                <Button
-                    variant="contained"
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : undefined}
-                >
-                    Erstellen
-                </Button>
-            </DialogActions>
-        </Dialog>
+                    </DialogContent>
+                    <DialogActions sx={{px: 4, pb: 3}}>
+                        <Button variant="outlined" onClick={onClose} disabled={isSaving}>
+                            Abbrechen
+                        </Button>
+                        <Button
+                            variant="contained"
+                            onClick={handleSave}
+                            disabled={isSaving}
+                            startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : undefined}
+                        >
+                            Erstellen
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
+        </Box>
     );
 }

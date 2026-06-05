@@ -1,41 +1,63 @@
-//TODO JET Adjust according to Stephan's APIs :)
 export const STORAGE_STATE = {
-    Open: 'Open',
-    Closed: 'Closed',
+    Open: 'Offen',
+    Closed: 'Abgeschlossen',
 } as const;
 
 export type StorageState = (typeof STORAGE_STATE)[keyof typeof STORAGE_STATE];
 
 export const ITEM_STATE = {
-    Initial: 'Initial',
-    Ok: 'Ok',
-    Missing: 'Missing',
-    WrongStorage: 'Wrong Storage',
-    RescanRequired: 'Rescan Required',
-    DuplicateScan: 'Duplicate Scan',
-    NotInAuditing: 'Not In Auditing',
-    UnknownStorage: 'Unknown',
+    INITIAL: 'INITIAL',
+    OK: 'OK',
+    MISSING: 'MISSING',
+    WRONG_STORAGE: 'WRONG_STORAGE',
+    RESCAN_REQUIRED: 'RESCAN_REQUIRED',
+    DUPLICATE_SCAN: 'DUPLICATE_SCAN', //one scan must be voided - can only be done when it is not part of a resolution - selection on which needs to be voided
+    NOT_IN_STOCKTAKE: 'NOT_IN_STOCKTAKE',
+    UNKNOWN: 'UNKNOWN',
 } as const;
 
 export type ItemState = (typeof ITEM_STATE)[keyof typeof ITEM_STATE];
 
+export const ITEM_STATE_LABELS: Record<ItemState, string> = {
+    [ITEM_STATE.INITIAL]: 'Initial',
+    [ITEM_STATE.OK]: 'Ok',
+    [ITEM_STATE.MISSING]: 'Fehlt',
+    [ITEM_STATE.WRONG_STORAGE]: 'Falsches Lager',
+    [ITEM_STATE.RESCAN_REQUIRED]: 'Erneuter Scan nötig',
+    [ITEM_STATE.DUPLICATE_SCAN]: 'Doppelter Scan',
+    [ITEM_STATE.NOT_IN_STOCKTAKE]: 'Nicht in Überprüfung',
+    [ITEM_STATE.UNKNOWN]: 'Unbekannt',
+} as const;
+
+export type ItemStateLabels = (typeof ITEM_STATE_LABELS)[keyof typeof ITEM_STATE_LABELS];
+
 export const ITEM_TYPE = {
-    Roll: 'Roll',
-    Scrap: 'Scrap',
-    Unknown: 'Unknown',
+    ROLL: 'ROLL',
+    SCRAP: 'SCRAP',
+    UNKNOWN: 'UNKNOWN',
 } as const;
 
 export type ItemType = (typeof ITEM_TYPE)[keyof typeof ITEM_TYPE];
 
 export const RESOLUTION_TYPE = {
-    AdjustStorage: 'Adjust Storage',
-    MovePhysically: 'Move Physically',
-    IgnoreMissing: 'Ignore Missing',
-    RemoveMissing: 'Remove Missing',
-    Acknowledge: 'Acknowledge',
+    ADJUST_STORAGE: 'ADJUST_STORAGE',
+    MOVE_PHYSICALLY: 'MOVE_PHYSICALLY',
+    IGNORE_MISSING: 'IGNORE_MISSING',
+    REMOVE_MISSING: 'REMOVE_MISSING',
+    ACKNOWLEDGE: 'ACKNOWLEDGE',
 } as const;
 
 export type ResolutionType = (typeof RESOLUTION_TYPE)[keyof typeof RESOLUTION_TYPE];
+
+export const RESOLUTION_TYPES_LABELS: Record<ResolutionType, string> = {
+    [RESOLUTION_TYPE.ADJUST_STORAGE]: 'Lager anpassen',
+    [RESOLUTION_TYPE.MOVE_PHYSICALLY]: 'Verschieben',
+    [RESOLUTION_TYPE.IGNORE_MISSING]: 'Fehlende ignorieren',
+    [RESOLUTION_TYPE.REMOVE_MISSING]: 'Fehlende entfernen',
+    [RESOLUTION_TYPE.ACKNOWLEDGE]: 'Bestätigen',
+};
+
+export type ResolutionTypeLabels = (typeof RESOLUTION_TYPES_LABELS)[keyof typeof RESOLUTION_TYPES_LABELS];
 
 export type CreateFeltStocktakeDto = {
     description: string;
@@ -81,7 +103,7 @@ export type FeltStocktakeScanDto = {
 export type FeltStocktakeItemDto = {
     type: ItemType;
     itemId: number;
-    rollOrScrapDto: FeltStocktakeRollOrScrapDto;
+    rollOrScrap: FeltStocktakeRollOrScrapDto;
     barcode: string;
     expectedStorageId: number;
     expectedStorageName: string;

@@ -683,7 +683,7 @@ export const createStocktake = async (dto: CreateFeltStocktakeDto): Promise<Felt
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-        const result = await post<FeltStocktakeDto>('/stocktakes', {dto: dto}, {signal: controller.signal});
+        const result = await post<FeltStocktakeDto>('/stocktakes', dto, {signal: controller.signal});
         clearTimeout(timeoutId);
         return result;
     } catch (error) {

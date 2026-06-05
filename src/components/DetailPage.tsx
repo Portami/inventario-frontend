@@ -14,9 +14,10 @@ type DetailPageProps = {
     readonly onBack: () => void;
     readonly onErrorClose?: () => void;
     readonly children: ReactNode;
+    readonly actions?: ReactNode;
 };
 
-export default function DetailPage({title, isLoading, error, onBack, onErrorClose, children}: Readonly<DetailPageProps>) {
+export default function DetailPage({title, isLoading, error, onBack, onErrorClose, children, actions}: Readonly<DetailPageProps>) {
     return (
         <Box sx={{p: 3}}>
             <Stack spacing={3}>
@@ -24,9 +25,12 @@ export default function DetailPage({title, isLoading, error, onBack, onErrorClos
                     <Button startIcon={<ArrowBackIcon />} onClick={onBack} variant="text" sx={{mb: 1, ml: -1}}>
                         Zurück
                     </Button>
-                    <Typography variant="h3" component="h1">
-                        {title}
-                    </Typography>
+                    <Box sx={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2}}>
+                        <Typography variant="h3" component="h1">
+                            {title}
+                        </Typography>
+                        {actions && <Box sx={{flexShrink: 0}}>{actions}</Box>}
+                    </Box>
                 </Box>
 
                 {error && (
