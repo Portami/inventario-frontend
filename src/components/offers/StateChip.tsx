@@ -2,7 +2,7 @@ import {OFFER_STATE_META} from '@/pages/constants/offerConstants';
 import {OfferState} from '@/types/offerte';
 import {Chip} from '@mui/material';
 
-export default function StateChip({stateKey}: {stateKey: OfferState}) {
+export default function StateChip({stateKey}: Readonly<{stateKey: OfferState}>) {
     const m = OFFER_STATE_META[stateKey];
     if (!m) return null;
     const {Icon} = m;

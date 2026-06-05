@@ -1,13 +1,12 @@
 import logo from '@/assets/logo.svg';
 import {useHidScanner} from '@/hooks/useHidScanner';
 import {lookupRollCode} from '@/services/backend';
+import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import CropFreeIcon from '@mui/icons-material/CropFree';
 import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
-import LogoutIcon from '@mui/icons-material/Logout';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import PrintIcon from '@mui/icons-material/Print';
 import QrCodeIcon from '@mui/icons-material/QrCode';
@@ -26,7 +25,7 @@ interface NavBtnProps {
     collapsed: boolean;
 }
 
-function NavBtn({to, icon, label, collapsed}: NavBtnProps) {
+function NavBtn({to, icon, label, collapsed}: Readonly<NavBtnProps>) {
     const theme = useTheme();
     const btn = (
         <Button
@@ -102,9 +101,6 @@ export default function NavigationLayout() {
                             <CropFreeIcon />
                         </IconButton>
                     </Tooltip>
-                    <IconButton size="large" sx={{color: theme.palette.background.paper, display: 'none'}}>
-                        <NotificationsNoneIcon />
-                    </IconButton>
                 </Toolbar>
             </AppBar>
 
@@ -293,26 +289,10 @@ export default function NavigationLayout() {
                     <ListItem disableGutters>
                         <NavBtn to="/customers" icon={<PeopleOutlinedIcon />} label="Kunden" collapsed={collapsed} />
                     </ListItem>
+                    <ListItem disableGutters>
+                        <NavBtn to="/statistics" icon={<BarChartOutlinedIcon />} label="Statistiken" collapsed={collapsed} />
+                    </ListItem>
                 </List>
-
-                {/* Logout */}
-                <Box sx={{px: collapsed ? 1 : 3, pb: 2, display: 'none'}}>
-                    <Tooltip title={collapsed ? 'Abmelden' : ''} placement="right">
-                        <Button
-                            startIcon={<LogoutIcon />}
-                            sx={{
-                                justifyContent: collapsed ? 'center' : 'flex-start',
-                                width: '100%',
-                                minWidth: 0,
-                                px: collapsed ? 1 : 1.5,
-                                color: theme.palette.text.primary,
-                                '& .MuiButton-startIcon': {margin: collapsed ? 0 : undefined},
-                            }}
-                        >
-                            {!collapsed && 'Abmelden'}
-                        </Button>
-                    </Tooltip>
-                </Box>
             </Drawer>
 
             <Container>

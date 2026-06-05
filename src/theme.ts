@@ -1,5 +1,5 @@
+import '@mui/x-data-grid/themeAugmentation';
 import {createTheme} from '@mui/material/styles';
-import type {} from '@mui/x-data-grid/themeAugmentation';
 
 const theme = createTheme({
     cssVariables: true,

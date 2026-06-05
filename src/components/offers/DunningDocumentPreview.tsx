@@ -41,7 +41,7 @@ const DUNNING_CONTENT: Record<DunningState, {title: string; subtitle: string; pa
     },
 };
 
-function SmLine({label, value, dim, bold}: {label: string; value: string; dim?: boolean; bold?: boolean}) {
+function SmLine({label, value, dim, bold}: Readonly<{label: string; value: string; dim?: boolean; bold?: boolean}>) {
     return (
         <Box sx={{display: 'flex', justifyContent: 'space-between', mb: 0.25}}>
             <Typography sx={{fontSize: 12, color: dim ? 'text.secondary' : 'text.primary', fontWeight: bold ? 700 : 400}}>{label}</Typography>
@@ -52,7 +52,7 @@ function SmLine({label, value, dim, bold}: {label: string; value: string; dim?: 
     );
 }
 
-function CondRow({label, value}: {label: string; value: string}) {
+function CondRow({label, value}: Readonly<{label: string; value: string}>) {
     return (
         <Box sx={{display: 'flex', gap: 1, mb: 0.25}}>
             <Typography sx={{fontSize: 11, fontWeight: 600, color: 'text.secondary', minWidth: 100, flexShrink: 0}}>{label}</Typography>
@@ -61,7 +61,7 @@ function CondRow({label, value}: {label: string; value: string}) {
     );
 }
 
-export default function DunningDocumentPreview({offer, state}: Props) {
+export default function DunningDocumentPreview({offer, state}: Readonly<Props>) {
     const {customer, lines, number, createdISO, dueISO} = offer;
     const content = DUNNING_CONTENT[state];
     const subtotal = lines.reduce((s, l) => s + lineSubtotal(l), 0);

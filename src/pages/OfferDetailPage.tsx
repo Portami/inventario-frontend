@@ -16,7 +16,7 @@ import TotalsCard from '@/components/offers/TotalsCard';
 import {useOffer} from '@/hooks/useOffer';
 import {OFFER_STATE, OFFER_STATE_META} from '@/pages/constants/offerConstants';
 import {FeltCatalogItem, ProductCatalogItem} from '@/types/offerte';
-import {Box, CircularProgress, Typography} from '@mui/material';
+import {Box, Card, CardContent, CircularProgress, Typography} from '@mui/material';
 import {ReactNode, useState} from 'react';
 import {useNavigate, useParams} from 'react-router';
 
@@ -86,6 +86,7 @@ export default function OfferDetailPage() {
     const isDunning =
         offer.state === OFFER_STATE.PAYMENT_REMINDER || offer.state === OFFER_STATE.FIRST_DUNNING_NOTICE || offer.state === OFFER_STATE.SECOND_DUNNING_NOTICE;
     const isCompleted = offer.state === OFFER_STATE.COMPLETED;
+    const isClosed = offer.state === OFFER_STATE.CANCELLED || offer.state === OFFER_STATE.NO_RESPONSE;
 
     const SIDEBAR_GRID = {display: 'grid', gridTemplateColumns: '1fr 360px', gap: 3, alignItems: 'start'} as const;
     const SIDEBAR_COL = {display: 'flex', flexDirection: 'column', gap: 3, position: 'sticky', top: 88} as const;
@@ -141,6 +142,40 @@ export default function OfferDetailPage() {
                     <CustomerCompactCard customer={offer.customer} onEdit={() => setEditCustomerOpen(true)} />
                     <TotalsCard lines={offer.lines} />
                     <ReservationPanel lines={offer.lines} />
+                </Box>
+            </Box>
+        );
+    } else if (isClosed) {
+        const meta = OFFER_STATE_META[offer.state];
+        const msg = offer.state === OFFER_STATE.CANCELLED ? 'Diese Offerte wurde als Absage markiert.' : 'Noch keine Rückmeldung erhalten.';
+        mainLayout = (
+            <Box sx={SIDEBAR_GRID}>
+                <Card variant="outlined" sx={{borderColor: `${meta.color}44`}}>
+                    <CardContent sx={{py: 4, px: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, textAlign: 'center'}}>
+                        <Box
+                            sx={{
+                                width: 56,
+                                height: 56,
+                                borderRadius: '50%',
+                                bgcolor: meta.bg,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <meta.Icon sx={{fontSize: 28, color: meta.color}} />
+                        </Box>
+                        <Typography variant="h6" sx={{fontWeight: 700, color: meta.color}}>
+                            {meta.label}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            {msg}
+                        </Typography>
+                    </CardContent>
+                </Card>
+                <Box sx={SIDEBAR_COL}>
+                    <CustomerCompactCard customer={offer.customer} onEdit={() => setEditCustomerOpen(true)} />
+                    <TotalsCard lines={offer.lines} />
                 </Box>
             </Box>
         );

@@ -7,7 +7,7 @@ import LockClockOutlinedIcon from '@mui/icons-material/LockClockOutlined';
 import {Box, Card, CardContent, Divider, Stack, Typography, useTheme} from '@mui/material';
 import React from 'react';
 
-function ReservationItem({title, sub, icon, color}: {title: string; sub: string; icon: React.ReactNode; color: string}) {
+function ReservationItem({title, sub, icon, color}: Readonly<{title: string; sub: string; icon: React.ReactNode; color: string}>) {
     return (
         <Box sx={{display: 'flex', gap: 1.5, alignItems: 'flex-start', py: 1}}>
             <Box
@@ -35,7 +35,7 @@ function ReservationItem({title, sub, icon, color}: {title: string; sub: string;
     );
 }
 
-export default function ReservationPanel({lines}: {lines: LineItemDto[]}) {
+export default function ReservationPanel({lines}: Readonly<{lines: LineItemDto[]}>) {
     const theme = useTheme();
     const primary = theme.palette.primary.main;
     const reserved = lines.filter((l) => l.reservation?.kind === RESERVATION_KIND.RESERVED);

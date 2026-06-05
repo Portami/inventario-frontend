@@ -18,7 +18,7 @@ interface LineItemsTableProps {
     locked?: boolean;
 }
 
-export default function LineItemsTable({lines, onPatch, onDelete, onAddFelt, onAddProduct, locked = false}: LineItemsTableProps) {
+export default function LineItemsTable({lines, onPatch, onDelete, onAddFelt, onAddProduct, locked = false}: Readonly<LineItemsTableProps>) {
     const theme = useTheme();
     const cellPad = '12px 12px';
 

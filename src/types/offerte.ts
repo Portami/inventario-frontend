@@ -1,4 +1,13 @@
-export type OfferState = 'OFFER' | 'ORDER_CONFIRMATION' | 'INVOICE' | 'PAYMENT_REMINDER' | 'FIRST_DUNNING_NOTICE' | 'SECOND_DUNNING_NOTICE' | 'COMPLETED';
+export type OfferState =
+    | 'OFFER'
+    | 'ORDER_CONFIRMATION'
+    | 'INVOICE'
+    | 'PAYMENT_REMINDER'
+    | 'FIRST_DUNNING_NOTICE'
+    | 'SECOND_DUNNING_NOTICE'
+    | 'COMPLETED'
+    | 'CANCELLED'
+    | 'NO_RESPONSE';
 
 /** Lightweight list-view snapshot of an offer, returned by the offers collection endpoint. */
 export interface OfferSummaryDto {
@@ -18,7 +27,7 @@ export interface OfferSummaryDto {
     taggedRolls: number;
 }
 
-export type LineItemKind = 'RESTSTUECK' | 'ROLLE' | 'PRODUKT';
+export type LineItemKind = 'SCRAP' | 'ROLL' | 'PRODUCT';
 
 export type ReservationKind = 'RESERVED' | 'TAGGED';
 
@@ -106,8 +115,6 @@ export interface HistoryEntry {
     what: string;
 }
 
-export type BackendOfferState = OfferState;
-
 export interface BackendCustomerDto {
     id: number;
     name: string;
@@ -136,6 +143,7 @@ export interface BackendFullCustomerDto {
 
 export interface BackendOfferItemDto {
     id: number;
+    kind: LineItemKind;
     productVariantId: number;
     description: string | null;
     quantity: number;
@@ -145,7 +153,7 @@ export interface BackendOfferItemDto {
 export interface BackendOfferDto {
     id: number;
     customerDto: BackendCustomerDto;
-    state: BackendOfferState;
+    state: OfferState;
     createdAt: string;
     updatedAt: string;
     dueAt?: string;
@@ -154,6 +162,7 @@ export interface BackendOfferDto {
 }
 
 export interface BackendCreateOfferItemDto {
+    kind: LineItemKind;
     productVariantId: number;
     description?: string;
     quantity: number;

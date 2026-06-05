@@ -33,7 +33,7 @@ interface FeltSearchDialogProps {
     onPick: (felt: FeltCatalogItem) => void;
 }
 
-export default function FeltSearchDialog({open, catalog, onClose, onPick}: FeltSearchDialogProps) {
+export default function FeltSearchDialog({open, catalog, onClose, onPick}: Readonly<FeltSearchDialogProps>) {
     const [q, setQ] = useState('');
     const [typeFilter, setTypeFilter] = useState('');
     const [thicknessFilter, setThicknessFilter] = useState('');

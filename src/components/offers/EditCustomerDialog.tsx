@@ -22,7 +22,7 @@ interface Props {
 
 const labelSx = {shrink: true, sx: {textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontWeight: 600}};
 
-export default function EditCustomerDialog({open, customer, onClose, onSave}: Props) {
+export default function EditCustomerDialog({open, customer, onClose, onSave}: Readonly<Props>) {
     const [form, setForm] = useState<CustomerDto>(customer);
     const [saving, setSaving] = useState(false);
 

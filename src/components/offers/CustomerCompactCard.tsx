@@ -13,7 +13,7 @@ interface Props {
     onEdit: () => void;
 }
 
-function ContactRow({icon, href, children}: {icon: React.ReactNode; href?: string; children: React.ReactNode}) {
+function ContactRow({icon, href, children}: Readonly<{icon: React.ReactNode; href?: string; children: React.ReactNode}>) {
     return (
         <Box
             component={href ? 'a' : 'div'}
@@ -34,7 +34,7 @@ function ContactRow({icon, href, children}: {icon: React.ReactNode; href?: strin
     );
 }
 
-export default function CustomerCompactCard({customer, onEdit}: Props) {
+export default function CustomerCompactCard({customer, onEdit}: Readonly<Props>) {
     const {name, contactPerson, phone, email, street, zip, city} = customer;
 
     return (

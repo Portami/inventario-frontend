@@ -10,6 +10,11 @@ export type Product = {
     length?: number;
     width?: number;
     felt?: Felt;
+    feltTypeName?: string;
+    thickness?: number;
+    density?: number;
+    supplierName?: string;
+    color?: string;
 };
 
 // Backend product catalog types (GET /api/products)

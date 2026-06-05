@@ -28,7 +28,7 @@ export default function EditProductDialog({open, onClose, onSaved, product}: Edi
         void fetchProductCategories()
             .then((cats) => {
                 setCategories(cats);
-                if (!cats.find((c) => c.id === product.category.id)) {
+                if (!cats.some((c) => c.id === product.category.id)) {
                     setCategories((prev) => [...prev, product.category]);
                 }
             })

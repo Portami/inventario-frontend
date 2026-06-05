@@ -8,7 +8,7 @@ interface DueCellProps {
     state: OfferState;
 }
 
-export default function DueCell({dueISO, overdue, state}: DueCellProps) {
+export default function DueCell({dueISO, overdue, state}: Readonly<DueCellProps>) {
     if (state === OFFER_STATE.COMPLETED) {
         return <Typography sx={{fontSize: 13, color: '#2e7d32'}}>{fmtDate(dueISO)}</Typography>;
     }
@@ -23,7 +23,8 @@ export default function DueCell({dueISO, overdue, state}: DueCellProps) {
         );
     }
     const days = daysFromNow(dueISO);
-    const dueLabel = days <= 0 ? 'heute fällig' : `in ${days} Tag${days === 1 ? '' : 'en'}`;
+    const dayPlural = days === 1 ? '' : 'en';
+    const dueLabel = days <= 0 ? 'heute fällig' : `in ${days} Tag${dayPlural}`;
     return (
         <Box>
             <Typography sx={{fontSize: 13}}>{fmtDate(dueISO)}</Typography>
