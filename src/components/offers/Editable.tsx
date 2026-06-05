@@ -10,7 +10,7 @@ interface EditableProps {
     step?: number;
 }
 
-export default function Editable({value, onChange, suffix, width = 80, step = 0.01}: EditableProps) {
+export default function Editable({value, onChange, suffix, width = 80, step = 0.01}: Readonly<EditableProps>) {
     const [editing, setEditing] = useState(false);
     const [raw, setRaw] = useState(String(value));
     const inputRef = useRef<HTMLInputElement>(null);
@@ -21,9 +21,12 @@ export default function Editable({value, onChange, suffix, width = 80, step = 0.
 
     const commit = useCallback(() => {
         setEditing(false);
-        const n = parseFloat(raw.replace(',', '.'));
-        if (!Number.isNaN(n)) onChange(n);
-        else setRaw(String(value));
+        const n = Number.parseFloat(raw.replace(',', '.'));
+        if (Number.isNaN(n)) {
+            setRaw(String(value));
+        } else {
+            onChange(n);
+        }
     }, [raw, value, onChange]);
 
     if (editing) {

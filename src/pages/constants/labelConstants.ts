@@ -13,7 +13,7 @@ export const PAGE_MARGINS_MM = 20;
 
 // Default label dimensions (mm)
 export const DEFAULT_LABEL_WIDTH_MM = 90; // Allows ~2 labels per row on A4
-export const DEFAULT_LABEL_HEIGHT_MM = 120; // Allows ~2 labels per column on A4
+export const DEFAULT_LABEL_HEIGHT_MM = 60;
 
 // Label dimension constraints (mm)
 export const MIN_LABEL_WIDTH_MM = 50;

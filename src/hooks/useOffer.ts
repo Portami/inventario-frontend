@@ -16,6 +16,16 @@ import {CustomerDto, FeltCatalogItem, LineItemDto, OfferDto, OfferState, Product
 import {toErrorMessage} from '@/utils/pageUtils';
 import {useCallback, useEffect, useState} from 'react';
 
+function withLineReplaced(o: OfferDto | null, lineId: string, line: LineItemDto): OfferDto | null {
+    if (!o) return null;
+    return {...o, lines: o.lines.map((l) => (l.id === lineId ? line : l))};
+}
+
+function withLineMerged(o: OfferDto | null, lineId: string, changes: Partial<LineItemDto>): OfferDto | null {
+    if (!o) return null;
+    return {...o, lines: o.lines.map((l) => (l.id === lineId ? {...l, ...changes} : l))};
+}
+
 /** All state and actions exposed by the useOffer hook for the offer detail page. */
 export interface UseOfferReturn {
     /** The current offer, with path kept in sync with navigation history, or null while loading. */
@@ -27,7 +37,7 @@ export interface UseOfferReturn {
     loading: boolean;
     error: string;
     /** Optimistically updates a line item by deleting and re-adding it via the API. Rolls back on failure. */
-    patchLine: (lineId: string, changes: Partial<LineItemDto>) => void;
+    patchLine: (lineId: string, changes: Partial<LineItemDto>) => Promise<void>;
     deleteLine: (lineId: string) => void;
     addFeltLine: (felt: FeltCatalogItem) => Promise<void>;
     addProductLine: (p: ProductCatalogItem) => Promise<void>;
@@ -72,33 +82,31 @@ export function useOffer(id: string | undefined): UseOfferReturn {
     const prevState = statePath.length > 1 ? statePath[statePath.length - 2] : null;
 
     const patchLine = useCallback(
-        (lineId: string, changes: Partial<LineItemDto>) => {
+        async (lineId: string, changes: Partial<LineItemDto>) => {
             if (!id) return;
             const originalLine = offer?.lines.find((l) => l.id === lineId);
             if (!originalLine?.variantId) return;
 
-            setOffer((o) => (o ? {...o, lines: o.lines.map((l) => (l.id === lineId ? {...l, ...changes} : l))} : o));
+            setOffer((o) => withLineMerged(o, lineId, changes));
 
             const variantId = originalLine.variantId;
             const updated: Omit<LineItemDto, 'id'> = {...originalLine, ...changes};
 
-            void (async () => {
-                try {
-                    await deleteOfferLine(id, lineId);
-                    const newLine = await addOfferLine(id, variantId, updated);
-                    setOffer((o) => (o ? {...o, lines: o.lines.map((l) => (l.id === lineId ? newLine : l))} : o));
-                } catch {
-                    setOffer((o) => (o ? {...o, lines: o.lines.map((l) => (l.id === lineId ? originalLine : l))} : o));
-                    showToast('Position konnte nicht aktualisiert werden', 'error');
-                }
-            })();
+            try {
+                await deleteOfferLine(id, lineId);
+                const newLine = await addOfferLine(id, variantId, updated);
+                setOffer((o) => withLineReplaced(o, lineId, newLine));
+            } catch {
+                setOffer((o) => withLineReplaced(o, lineId, originalLine));
+                showToast('Position konnte nicht aktualisiert werden', 'error');
+            }
         },
         [id, offer, showToast],
     );
 
     const deleteLine = useCallback(
         (lineId: string) => {
-            setOffer((o) => (o ? {...o, lines: o.lines.filter((l) => l.id !== lineId)} : o));
+            setOffer((o) => (o ? {...o, lines: o.lines.filter((l) => l.id !== lineId)} : null));
             if (id) void deleteOfferLine(id, lineId);
         },
         [id],
@@ -108,7 +116,7 @@ export function useOffer(id: string | undefined): UseOfferReturn {
         async (felt: FeltCatalogItem) => {
             if (!id) return;
             const line: Omit<LineItemDto, 'id'> = {
-                kind: LINE_KIND.ROLLE,
+                kind: LINE_KIND.ROLL,
                 articleNumber: felt.articleNumber,
                 feltTypeName: felt.feltTypeName,
                 color: felt.color,
@@ -136,7 +144,7 @@ export function useOffer(id: string | undefined): UseOfferReturn {
         async (p: ProductCatalogItem) => {
             if (!id) return;
             const line: Omit<LineItemDto, 'id'> = {
-                kind: LINE_KIND.PRODUKT,
+                kind: LINE_KIND.PRODUCT,
                 articleNumber: p.articleNumber,
                 feltTypeName: p.name,
                 color: null,

@@ -10,13 +10,24 @@ export type Product = {
     length?: number;
     width?: number;
     felt?: Felt;
+    feltTypeName?: string;
+    thickness?: number;
+    density?: number;
+    supplierName?: string;
+    color?: string;
 };
 
 // Backend product catalog types (GET /api/products)
 
+export type CategoryFieldDto = {
+    readonly id: number;
+    readonly name: string;
+};
+
 export type ProductCategoryDto = {
     readonly id: number;
     readonly name: string;
+    readonly fields: CategoryFieldDto[];
 };
 
 export type ProductAttributeDto = {
@@ -30,11 +41,29 @@ export type ProductVariantAttributeDto = {
     readonly value: string;
 };
 
+export type ProductInventoryDto = {
+    readonly storageId: number;
+    readonly storageName: string;
+    readonly quantity: number;
+};
+
 export type ProductVariantDto = {
     readonly id: number;
     readonly name: string;
     readonly price: number;
+    readonly inventory: ProductInventoryDto[];
     readonly attributes: ProductVariantAttributeDto[];
+};
+
+export type CreateProductVariantDto = {
+    name: string;
+    price: number;
+};
+
+export type CreateProductDto = {
+    name: string;
+    categoryId: number;
+    attributes?: {name: string}[];
 };
 
 export type ProductDto = {

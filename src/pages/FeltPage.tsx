@@ -7,8 +7,9 @@ import {FeltDto} from '@/types/felt';
 import {FeltRollDto} from '@/types/roll';
 import {toErrorMessage} from '@/utils/pageUtils';
 import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
 import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
-import {Box, Button, Chip, MenuItem, Slider, TextField, Tooltip, Typography} from '@mui/material';
+import {Box, Button, Chip, InputAdornment, MenuItem, Slider, TextField, Tooltip, Typography} from '@mui/material';
 import {alpha} from '@mui/material/styles';
 import {DataGrid, GridColDef, GridRenderCellParams, GridRowParams} from '@mui/x-data-grid';
 import {useEffect, useMemo, useState} from 'react';
@@ -19,7 +20,7 @@ const CHIP_PALETTE = ['#1565C0', '#2E7D32', '#C62828', '#E65100', '#00695C', '#5
 function rollColorToChipBg(color: string): string {
     let hash = 0;
     for (let i = 0; i < color.length; i++) {
-        hash = color.charCodeAt(i) + ((hash << 5) - hash);
+        hash = (color.codePointAt(i) ?? 0) + ((hash << 5) - hash);
     }
     return CHIP_PALETTE[Math.abs(hash) % CHIP_PALETTE.length];
 }
@@ -43,6 +44,7 @@ export default function FeltPage() {
         return [Math.min(...lengths), Math.max(...lengths)];
     }, [rolls]);
 
+    const [searchQuery, setSearchQuery] = useState('');
     const [lengthFilter, setLengthFilter] = useState<[number, number] | null>(null);
     const [widthFilter, setWidthFilter] = useState<[number, number]>([0, 500]);
     const [densityFilter, setDensityFilter] = useState('');
@@ -85,12 +87,20 @@ export default function FeltPage() {
                             -
                         </Typography>
                     );
-                const visible = feltRolls.slice(0, 6);
+                const sorted = [...feltRolls].sort((a, b) => {
+                    const aIs180 = a.width === 180 ? 1 : 0;
+                    const bIs180 = b.width === 180 ? 1 : 0;
+                    return aIs180 - bIs180;
+                });
+                const visible = sorted.slice(0, 6);
                 const overflow = feltRolls.length - visible.length;
                 return (
                     <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5, py: 0.75, alignContent: 'center'}}>
                         {visible.map((roll) => {
                             const bg = roll.storageName ? storageColorMap.get(roll.storageName) : undefined;
+                            let widthBorder: string | undefined;
+                            if (roll.width === 180) widthBorder = '2px solid #FF8F00';
+                            else if (roll.width === 100) widthBorder = '2px solid #0277BD';
                             return (
                                 <Tooltip key={roll.id} title={roll.storageName ?? 'Kein Lagerort'} arrow>
                                     <Chip
@@ -101,6 +111,7 @@ export default function FeltPage() {
                                             color: bg ? '#fff' : 'text.secondary',
                                             fontSize: '0.7rem',
                                             height: 22,
+                                            border: widthBorder,
                                             '& .MuiChip-label': {px: 1},
                                         }}
                                     />
@@ -119,7 +130,7 @@ export default function FeltPage() {
         [rollsByFeltId, storageColorMap],
     );
 
-    // Felts that pass the dimension (length/width) filters only — used to derive dropdown options
+    // Felts that pass the dimension (length/width) filters only - used to derive dropdown options
     const feltsByDimension = useMemo(() => {
         const lengthActive = activeLengthFilter[0] !== rollLengthBounds[0] || activeLengthFilter[1] !== rollLengthBounds[1];
         const widthActive = widthFilter[0] !== 0 || widthFilter[1] !== 500;
@@ -158,9 +169,11 @@ export default function FeltPage() {
         }
     }, [thicknessOptions, thicknessFilter]);
 
-    const isFilterActive = densityFilter !== '' || thicknessFilter !== '' || lengthFilter !== null || widthFilter[0] !== 0 || widthFilter[1] !== 500;
+    const isFilterActive =
+        searchQuery !== '' || densityFilter !== '' || thicknessFilter !== '' || lengthFilter !== null || widthFilter[0] !== 0 || widthFilter[1] !== 500;
 
     const resetFilters = () => {
+        setSearchQuery('');
         setLengthFilter(null);
         setWidthFilter([0, 500]);
         setDensityFilter('');
@@ -169,15 +182,18 @@ export default function FeltPage() {
 
     const filteredFelts = useMemo(() => {
         return feltsByDimension.filter((felt) => {
+            if (
+                searchQuery &&
+                !`${felt.feltTypeName} ${felt.color} ${felt.thickness} ${felt.density} ${felt.supplierName}`.toLowerCase().includes(searchQuery.toLowerCase())
+            ) {
+                return false;
+            }
             if (densityFilter && felt.density !== Number(densityFilter)) {
                 return false;
             }
-            if (thicknessFilter && felt.thickness !== Number(thicknessFilter)) {
-                return false;
-            }
-            return true;
+            return !(thicknessFilter && felt.thickness !== Number(thicknessFilter));
         });
-    }, [feltsByDimension, densityFilter, thicknessFilter]);
+    }, [feltsByDimension, searchQuery, densityFilter, thicknessFilter]);
 
     return (
         <ListPage
@@ -216,6 +232,26 @@ export default function FeltPage() {
                         </Button>
                     )}
                 </Box>
+
+                <TextField
+                    label="Suche"
+                    placeholder="Filztyp, Farbe, Dicke, Dichte, Lieferant …"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    size="small"
+                    fullWidth
+                    sx={{'& .MuiOutlinedInput-root': {bgcolor: 'background.paper'}, mb: 3}}
+                    slotProps={{
+                        input: {
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon sx={{fontSize: 18, color: 'rgba(0,0,0,0.45)'}} />
+                                </InputAdornment>
+                            ),
+                        },
+                        inputLabel: {shrink: true},
+                    }}
+                />
 
                 <Box sx={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 4}}>
                     <Box>
@@ -317,7 +353,7 @@ export default function FeltPage() {
 
             <DataGrid
                 rows={filteredFelts}
-                columns={[...columns.slice(0, -1), rollsColumn, columns[columns.length - 1]]}
+                columns={[...columns.slice(1, -1), rollsColumn, columns[columns.length - 1]]}
                 getRowHeight={() => 'auto'}
                 loading={isLoading}
                 disableRowSelectionOnClick
@@ -369,6 +405,20 @@ export default function FeltPage() {
                     ))}
                 </Box>
             )}
+            <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 2, mt: 0.5, ml: 0.5}}>
+                <Box sx={{display: 'flex', alignItems: 'center', gap: 0.75}}>
+                    <Box sx={{width: 10, height: 10, borderRadius: '50%', border: '2px solid #0277BD', flexShrink: 0}} />
+                    <Typography variant="caption" color="text.secondary">
+                        1m Breite
+                    </Typography>
+                </Box>
+                <Box sx={{display: 'flex', alignItems: 'center', gap: 0.75}}>
+                    <Box sx={{width: 10, height: 10, borderRadius: '50%', border: '2px solid #FF8F00', flexShrink: 0}} />
+                    <Typography variant="caption" color="text.secondary">
+                        1.8m Breite
+                    </Typography>
+                </Box>
+            </Box>
 
             <FeltDialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} onSaved={handleCreated} />
             <DeleteFeltDialog

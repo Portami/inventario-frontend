@@ -10,7 +10,7 @@ interface Props {
     offer: OfferDto;
 }
 
-export default function PaymentSummaryCard({offer}: Props) {
+export default function PaymentSummaryCard({offer}: Readonly<Props>) {
     const {number, createdISO, customer, lines, path} = offer;
     const subtotal = lines.reduce((s, l) => s + lineSubtotal(l), 0);
     const pathLabel = path.includes('ORDER_CONFIRMATION') ? 'Offerte → AB → Rechnung' : 'Offerte → Rechnung';

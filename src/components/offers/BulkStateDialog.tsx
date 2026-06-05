@@ -13,7 +13,7 @@ interface Props {
 
 const ALL_STATES = Object.values(OFFER_STATE) as OfferState[];
 
-export default function BulkStateDialog({open, count, loading, onClose, onConfirm}: Props) {
+export default function BulkStateDialog({open, count, loading, onClose, onConfirm}: Readonly<Props>) {
     const [selected, setSelected] = useState<OfferState | null>(null);
 
     const handleClose = () => {
@@ -28,7 +28,7 @@ export default function BulkStateDialog({open, count, loading, onClose, onConfir
     return (
         <Dialog open={open} onClose={loading ? undefined : handleClose} maxWidth="xs" fullWidth>
             <DialogTitle sx={{pb: 1}}>
-                Status für {count} Offerte{count !== 1 ? 'n' : ''} setzen
+                Status für {count} Offerte{count === 1 ? '' : 'n'} setzen
             </DialogTitle>
             <DialogContent>
                 <Typography variant="body2" color="text.secondary" sx={{mb: 2}}>

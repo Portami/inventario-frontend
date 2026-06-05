@@ -9,7 +9,7 @@ import {ChangeEvent, useEffect, useState} from 'react';
 type RollDialogProps = {
     readonly open: boolean;
     readonly onClose: () => void;
-    readonly onSaved: () => void;
+    readonly onSaved: (roll: FeltRollDto) => void;
     readonly roll?: FeltRollDto | null;
     readonly felts: FeltDto[];
     readonly defaultFeltId?: number;
@@ -73,13 +73,14 @@ export default function RollDialog({open, onClose, onSaved, roll, felts, default
         if (Number.isNaN(length) || length <= 0 || Number.isNaN(width) || width <= 0) return;
         setIsSaving(true);
         try {
+            let savedRoll: FeltRollDto;
             if (roll == null) {
                 const feltId = Number.parseInt(form.feltId, 10);
                 if (Number.isNaN(feltId)) {
                     setIsSaving(false);
                     return;
                 }
-                await createRoll({
+                savedRoll = await createRoll({
                     feltId,
                     length,
                     width,
@@ -88,7 +89,7 @@ export default function RollDialog({open, onClose, onSaved, roll, felts, default
                 });
                 showToast('Rolle erfolgreich erstellt.');
             } else {
-                await updateRoll(roll.id, {
+                savedRoll = await updateRoll(roll.id, {
                     length,
                     width,
                     ...(form.batchId && {batchId: Number.parseInt(form.batchId, 10)}),
@@ -96,7 +97,7 @@ export default function RollDialog({open, onClose, onSaved, roll, felts, default
                 });
                 showToast('Rolle erfolgreich gespeichert.');
             }
-            onSaved();
+            onSaved(savedRoll);
         } catch {
             showToast(roll == null ? 'Rolle konnte nicht erstellt werden.' : 'Rolle konnte nicht gespeichert werden.', 'error');
         } finally {

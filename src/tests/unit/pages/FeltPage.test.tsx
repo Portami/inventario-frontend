@@ -4,7 +4,7 @@ import React from 'react';
 import {MemoryRouter} from 'react-router';
 import {vi} from 'vitest';
 
-// Mock backend — Daten werden INSIDE der Factory erstellt, damit hoisting kein Problem ist.
+// Mock backend - Daten werden INSIDE der Factory erstellt, damit hoisting kein Problem ist.
 vi.mock('@/services/backend', () => {
     const mockFelts = [
         {
@@ -75,8 +75,8 @@ describe('FeltPage', () => {
         );
 
         // Use title query to select DataGrid cells (unique) to avoid conflict with dialog text
-        expect(await screen.findByTitle('A-1')).toBeInTheDocument();
-        expect(screen.getByTitle('B-2')).toBeInTheDocument();
+        expect(await screen.findByTitle('Supplier A')).toBeInTheDocument();
+        expect(screen.getByTitle('Supplier B')).toBeInTheDocument();
     });
 
     it('delete flow: clicking delete opens delete dialog and calls backend delete', async () => {
@@ -88,7 +88,7 @@ describe('FeltPage', () => {
         );
 
         // wait for rows
-        await screen.findByTitle('A-1');
+        await screen.findByTitle('Supplier A');
 
         // find all delete buttons by aria-label (the actions column uses aria-label="delete")
         const deleteButtons = await screen.findAllByLabelText('delete');

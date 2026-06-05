@@ -77,7 +77,7 @@ interface CustomerInputProps {
 }
 
 /** Renders either a searchable customer autocomplete (existing mode) or a full address form (new mode). */
-function CustomerInput({mode, customers, selected, onSelect, form, setField}: CustomerInputProps) {
+function CustomerInput({mode, customers, selected, onSelect, form, setField}: Readonly<CustomerInputProps>) {
     if (mode === 'existing') {
         return (
             <Autocomplete
@@ -185,7 +185,7 @@ function CustomerInput({mode, customers, selected, onSelect, form, setField}: Cu
  * Two-step dialog for creating a new offer. Step 1 selects or creates a customer;
  * step 2 adds line items from the felt or product catalog before submission.
  */
-export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
+export default function CreateOfferDialog({open, onClose, onCreated}: Readonly<Props>) {
     const showToast = useToast();
 
     const [step, setStep] = useState(0);
@@ -234,7 +234,7 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
             {
                 stageKey: crypto.randomUUID(),
                 productVariantId: felt.id,
-                kind: LINE_KIND.ROLLE,
+                kind: LINE_KIND.ROLL,
                 articleNumber: felt.articleNumber,
                 feltTypeName: felt.feltTypeName,
                 color: felt.color,
@@ -258,7 +258,7 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
             {
                 stageKey: crypto.randomUUID(),
                 productVariantId: p.id,
-                kind: LINE_KIND.PRODUKT,
+                kind: LINE_KIND.PRODUCT,
                 articleNumber: p.articleNumber,
                 feltTypeName: p.name,
                 color: null,
@@ -288,6 +288,7 @@ export default function CreateOfferDialog({open, onClose, onCreated}: Props) {
             }
             const customerName = customerMode === 'existing' ? selectedCustomer!.name : newCustomer.name.trim();
             const backendItems: BackendCreateOfferItemDto[] = stagedLines.map((line) => ({
+                kind: line.kind,
                 productVariantId: line.productVariantId,
                 description: line.description || undefined,
                 quantity: line.quantity,

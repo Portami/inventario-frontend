@@ -9,7 +9,7 @@ interface Props {
     offer: OfferDto;
 }
 
-export default function OrderConfirmationSummaryCard({offer}: Props) {
+export default function OrderConfirmationSummaryCard({offer}: Readonly<Props>) {
     const {lines, number, createdISO, dueISO} = offer;
     const subtotal = lines.reduce((s, l) => s + lineSubtotal(l), 0);
     const total = subtotal * (1 + VAT_RATE);
@@ -110,7 +110,7 @@ export default function OrderConfirmationSummaryCard({offer}: Props) {
                     {[
                         ['Auftragsnummer', number],
                         ['Erstellt', fmtDate(createdISO)],
-                        ['Fällig bis', dueISO ? fmtDate(dueISO) : '—'],
+                        ['Fällig bis', dueISO ? fmtDate(dueISO) : '-'],
                         ['Versandart', 'Economy'],
                         ['Liefertermin', 'ca. 10–12 Arbeitstage'],
                     ].map(([label, value]) => (

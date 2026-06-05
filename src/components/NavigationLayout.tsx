@@ -1,18 +1,20 @@
 import logo from '@/assets/logo.svg';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import {useHidScanner} from '@/hooks/useHidScanner';
+import {lookupRollCode} from '@/services/backend';
+import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import CropFreeIcon from '@mui/icons-material/CropFree';
 import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
-import LogoutIcon from '@mui/icons-material/Logout';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import PrintIcon from '@mui/icons-material/Print';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
-import {AppBar, Box, Button, Container, Drawer, IconButton, List, ListItem, Toolbar, Tooltip, Typography, useTheme} from '@mui/material';
+import {Alert, AppBar, Box, Button, Container, Drawer, IconButton, List, ListItem, Snackbar, Toolbar, Tooltip, Typography, useTheme} from '@mui/material';
 import React, {useState} from 'react';
-import {NavLink, Outlet, useLocation} from 'react-router';
+import {NavLink, Outlet, useLocation, useNavigate} from 'react-router';
 
 const NAV_EXPANDED = 240;
 const NAV_COLLAPSED = 64;
@@ -24,7 +26,7 @@ interface NavBtnProps {
     collapsed: boolean;
 }
 
-function NavBtn({to, icon, label, collapsed}: NavBtnProps) {
+function NavBtn({to, icon, label, collapsed}: Readonly<NavBtnProps>) {
     const theme = useTheme();
     const btn = (
         <Button
@@ -56,22 +58,69 @@ function NavBtn({to, icon, label, collapsed}: NavBtnProps) {
 export default function NavigationLayout() {
     const theme = useTheme();
     const location = useLocation();
+    const navigate = useNavigate();
     const [collapsed, setCollapsed] = useState(false);
     const navWidth = collapsed ? NAV_COLLAPSED : NAV_EXPANDED;
+    const [globalScanActive, setGlobalScanActive] = useState(false);
+    const [showScanNotice, setShowScanNotice] = useState(false);
+    const [scanError, setScanError] = useState('');
+
+    useHidScanner(globalScanActive, async (code: string) => {
+        const trimmed = code.trim();
+        const padded = /^\d+$/.test(trimmed) ? trimmed.padStart(5, '0') : trimmed;
+        try {
+            const result = await lookupRollCode(padded);
+            navigate(result.type === 'roll' ? `/roll/${result.id}` : `/scrap/${result.id}`);
+        } catch {
+            setScanError(`Code nicht gefunden: ${padded}`);
+        }
+    });
 
     return (
         <Box sx={{display: 'flex'}}>
             <AppBar position="fixed" sx={{zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: theme.palette.primary.main}}>
                 <Toolbar>
                     <Box component={NavLink} to="/" sx={{display: 'inline-flex', lineHeight: 0}}>
-                        <Box component="img" src={logo} alt="Logo" sx={{height: (theme) => theme.mixins.toolbar.minHeight}} />
+                        <Box component="img" src={logo} alt="Logo" sx={{height: (theme) => theme.mixins.toolbar.minHeight, filter: 'invert(1)'}} />
                     </Box>
                     <Box sx={{flexGrow: 1}} />
-                    <IconButton size="large" sx={{color: theme.palette.background.paper}}>
-                        <NotificationsNoneIcon />
-                    </IconButton>
+                    <Tooltip title={globalScanActive ? 'Scanner aktiv – klicken zum Deaktivieren' : 'Globalen Scanner aktivieren'}>
+                        <IconButton
+                            size="large"
+                            onClick={() =>
+                                setGlobalScanActive((s) => {
+                                    if (!s) setShowScanNotice(true);
+                                    return !s;
+                                })
+                            }
+                            sx={{
+                                color: globalScanActive ? '#66bb6a' : theme.palette.background.paper,
+                                backgroundColor: globalScanActive ? 'rgba(102, 187, 106, 0.15)' : undefined,
+                                '&:hover': {backgroundColor: globalScanActive ? 'rgba(102, 187, 106, 0.25)' : undefined},
+                            }}
+                        >
+                            <CropFreeIcon />
+                        </IconButton>
+                    </Tooltip>
                 </Toolbar>
             </AppBar>
+
+            <Snackbar
+                open={showScanNotice}
+                autoHideDuration={6000}
+                onClose={() => setShowScanNotice(false)}
+                anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+            >
+                <Alert severity="info" onClose={() => setShowScanNotice(false)}>
+                    Scanner aktiv – Tastatureingaben werden blockiert. Zum Tippen Scanner oben rechts wieder deaktivieren.
+                </Alert>
+            </Snackbar>
+
+            <Snackbar open={!!scanError} autoHideDuration={4000} onClose={() => setScanError('')} anchorOrigin={{vertical: 'top', horizontal: 'center'}}>
+                <Alert severity="error" onClose={() => setScanError('')}>
+                    {scanError}
+                </Alert>
+            </Snackbar>
 
             <Drawer
                 variant="permanent"
@@ -108,9 +157,64 @@ export default function NavigationLayout() {
                 )}
 
                 <List component="nav" sx={{px: collapsed ? 1 : 3, flex: 1}}>
-                    <ListItem disableGutters>
-                        <NavBtn to="/products" icon={<CategoryOutlinedIcon />} label="Produkte" collapsed={collapsed} />
-                    </ListItem>
+                    <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                        <ListItem disableGutters>
+                            <NavBtn to="/products" icon={<CategoryOutlinedIcon />} label="Produkte" collapsed={collapsed} />
+                        </ListItem>
+                        {!collapsed && (
+                            <List component="div" disablePadding sx={{width: '100%'}}>
+                                <ListItem
+                                    disableGutters
+                                    sx={{
+                                        ml: 1.5,
+                                        pl: 2,
+                                        borderLeft:
+                                            location.pathname === '/products'
+                                                ? `3px solid ${theme.palette.primary.main}`
+                                                : `3px solid ${theme.palette.divider}`,
+                                    }}
+                                >
+                                    <Button
+                                        component={NavLink}
+                                        to="/products"
+                                        end
+                                        sx={{
+                                            justifyContent: 'flex-start',
+                                            width: '100%',
+                                            color: theme.palette.text.primary,
+                                            '&.active': {color: theme.palette.primary.main, fontWeight: 600},
+                                        }}
+                                    >
+                                        Übersicht
+                                    </Button>
+                                </ListItem>
+                                <ListItem
+                                    disableGutters
+                                    sx={{
+                                        ml: 1.5,
+                                        pl: 2,
+                                        borderLeft:
+                                            location.pathname === '/products/categories'
+                                                ? `3px solid ${theme.palette.primary.main}`
+                                                : `3px solid ${theme.palette.divider}`,
+                                    }}
+                                >
+                                    <Button
+                                        component={NavLink}
+                                        to="/products/categories"
+                                        sx={{
+                                            justifyContent: 'flex-start',
+                                            width: '100%',
+                                            color: theme.palette.text.primary,
+                                            '&.active': {color: theme.palette.primary.main, fontWeight: 600},
+                                        }}
+                                    >
+                                        Kategorien
+                                    </Button>
+                                </ListItem>
+                            </List>
+                        )}
+                    </Box>
                     <ListItem disableGutters>
                         <NavBtn to="/scan" icon={<QrCodeIcon />} label="Scannen" collapsed={collapsed} />
                     </ListItem>
@@ -189,26 +293,10 @@ export default function NavigationLayout() {
                     <ListItem disableGutters>
                         <NavBtn to="/customers" icon={<PeopleOutlinedIcon />} label="Kunden" collapsed={collapsed} />
                     </ListItem>
+                    <ListItem disableGutters>
+                        <NavBtn to="/statistics" icon={<BarChartOutlinedIcon />} label="Statistiken" collapsed={collapsed} />
+                    </ListItem>
                 </List>
-
-                {/* Logout */}
-                <Box sx={{px: collapsed ? 1 : 3, pb: 2}}>
-                    <Tooltip title={collapsed ? 'Abmelden' : ''} placement="right">
-                        <Button
-                            startIcon={<LogoutIcon />}
-                            sx={{
-                                justifyContent: collapsed ? 'center' : 'flex-start',
-                                width: '100%',
-                                minWidth: 0,
-                                px: collapsed ? 1 : 1.5,
-                                color: theme.palette.text.primary,
-                                '& .MuiButton-startIcon': {margin: collapsed ? 0 : undefined},
-                            }}
-                        >
-                            {!collapsed && 'Abmelden'}
-                        </Button>
-                    </Tooltip>
-                </Box>
             </Drawer>
 
             <Container>
