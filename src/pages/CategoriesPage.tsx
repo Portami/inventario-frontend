@@ -9,13 +9,17 @@ import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import {
+    Box,
     Button,
+    Chip,
     CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
+    Divider,
     IconButton,
+    InputAdornment,
     Paper,
     Table,
     TableBody,
@@ -24,8 +28,9 @@ import {
     TableRow,
     TextField,
     Tooltip,
+    Typography,
 } from '@mui/material';
-import {useCallback, useEffect, useState} from 'react';
+import {KeyboardEvent, useCallback, useEffect, useState} from 'react';
 
 type CategoryDialogProps = {
     readonly open: boolean;
@@ -37,24 +42,45 @@ type CategoryDialogProps = {
 function CategoryDialog({open, onClose, onSaved, category}: CategoryDialogProps) {
     const showToast = useToast();
     const [name, setName] = useState('');
+    const [fields, setFields] = useState<string[]>([]);
+    const [newField, setNewField] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const isEdit = category != null;
 
     useEffect(() => {
         if (!open) return;
         setName(category?.name ?? '');
+        setFields(category?.fields.map((f) => f.name) ?? []);
+        setNewField('');
     }, [open, category]);
+
+    const addField = () => {
+        const trimmed = newField.trim();
+        if (!trimmed || fields.includes(trimmed)) return;
+        setFields((prev) => [...prev, trimmed]);
+        setNewField('');
+    };
+
+    const removeField = (index: number) => {
+        setFields((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const handleFieldKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addField();
+        }
+    };
 
     const handleSave = async () => {
         if (!name.trim()) return;
-        if (isEdit && !category) return;
         setIsSaving(true);
         try {
             if (isEdit && category) {
-                await patchProductCategory(category.id, name.trim());
+                await patchProductCategory(category.id, {name: name.trim(), fieldNames: fields});
                 showToast('Kategorie gespeichert.');
             } else {
-                await createProductCategory(name.trim());
+                await createProductCategory(name.trim(), fields);
                 showToast('Kategorie erstellt.');
             }
             onSaved();
@@ -85,6 +111,42 @@ function CategoryDialog({open, onClose, onSaved, category}: CategoryDialogProps)
                     sx={{mt: 1}}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') void handleSave();
+                    }}
+                />
+
+                <Divider sx={{my: 2.5}} />
+
+                <Typography variant="overline" sx={{color: 'text.secondary', display: 'block', mb: 1}}>
+                    Felder (Attribute)
+                </Typography>
+
+                {fields.length > 0 && (
+                    <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: 1.5}}>
+                        {fields.map((f, i) => (
+                            <Chip key={i} label={f} size="small" onDelete={() => removeField(i)} disabled={isSaving} />
+                        ))}
+                    </Box>
+                )}
+
+                <TextField
+                    label="Neues Feld"
+                    value={newField}
+                    onChange={(e) => setNewField(e.target.value)}
+                    onKeyDown={handleFieldKeyDown}
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    disabled={isSaving}
+                    slotProps={{
+                        input: {
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton size="small" onClick={addField} disabled={!newField.trim() || isSaving}>
+                                        <AddIcon fontSize="small" />
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        },
                     }}
                 />
             </DialogContent>
@@ -149,7 +211,7 @@ export default function CategoriesPage() {
         <>
             <ListPage
                 title="Kategorien"
-                description="Produktkategorien verwalten."
+                description="Produktkategorien und deren Felder (Attribute) verwalten."
                 actions={
                     <Button
                         variant="contained"
@@ -173,6 +235,7 @@ export default function CategoriesPage() {
                         <TableHead>
                             <TableRow sx={{'& th': {fontWeight: 700, textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: 0.5}}}>
                                 <TableCell>Name</TableCell>
+                                <TableCell>Felder</TableCell>
                                 <TableCell align="right" />
                             </TableRow>
                         </TableHead>
@@ -180,6 +243,19 @@ export default function CategoriesPage() {
                             {categories.map((cat) => (
                                 <TableRow key={cat.id} hover>
                                     <TableCell>{cat.name}</TableCell>
+                                    <TableCell>
+                                        {cat.fields.length === 0 ? (
+                                            <Typography component="span" variant="body2" color="text.disabled">
+                                                –
+                                            </Typography>
+                                        ) : (
+                                            <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
+                                                {cat.fields.map((f) => (
+                                                    <Chip key={f.id} label={f.name} size="small" variant="outlined" />
+                                                ))}
+                                            </Box>
+                                        )}
+                                    </TableCell>
                                     <TableCell align="right" sx={{whiteSpace: 'nowrap'}}>
                                         <Tooltip title="Bearbeiten">
                                             <IconButton

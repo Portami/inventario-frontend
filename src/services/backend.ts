@@ -641,11 +641,11 @@ export const fetchProductCategories = async (): Promise<ProductCategoryDto[]> =>
     }
 };
 
-export const patchProductCategory = async (id: number, name: string): Promise<ProductCategoryDto> => {
+export const patchProductCategory = async (id: number, payload: {name?: string; fieldNames?: string[]}): Promise<ProductCategoryDto> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-        const result = await patch<ProductCategoryDto>(`/products/categories/${id}`, {name}, {signal: controller.signal});
+        const result = await patch<ProductCategoryDto>(`/products/categories/${id}`, payload, {signal: controller.signal});
         clearTimeout(timeoutId);
         cacheInvalidate('products');
         return result;
@@ -668,11 +668,11 @@ export const deleteProductCategory = async (id: number): Promise<void> => {
     }
 };
 
-export const createProductCategory = async (name: string): Promise<ProductCategoryDto> => {
+export const createProductCategory = async (name: string, fieldNames?: string[]): Promise<ProductCategoryDto> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-        const result = await post<ProductCategoryDto>('/products/categories', {name}, {signal: controller.signal});
+        const result = await post<ProductCategoryDto>('/products/categories', {name, fieldNames}, {signal: controller.signal});
         clearTimeout(timeoutId);
         cacheInvalidate('products');
         return result;
@@ -696,7 +696,10 @@ export const createProduct = async (payload: CreateProductDto): Promise<ProductD
     }
 };
 
-export const patchProduct = async (id: number, payload: {name?: string; categoryId?: number}): Promise<ProductDto> => {
+export const patchProduct = async (
+    id: number,
+    payload: {name?: string; categoryId?: number; attributes?: {id?: number; name: string}[]},
+): Promise<ProductDto> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
