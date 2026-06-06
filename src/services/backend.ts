@@ -17,7 +17,7 @@ import {
     ProductCatalogItem,
 } from '@/types/offerte';
 import {CreateProductDto, Product, ProductCategoryDto, ProductDto, ProductId, ProductInventoryDto, ProductVariantDto} from '@/types/product';
-import {CreateFeltRollRequest, FeltRollDto, UpdateFeltRollRequest} from '@/types/roll';
+import {CreateFeltRollRequest, CutFeltRollRequest, CutResult, FeltRollDto, ScrapPieceDto, UpdateFeltRollRequest} from '@/types/roll';
 import {ScanResult} from '@/types/scanner';
 import {Storage} from '@/types/storage';
 import {Supplier} from '@/types/supplier.ts';
@@ -338,6 +338,24 @@ export const splitRoll = async (rollId: ProductId, payload: {width: number}): Pr
 };
 
 /**
+ * Shorten a roll and create the leftover scrap pieces (Abschneiden). Calls POST /api/rolls/{id}/cut.
+ * Too-small scraps are dropped server-side and are absent from the returned createdScraps.
+ */
+export const cutRoll = async (rollId: ProductId, payload: CutFeltRollRequest): Promise<CutResult> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await post<CutResult>(`/rolls/${rollId}/cut`, payload, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        cacheInvalidate('rolls');
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
+
+/**
  * Delete a roll. Calls DELETE /api/rolls/{id}.
  */
 export const deleteRoll = async (rollId: ProductId): Promise<void> => {
@@ -368,16 +386,11 @@ export const fetchAllScraps = async (): Promise<Product[]> => {
     }
 };
 
-export const fetchScrapsByFelt = async (feltId: number): Promise<Product[]> => {
-    if (import.meta.env.DEV) {
-        // Mock data has no feltId field, so filtering is not possible; return empty to avoid showing unrelated scraps.
-        return [];
-    }
-
+export const fetchScrapsByFelt = async (feltId: number): Promise<ScrapPieceDto[]> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-        const result = await get<Product[]>(`/felts/${feltId}/scraps`, {signal: controller.signal});
+        const result = await get<ScrapPieceDto[]>(`/felts/${feltId}/scraps`, {signal: controller.signal});
         clearTimeout(timeoutId);
         return result;
     } catch (error) {
@@ -386,15 +399,17 @@ export const fetchScrapsByFelt = async (feltId: number): Promise<Product[]> => {
     }
 };
 
-export const fetchScrapDetails = async (scrapId: ProductId): Promise<Product> => {
-    const roll = await fetchRollDetails(scrapId);
-    return {
-        id: roll.id,
-        articleNumber: roll.articleNumber,
-        name: `${roll.feltTypeName} · ${roll.color}`,
-        length: roll.length,
-        width: roll.width,
-    };
+export const fetchScrapDetails = async (scrapId: number): Promise<ScrapPieceDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await get<ScrapPieceDto>(`/scraps/${scrapId}`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
 };
 
 export const fetchProducts = async (): Promise<ProductDto[]> => {

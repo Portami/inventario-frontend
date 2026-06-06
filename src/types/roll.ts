@@ -32,3 +32,29 @@ export type FeltRollDto = {
     storageId?: number;
     storageName?: string;
 };
+
+/**
+ * Response shape from GET /api/scraps/{id}. Structurally identical to {@link FeltRollDto}; a scrap
+ * piece is an offcut of felt that is no longer a roll.
+ */
+export type ScrapPieceDto = FeltRollDto;
+
+/** One leftover scrap piece entered in the Abschneiden dialog. */
+export type CutScrapInput = {
+    length: number; // cm
+    width: number; // cm
+    batchId?: number;
+    storageId?: number;
+};
+
+/** Request body for POST /api/rolls/{id}/cut (Abschneiden). */
+export type CutFeltRollRequest = {
+    cutLength: number; // cm to remove from the roll
+    scraps: CutScrapInput[];
+};
+
+/** Result of a roll cut: the shortened roll plus the scrap pieces that were actually kept. */
+export type CutResult = {
+    roll: FeltRollDto;
+    createdScraps: ScrapPieceDto[];
+};

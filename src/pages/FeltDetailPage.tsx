@@ -5,8 +5,7 @@ import RollDialog from '@/components/rolls/RollDialog';
 import {useToast} from '@/components/ToastProvider';
 import {deleteFelt, deleteRoll, fetchFelts, fetchRolls, fetchRollsByFelt, fetchScrapsByFelt, splitRoll} from '@/services/backend';
 import {FeltDto} from '@/types/felt';
-import {Product} from '@/types/product';
-import {FeltRollDto} from '@/types/roll';
+import {FeltRollDto, ScrapPieceDto} from '@/types/roll';
 import {toErrorMessage} from '@/utils/pageUtils';
 import AddIcon from '@mui/icons-material/Add';
 import CallSplitIcon from '@mui/icons-material/CallSplit';
@@ -67,7 +66,7 @@ export default function FeltDetailPage() {
     const [felt, setFelt] = useState<FeltDto | null>(null);
     const [allFelts, setAllFelts] = useState<FeltDto[]>([]);
     const [rolls, setRolls] = useState<FeltRollDto[]>([]);
-    const [scraps, setScraps] = useState<Product[]>([]);
+    const [scraps, setScraps] = useState<ScrapPieceDto[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [isEditOpen, setIsEditOpen] = useState(false);
@@ -329,18 +328,6 @@ export default function FeltDetailPage() {
                                                     <Box sx={{position: 'absolute', top: 6, right: 6, display: 'flex', gap: 0.25}}>
                                                         <IconButton
                                                             size="small"
-                                                            color="primary"
-                                                            aria-label="cut"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setSplitWidthInput('');
-                                                                setRollToSplit(roll);
-                                                            }}
-                                                        >
-                                                            <CallSplitIcon fontSize="small" />
-                                                        </IconButton>
-                                                        <IconButton
-                                                            size="small"
                                                             color="error"
                                                             aria-label="delete"
                                                             onClick={(e) => {
@@ -361,11 +348,11 @@ export default function FeltDetailPage() {
 
                         <Box>
                             <Typography variant="h6" sx={{mb: 2}}>
-                                Abfallstücke ({scraps.length})
+                                Reststücke ({scraps.length})
                             </Typography>
                             {scraps.length === 0 ? (
                                 <Typography variant="body2" color="text.secondary">
-                                    Noch keine Abfallstücke vorhanden.
+                                    Noch keine Reststücke vorhanden.
                                 </Typography>
                             ) : (
                                 <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 1}}>
@@ -388,7 +375,7 @@ export default function FeltDetailPage() {
                                             }}
                                         >
                                             <Typography variant="body2" sx={{fontWeight: 600}}>
-                                                {Math.round((scrap.length ?? 0) / 10)} × {Math.round((scrap.width ?? 0) / 10)} cm
+                                                {scrap.length ?? 0} × {scrap.width ?? 0} cm
                                             </Typography>
                                         </Box>
                                     ))}

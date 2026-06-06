@@ -13,6 +13,7 @@ export default function ScrapDetail() {
     const [articleNumber, setArticleNumber] = useState('');
     const [length, setLength] = useState(0);
     const [width, setWidth] = useState(0);
+    const parsed = id == null ? Number.NaN : Number.parseInt(id, 10);
 
     useEffect(() => {
         const loadScrapDetails = async () => {
@@ -21,8 +22,8 @@ export default function ScrapDetail() {
             setIsLoading(true);
             setError('');
             try {
-                const scrap = await fetchScrapDetails(id);
-                setScrapName(scrap.name || 'N/A');
+                const scrap = await fetchScrapDetails(parsed);
+                setScrapName("Reststück");
                 setArticleNumber(scrap.articleNumber);
                 setLength(scrap.length || 0);
                 setWidth(scrap.width || 0);
@@ -50,13 +51,13 @@ export default function ScrapDetail() {
                         </div>
                         <div>
                             <Typography variant="body2" color="textSecondary">
-                                Länge (mm)
+                                Länge (cm)
                             </Typography>
                             <Typography variant="body1">{length || '-'}</Typography>
                         </div>
                         <div>
                             <Typography variant="body2" color="textSecondary">
-                                Breite (mm)
+                                Breite (cm)
                             </Typography>
                             <Typography variant="body1">{width || '-'}</Typography>
                         </div>
