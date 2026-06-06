@@ -48,7 +48,7 @@ export default function InventoryAuditingView() {
             }
 
             await completeStocktake(inventoryAuditing.id.toString());
-            showToast('Bestandsprüfung erfolgeich abgeschlossen.', 'success');
+            showToast('Bestandsprüfung erfolgreich abgeschlossen.', 'success');
             void navigate('/inventory');
         } catch {
             showToast('Bestandsprüfung konnte nicht abgeschlossen werden.', 'error');
