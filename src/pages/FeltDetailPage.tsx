@@ -1,9 +1,10 @@
 import DetailPage from '@/components/DetailPage';
 import DeleteFeltDialog from '@/components/felts/DeleteFeltDialog';
 import FeltDialog from '@/components/felts/FeltDialog';
+import PieceCard from '@/components/pieces/PieceCard';
 import RollDialog from '@/components/rolls/RollDialog';
 import {useToast} from '@/components/ToastProvider';
-import {deleteFelt, deleteRoll, fetchFelts, fetchRolls, fetchRollsByFelt, fetchScrapsByFelt, splitRoll} from '@/services/backend';
+import {deleteFelt, deleteRoll, deleteScrap, fetchFelts, fetchRolls, fetchRollsByFelt, fetchScrapsByFelt, splitRoll} from '@/services/backend';
 import {FeltDto} from '@/types/felt';
 import {FeltRollDto, ScrapPieceDto} from '@/types/roll';
 import {toErrorMessage} from '@/utils/pageUtils';
@@ -17,19 +18,16 @@ import {
     Button,
     Card,
     CardContent,
-    Chip,
     CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
     Divider,
-    IconButton,
     Stack,
     TextField,
     Typography,
 } from '@mui/material';
-import {alpha} from '@mui/material/styles';
 import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router';
 
@@ -43,17 +41,6 @@ function Field({label, value}: {readonly label: string; readonly value: string |
         </div>
     );
 }
-
-function rollWidthCategory(width: number): '1.8m' | '1m' | null {
-    if (width === 180) return '1.8m';
-    if (width === 100) return '1m';
-    return null;
-}
-
-const WIDTH_STYLES = {
-    '1.8m': {bg: 'rgba(255,143,0,0.08)', border: '#FF8F00', badge: '#FF8F00'},
-    '1m': {bg: 'rgba(2,119,189,0.08)', border: '#0277BD', badge: '#0277BD'},
-} as const;
 
 export default function FeltDetailPage() {
     const {id} = useParams<{id: string}>();
@@ -78,6 +65,8 @@ export default function FeltDetailPage() {
     const [rollToSplit, setRollToSplit] = useState<FeltRollDto | null>(null);
     const [splitWidthInput, setSplitWidthInput] = useState('');
     const [isSplitting, setIsSplitting] = useState(false);
+    const [scrapToDelete, setScrapToDelete] = useState<ScrapPieceDto | null>(null);
+    const [isDeletingScrap, setIsDeletingScrap] = useState(false);
 
     useEffect(() => {
         const load = async () => {
@@ -136,6 +125,15 @@ export default function FeltDetailPage() {
         }
     };
 
+    const refetchScraps = async () => {
+        if (feltId == null) return;
+        try {
+            setScraps(await fetchScrapsByFelt(feltId));
+        } catch (err) {
+            setError(toErrorMessage(err, 'Reststücke konnten nicht geladen werden'));
+        }
+    };
+
     const handleFeltSaved = () => {
         setIsEditOpen(false);
         void refetchFelt();
@@ -174,6 +172,22 @@ export default function FeltDetailPage() {
             setRollToDelete(null);
         } finally {
             setIsDeletingRoll(false);
+        }
+    };
+
+    const handleScrapDeleteConfirm = async () => {
+        if (!scrapToDelete) return;
+        setIsDeletingScrap(true);
+        try {
+            await deleteScrap(scrapToDelete.id);
+            setScrapToDelete(null);
+            void refetchScraps();
+            showToast('Reststück erfolgreich gelöscht.', 'success');
+        } catch (err) {
+            showToast(toErrorMessage(err, 'Reststück konnte nicht gelöscht werden'), 'error');
+            setScrapToDelete(null);
+        } finally {
+            setIsDeletingScrap(false);
         }
     };
 
@@ -280,68 +294,14 @@ export default function FeltDetailPage() {
                                 </Typography>
                             ) : (
                                 <Box sx={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5}}>
-                                    {sortedRolls.map((roll) => {
-                                        const category = rollWidthCategory(roll.width);
-                                        const styles = category ? WIDTH_STYLES[category] : null;
-                                        return (
-                                            <Card
-                                                key={roll.id}
-                                                variant="outlined"
-                                                onClick={() => void navigate(`/roll/${roll.id}`)}
-                                                sx={{
-                                                    cursor: 'pointer',
-                                                    position: 'relative',
-                                                    bgcolor: styles?.bg ?? 'background.paper',
-                                                    transition: 'border-color 0.15s, box-shadow 0.15s',
-                                                    '&:hover': {
-                                                        borderColor: styles?.border ?? 'primary.main',
-                                                        boxShadow: (theme) => `0 0 0 1px ${styles?.border ?? theme.palette.primary.main}`,
-                                                    },
-                                                }}
-                                            >
-                                                <CardContent sx={{p: 2, '&:last-child': {pb: 2}}}>
-                                                    {category && (
-                                                        <Chip
-                                                            label={category}
-                                                            size="small"
-                                                            sx={{
-                                                                mb: 0.75,
-                                                                height: 18,
-                                                                fontSize: '0.65rem',
-                                                                bgcolor: styles?.badge,
-                                                                color: '#fff',
-                                                                '& .MuiChip-label': {px: 0.75},
-                                                            }}
-                                                        />
-                                                    )}
-                                                    <Typography sx={{fontSize: '1rem', fontWeight: 700, mb: 0.5, pr: 7, lineHeight: 1.3}}>
-                                                        {roll.length} × {roll.width} cm
-                                                    </Typography>
-                                                    <Typography variant="caption" color="text.secondary" sx={{display: 'block'}}>
-                                                        {roll.storageName ?? '–'}
-                                                    </Typography>
-                                                    {roll.batchName && (
-                                                        <Typography variant="caption" color="text.secondary" sx={{display: 'block'}}>
-                                                            Charge: {roll.batchName}
-                                                        </Typography>
-                                                    )}
-                                                    <Box sx={{position: 'absolute', top: 6, right: 6, display: 'flex', gap: 0.25}}>
-                                                        <IconButton
-                                                            size="small"
-                                                            color="error"
-                                                            aria-label="delete"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setRollToDelete(roll);
-                                                            }}
-                                                        >
-                                                            <DeleteOutlinedIcon fontSize="small" />
-                                                        </IconButton>
-                                                    </Box>
-                                                </CardContent>
-                                            </Card>
-                                        );
-                                    })}
+                                    {sortedRolls.map((roll) => (
+                                        <PieceCard
+                                            key={roll.id}
+                                            piece={roll}
+                                            onOpen={() => void navigate(`/roll/${roll.id}`)}
+                                            onDelete={() => setRollToDelete(roll)}
+                                        />
+                                    ))}
                                 </Box>
                             )}
                         </Box>
@@ -355,29 +315,14 @@ export default function FeltDetailPage() {
                                     Noch keine Reststücke vorhanden.
                                 </Typography>
                             ) : (
-                                <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 1}}>
+                                <Box sx={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5}}>
                                     {scraps.map((scrap) => (
-                                        <Box
+                                        <PieceCard
                                             key={scrap.id}
-                                            onClick={() => void navigate(`/scrap/${scrap.id}`)}
-                                            sx={{
-                                                cursor: 'pointer',
-                                                border: '1px solid',
-                                                borderColor: 'divider',
-                                                borderRadius: 2,
-                                                px: 2,
-                                                py: 1.25,
-                                                transition: 'border-color 0.15s, background-color 0.15s',
-                                                '&:hover': {
-                                                    borderColor: 'primary.main',
-                                                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.05),
-                                                },
-                                            }}
-                                        >
-                                            <Typography variant="body2" sx={{fontWeight: 600}}>
-                                                {scrap.length ?? 0} × {scrap.width ?? 0} cm
-                                            </Typography>
-                                        </Box>
+                                            piece={scrap}
+                                            onOpen={() => void navigate(`/scrap/${scrap.id}`)}
+                                            onDelete={() => setScrapToDelete(scrap)}
+                                        />
                                     ))}
                                 </Box>
                             )}
@@ -421,6 +366,32 @@ export default function FeltDetailPage() {
                         onClick={() => void handleRollDeleteConfirm()}
                         disabled={isDeletingRoll}
                         startIcon={isDeletingRoll ? <CircularProgress size={16} color="inherit" /> : undefined}
+                    >
+                        Löschen
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={scrapToDelete !== null} onClose={() => setScrapToDelete(null)} maxWidth="xs" fullWidth>
+                <DialogTitle>
+                    <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                        <DeleteOutlinedIcon color="error" />
+                        Reststück löschen
+                    </Box>
+                </DialogTitle>
+                <DialogContent>
+                    <Typography>{scrapToDelete && `Reststück ${scrapToDelete.length} × ${scrapToDelete.width} cm wirklich löschen?`}</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setScrapToDelete(null)} disabled={isDeletingScrap}>
+                        Abbrechen
+                    </Button>
+                    <Button
+                        color="error"
+                        variant="contained"
+                        onClick={() => void handleScrapDeleteConfirm()}
+                        disabled={isDeletingScrap}
+                        startIcon={isDeletingScrap ? <CircularProgress size={16} color="inherit" /> : undefined}
                     >
                         Löschen
                     </Button>

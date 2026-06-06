@@ -412,6 +412,35 @@ export const fetchScrapDetails = async (scrapId: number): Promise<ScrapPieceDto>
     }
 };
 
+/** Partially update a scrap piece. Calls PATCH /api/scraps/{id}. */
+export const updateScrap = async (scrapId: ProductId, payload: UpdateFeltRollRequest): Promise<ScrapPieceDto> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const result = await patch<ScrapPieceDto>(`/scraps/${scrapId}`, payload, {signal: controller.signal});
+        clearTimeout(timeoutId);
+        return result;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        console.warn(`Failed to update scrap: ${error}`);
+        throw error;
+    }
+};
+
+/** Delete a scrap piece. Calls DELETE /api/scraps/{id}. */
+export const deleteScrap = async (scrapId: ProductId): Promise<void> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        await del<void>(`/scraps/${scrapId}`, {signal: controller.signal});
+        clearTimeout(timeoutId);
+    } catch (error) {
+        clearTimeout(timeoutId);
+        console.warn(`Failed to delete scrap: ${error}`);
+        throw error;
+    }
+};
+
 export const fetchProducts = async (): Promise<ProductDto[]> => {
     const cached = cacheGet<ProductDto[]>('products');
     if (cached) return cached;

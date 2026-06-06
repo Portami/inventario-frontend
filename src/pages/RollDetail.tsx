@@ -1,4 +1,5 @@
 import DetailPage from '@/components/DetailPage';
+import PieceDetailCard, {labelProps, NamedOption, PieceFormState} from '@/components/pieces/PieceDetailCard';
 import CutRollDialog from '@/components/rolls/CutRollDialog';
 import {useToast} from '@/components/ToastProvider';
 import {cutRoll, deleteRoll, fetchRollDetails, fetchRolls, splitRoll, updateRoll} from '@/services/backend';
@@ -13,15 +14,11 @@ import {
     Box,
     Button,
     ButtonGroup,
-    Card,
-    CardContent,
     CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
-    Divider,
-    MenuItem,
     Stack,
     TextField,
     Tooltip,
@@ -31,27 +28,7 @@ import {alpha} from '@mui/material/styles';
 import {ChangeEvent, useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router';
 
-function Field({label, value}: {readonly label: string; readonly value: string | number | null | undefined}) {
-    return (
-        <div>
-            <Typography variant="body2" color="textSecondary" sx={{fontWeight: 500, mb: 0.25}}>
-                {label}
-            </Typography>
-            <Typography variant="body1">{value ?? '–'}</Typography>
-        </div>
-    );
-}
-
-type FormState = {
-    length: string;
-    width: string;
-    batchId: string;
-    storageId: string;
-};
-
-type NamedOption = {id: number; name: string};
-
-const labelProps = {shrink: true, sx: {textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontWeight: 600}};
+type FormState = PieceFormState;
 
 interface DeleteRollDialogProps {
     open: boolean;
@@ -379,117 +356,14 @@ export default function RollDetail() {
                         )}
                     </Box>
 
-                    <Card>
-                        <CardContent>
-                            <Stack spacing={3}>
-                                <div>
-                                    <Typography variant="overline" color="textSecondary">
-                                        Identifikation
-                                    </Typography>
-                                    <Box sx={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1}}>
-                                        <Field label="Artikelnummer" value={roll.articleNumber} />
-                                        <Field label="ID" value={roll.id} />
-                                        <Field label="Filztyp" value={roll.feltTypeName} />
-                                        <Field label="Farbe" value={roll.color} />
-                                        <Field label="Lieferant" value={roll.supplierName} />
-                                        <Field label="Lieferantenfarbe" value={roll.supplierColor} />
-                                    </Box>
-                                </div>
-
-                                <Divider />
-
-                                <div>
-                                    <Typography variant="overline" color="textSecondary">
-                                        Masse & Eigenschaften
-                                    </Typography>
-                                    <Box sx={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1}}>
-                                        {isEditing ? (
-                                            <TextField
-                                                label="Länge (cm)"
-                                                value={form.length}
-                                                onChange={setField('length')}
-                                                type="number"
-                                                variant="outlined"
-                                                size="small"
-                                                required
-                                                slotProps={{htmlInput: {min: 1, step: 1}, inputLabel: labelProps}}
-                                            />
-                                        ) : (
-                                            <Field label="Länge (cm)" value={roll.length} />
-                                        )}
-                                        {isEditing ? (
-                                            <TextField
-                                                label="Breite (cm)"
-                                                value={form.width}
-                                                onChange={setField('width')}
-                                                type="number"
-                                                variant="outlined"
-                                                size="small"
-                                                required
-                                                slotProps={{htmlInput: {min: 1, step: 1}, inputLabel: labelProps}}
-                                            />
-                                        ) : (
-                                            <Field label="Breite (cm)" value={roll.width} />
-                                        )}
-                                        <Field label="Dicke (mm)" value={roll.thickness} />
-                                        <Field label="Dichte (g/m²)" value={roll.density} />
-                                        <Field label="Preis (CHF)" value={roll.price == null ? null : `CHF ${roll.price.toFixed(2)}`} />
-                                    </Box>
-                                </div>
-
-                                <Divider />
-
-                                <div>
-                                    <Typography variant="overline" color="textSecondary">
-                                        Lagerung
-                                    </Typography>
-                                    <Box sx={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1}}>
-                                        {isEditing ? (
-                                            <TextField
-                                                select
-                                                label="Charge"
-                                                value={form.batchId}
-                                                onChange={setField('batchId')}
-                                                variant="outlined"
-                                                size="small"
-                                                disabled
-                                                slotProps={{inputLabel: labelProps, select: {displayEmpty: true}}}
-                                            >
-                                                <MenuItem value="">&ndash;</MenuItem>
-                                                {batchOptions.map((o) => (
-                                                    <MenuItem key={o.id} value={String(o.id)}>
-                                                        {o.name}
-                                                    </MenuItem>
-                                                ))}
-                                            </TextField>
-                                        ) : (
-                                            <Field label="Charge" value={roll.batchName} />
-                                        )}
-                                        {isEditing ? (
-                                            <TextField
-                                                select
-                                                label="Lagerort"
-                                                value={form.storageId}
-                                                onChange={setField('storageId')}
-                                                variant="outlined"
-                                                size="small"
-                                                slotProps={{inputLabel: labelProps, select: {displayEmpty: true}}}
-                                            >
-                                                <MenuItem value="">&ndash;</MenuItem>
-                                                {storageOptions.map((o) => (
-                                                    <MenuItem key={o.id} value={String(o.id)}>
-                                                        {o.name}
-                                                    </MenuItem>
-                                                ))}
-                                            </TextField>
-                                        ) : (
-                                            <Field label="Lagerort" value={roll.storageName} />
-                                        )}
-                                    </Box>
-                                </div>
-                            </Stack>
-                        </CardContent>
-                    </Card>
+                    <PieceDetailCard
+                        piece={roll}
+                        isEditing={isEditing}
+                        form={form}
+                        onField={setField}
+                        storageOptions={storageOptions}
+                        batchOptions={batchOptions}
+                    />
                 </Stack>
             )}
 
