@@ -10,13 +10,13 @@ import {useNavigate, useParams} from 'react-router';
 export default function InvAuditingArchiveView() {
     const navigate = useNavigate();
     const {id} = useParams<{id: string}>();
-    if (!id) return;
 
     const [inventoryAuditing, setinventoryAuditing] = useState<FeltStocktakeDto>();
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
     const load = async () => {
+        if (!id) return;
         try {
             setinventoryAuditing(await fetchStocktakeById(id));
         } catch (err) {
@@ -28,7 +28,13 @@ export default function InvAuditingArchiveView() {
 
     useEffect(() => {
         void load();
-    }, []);
+    }, [id]);
+
+    if (!id) {
+        setError('Bestandsprüfung nicht gefunden.');
+        setIsLoading(false);
+        return null;
+    }
 
     return (
         <Box sx={{p: 3}}>

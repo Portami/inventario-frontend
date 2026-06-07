@@ -92,10 +92,6 @@ export type CreateFeltStocktakeDto = {
     storageIds: number[];
 };
 
-export type ExtendStocktakeDto = {
-    storageIds: number[];
-};
-
 export type FeltStocktakeDto = {
     id: number;
     description: string;

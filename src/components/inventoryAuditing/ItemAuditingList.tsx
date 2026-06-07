@@ -46,7 +46,7 @@ export default function ItemAuditingList({inventoryId, items, onResolve, hideSta
             }
         };
         void load();
-    }, []);
+    }, [items]);
 
     const columns: GridColDef<ItemAuditing>[] = [
         {

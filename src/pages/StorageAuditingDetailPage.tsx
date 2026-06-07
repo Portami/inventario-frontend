@@ -13,20 +13,9 @@ export default function StorageAuditingDetailPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
-    if (!inventoryId) {
-        setError('Bestandsprüfung nicht gefunden.');
-        setIsLoading(false);
-        return;
-    }
-
-    if (!id) {
-        setError('Lager nicht gefunden.');
-        setIsLoading(false);
-        return;
-    }
-
     useEffect(() => {
         const load = async () => {
+            if (!inventoryId) return;
             try {
                 setInventoryAuditing(await fetchStocktakeById(inventoryId));
             } catch (err) {
@@ -37,6 +26,18 @@ export default function StorageAuditingDetailPage() {
         };
         void load();
     }, [inventoryId, id]);
+
+    if (!inventoryId) {
+        setError('Bestandsprüfung nicht gefunden.');
+        setIsLoading(false);
+        return null;
+    }
+
+    if (!id) {
+        setError('Lager nicht gefunden.');
+        setIsLoading(false);
+        return null;
+    }
 
     return (
         <Box sx={{py: 3}}>

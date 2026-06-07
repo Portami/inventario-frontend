@@ -49,7 +49,7 @@ export default function StorageAuditingList({inventoryId, storages}: Readonly<St
 
     useEffect(() => {
         void load();
-    }, []);
+    }, [storages, inventoryId]);
 
     const refetch = async () => {
         void load();

@@ -65,7 +65,7 @@ export default function StorageAuditingCard({inventoryId, storage}: Readonly<Sto
         try {
             await createFeltStocktakeScan(inventoryId, {
                 scannedStorageId: storage?.storageId,
-                barcode: code,
+                barcode: padded,
             });
             await refetch();
             showToast('Scan erfolgreich.', 'success');
