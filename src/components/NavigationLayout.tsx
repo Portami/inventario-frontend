@@ -1,6 +1,7 @@
 import logo from '@/assets/logo.svg';
 import {useHidScanner} from '@/hooks/useHidScanner';
 import {lookupRollCode} from '@/services/backend';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -278,6 +279,69 @@ export default function NavigationLayout() {
                                         }}
                                     >
                                         Nachbestellen
+                                    </Button>
+                                </ListItem>
+                            </List>
+                        )}
+                    </Box>
+                    <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                        <ListItem disableGutters>
+                            <NavBtn to="/inventory" icon={<AssessmentIcon />} label="Inventur" collapsed={collapsed} />
+                        </ListItem>
+                        {!collapsed && (
+                            <List component="div" disablePadding sx={{width: '100%'}}>
+                                <ListItem
+                                    disableGutters
+                                    sx={{
+                                        ml: 1.5,
+                                        pl: 2,
+                                        borderLeft:
+                                            location.pathname === '/inventory'
+                                                ? `3px solid ${theme.palette.primary.main}`
+                                                : `3px solid ${theme.palette.divider}`,
+                                    }}
+                                >
+                                    <Button
+                                        component={NavLink}
+                                        to="/inventory"
+                                        sx={{
+                                            justifyContent: 'flex-start',
+                                            width: '100%',
+                                            color: theme.palette.text.primary,
+                                            '&.active': {
+                                                color: location.pathname === '/inventory' ? theme.palette.primary.main : theme.palette.text.primary,
+                                                fontWeight: 600,
+                                            },
+                                        }}
+                                    >
+                                        Übersicht
+                                    </Button>
+                                </ListItem>
+                                <ListItem
+                                    disableGutters
+                                    sx={{
+                                        ml: 1.5,
+                                        pl: 2,
+                                        borderLeft:
+                                            location.pathname === '/inventoryArchive'
+                                                ? `3px solid ${theme.palette.primary.main}`
+                                                : `3px solid ${theme.palette.divider}`,
+                                    }}
+                                >
+                                    <Button
+                                        component={NavLink}
+                                        to="/inventoryArchive"
+                                        sx={{
+                                            justifyContent: 'flex-start',
+                                            width: '100%',
+                                            color: theme.palette.text.primary,
+                                            '&.active': {
+                                                color: location.pathname === '/inventoryArchive' ? theme.palette.primary.main : theme.palette.text.primary,
+                                                fontWeight: 600,
+                                            },
+                                        }}
+                                    >
+                                        Archiv
                                     </Button>
                                 </ListItem>
                             </List>
