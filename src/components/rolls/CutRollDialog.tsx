@@ -1,3 +1,4 @@
+import {labelProps, NamedOption} from '@/components/pieces/PieceDetailCard';
 import {fetchStorages} from '@/services/backend';
 import {CutFeltRollRequest, FeltRollDto} from '@/types/roll';
 import AddIcon from '@mui/icons-material/Add';
@@ -22,10 +23,6 @@ import {useEffect, useState} from 'react';
 
 /** A scrap with any side below this (cm) is dropped by the backend; flagged red here as a heads-up. */
 const SCRAP_MIN_SIDE_CM = 44;
-
-const labelProps = {shrink: true, sx: {textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontWeight: 600}};
-
-type NamedOption = {id: number; name: string};
 
 type ScrapRow = {
     key: number;
@@ -82,11 +79,13 @@ export default function CutRollDialog({open, roll, isCutting, onClose, onConfirm
         setRows((prev) => prev.map((r) => (r.key === key ? {...r, [field]: value} : r)));
 
     const cutLengthNum = Number.parseFloat(cutLength);
-    const remainingLength = roll && !Number.isNaN(cutLengthNum) && cutLengthNum > 0 ? roll.length - cutLengthNum : null;
-    const hasValidCut = remainingLength !== null && remainingLength > 0;
+    // The cut must remove a positive length that is strictly less than the roll (so something remains).
+    // This rejects 0, negative values (e.g. -5, which would otherwise lengthen the roll) and over-cuts.
+    const remainingLength = roll && !Number.isNaN(cutLengthNum) && cutLengthNum > 0 && cutLengthNum < roll.length ? roll.length - cutLengthNum : null;
+    const hasValidCut = remainingLength !== null;
     const currentDimensions = `${roll?.length ?? ''} × ${roll?.width ?? ''} cm`;
     const decimals = remainingLength !== null && remainingLength % 1 === 0 ? 0 : 1;
-    const remainingDimensions = hasValidCut ? `${remainingLength.toFixed(decimals)} × ${roll?.width ?? ''} cm` : `– × ${roll?.width ?? ''} cm`;
+    const remainingDimensions = remainingLength !== null ? `${remainingLength.toFixed(decimals)} × ${roll?.width ?? ''} cm` : `– × ${roll?.width ?? ''} cm`;
 
     const handleConfirm = () => {
         if (!hasValidCut) return;
