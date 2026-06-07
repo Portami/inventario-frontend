@@ -56,8 +56,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <Route path="/offers/:id" element={<OfferDetailPage />} />
                         <Route path="/customers" element={<CustomersPage />} />
                         <Route path="/statistics" element={<StatisticsPage />} />
+                        <Route path="/scrap/:id" element={<ScrapDetail />} />
                     </Route>
-                    <Route path="/scrap/:id" element={<ScrapDetail />} />
                 </Routes>
             </BrowserRouter>
         </ToastProvider>
