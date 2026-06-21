@@ -673,6 +673,7 @@ export const createOffer = async (customerName: string, items: BackendCreateOffe
     try {
         const raw = await post<BackendOfferDto>('/offers', {customerName, items}, {signal: controller.signal});
         clearTimeout(timeoutId);
+        cacheInvalidate('offers');
         return mapBackendOffer(raw);
     } catch (error) {
         clearTimeout(timeoutId);
