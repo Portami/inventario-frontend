@@ -1,5 +1,4 @@
 import './styles/index.scss';
-import App from './App';
 import theme from './theme';
 import NavigationLayout from '@/components/NavigationLayout.tsx';
 import {ToastProvider} from '@/components/ToastProvider';
@@ -26,7 +25,7 @@ import StorageAuditingDetailPage from '@/pages/StorageAuditingDetailPage.tsx';
 import StoragePage from '@/pages/StoragePage.tsx';
 import {CssBaseline, ThemeProvider} from '@mui/material';
 import ReactDOM from 'react-dom/client';
-import {BrowserRouter, Route, Routes} from 'react-router';
+import {BrowserRouter, Navigate, Route, Routes} from 'react-router';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
@@ -35,7 +34,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 <CssBaseline />
                 <Routes>
                     <Route element={<NavigationLayout />}>
-                        <Route index element={<App />} />
+                        <Route index element={<Navigate to="/felts" replace />} />
                         <Route path="/scan" element={<ScanPage />} />
                         <Route path="/labels" element={<LabelGeneratorPage />} />
                         <Route path="/felts" element={<FeltPage />} />
