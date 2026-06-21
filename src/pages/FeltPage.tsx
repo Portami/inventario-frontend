@@ -133,7 +133,7 @@ export default function FeltPage() {
     // Felts that pass the dimension (length/width) filters only - used to derive dropdown options
     const feltsByDimension = useMemo(() => {
         const lengthActive = activeLengthFilter[0] !== rollLengthBounds[0] || activeLengthFilter[1] !== rollLengthBounds[1];
-        const widthActive = widthFilter[0] !== 0 || widthFilter[1] !== 500;
+        const widthActive = widthFilter[0] !== 0 || widthFilter[1] !== 200;
 
         return felts.filter((felt) => {
             const feltRolls = rollsByFeltId.get(felt.id) ?? [];
@@ -170,12 +170,12 @@ export default function FeltPage() {
     }, [thicknessOptions, thicknessFilter]);
 
     const isFilterActive =
-        searchQuery !== '' || densityFilter !== '' || thicknessFilter !== '' || lengthFilter !== null || widthFilter[0] !== 0 || widthFilter[1] !== 500;
+        searchQuery !== '' || densityFilter !== '' || thicknessFilter !== '' || lengthFilter !== null || widthFilter[0] !== 0 || widthFilter[1] !== 200;
 
     const resetFilters = () => {
         setSearchQuery('');
         setLengthFilter(null);
-        setWidthFilter([0, 500]);
+        setWidthFilter([0, 200]);
         setDensityFilter('');
         setThicknessFilter('');
     };
@@ -284,7 +284,7 @@ export default function FeltPage() {
                             sx={{
                                 fontSize: '0.8rem',
                                 fontWeight: 600,
-                                color: widthFilter[0] !== 0 || widthFilter[1] !== 500 ? 'primary.main' : 'text.secondary',
+                                color: widthFilter[0] !== 0 || widthFilter[1] !== 200 ? 'primary.main' : 'text.secondary',
                                 mb: 1,
                             }}
                         >
@@ -294,7 +294,7 @@ export default function FeltPage() {
                             value={widthFilter}
                             onChange={(_, v) => setWidthFilter(v as [number, number])}
                             min={0}
-                            max={500}
+                            max={200}
                             disableSwap
                             size="small"
                             disabled={rolls.length === 0}
