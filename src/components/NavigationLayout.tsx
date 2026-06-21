@@ -323,20 +323,20 @@ export default function NavigationLayout() {
                                         ml: 1.5,
                                         pl: 2,
                                         borderLeft:
-                                            location.pathname === '/inventoryArchive'
+                                            location.pathname === '/inventory/archive'
                                                 ? `3px solid ${theme.palette.primary.main}`
                                                 : `3px solid ${theme.palette.divider}`,
                                     }}
                                 >
                                     <Button
                                         component={NavLink}
-                                        to="/inventoryArchive"
+                                        to="/inventory/archive"
                                         sx={{
                                             justifyContent: 'flex-start',
                                             width: '100%',
                                             color: theme.palette.text.primary,
                                             '&.active': {
-                                                color: location.pathname === '/inventoryArchive' ? theme.palette.primary.main : theme.palette.text.primary,
+                                                color: location.pathname === '/inventory/archive' ? theme.palette.primary.main : theme.palette.text.primary,
                                                 fontWeight: 600,
                                             },
                                         }}
