@@ -46,7 +46,7 @@ export default function FeltPage() {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [lengthFilter, setLengthFilter] = useState<[number, number] | null>(null);
-    const [widthFilter, setWidthFilter] = useState<[number, number]>([0, 500]);
+    const [widthFilter, setWidthFilter] = useState<[number, number]>([0, 200]);
     const [densityFilter, setDensityFilter] = useState('');
     const [thicknessFilter, setThicknessFilter] = useState('');
 
