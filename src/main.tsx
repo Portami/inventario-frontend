@@ -42,8 +42,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <Route path="/felts/reorder" element={<FeltReorderPage />} />
                         <Route path="/felts/:id" element={<FeltDetailPage />} />
                         <Route path="/inventory" element={<InventoryPage />} />
-                        <Route path="/inventoryArchive" element={<InvAuditingArchive />} />
-                        <Route path="/inventoryArchive/:id" element={<InvAuditingArchiveView />} />
+                        <Route path="/inventory/archive" element={<InvAuditingArchive />} />
+                        <Route path="/inventory/archive/:id" element={<InvAuditingArchiveView />} />
                         <Route path="/inventory/:id" element={<InventoryAuditingView />} />
                         <Route path="/inventory/:inventoryId/storage/:id" element={<StorageAuditingDetailPage />} />
                         <Route path="/storage" element={<StoragePage />} />
