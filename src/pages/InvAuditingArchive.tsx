@@ -75,7 +75,7 @@ export default function InvAuditingArchive() {
                 initialState={{pagination: {paginationModel: {pageSize: 10}}}}
                 localeText={{noRowsLabel: 'Keine Bestandsprüfungen.'}}
                 sx={{'& .MuiDataGrid-row': {cursor: 'pointer'}, height: 600}}
-                onRowClick={({row}) => void navigate(`/inventoryArchive/${row.id}`)}
+                onRowClick={({row}) => void navigate(`/inventory/archive/${row.id}`)}
             />
         </ListPage>
     );
