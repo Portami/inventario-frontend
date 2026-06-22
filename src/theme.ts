@@ -66,10 +66,11 @@ const theme = createTheme({
                         fill: '#ffffff !important',
                         opacity: '1 !important',
                     },
-                    '& .MuiDataGrid-iconButtonContainer .MuiIconButton-root': {
+                    '& .MuiDataGrid-columnHeader .MuiIconButton-root': {
                         color: '#ffffff',
+                        backgroundColor: 'transparent',
                         '&:hover': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.15)',
                         },
                     },
                     '& .MuiDataGrid-columnHeaderCheckbox .MuiCheckbox-root': {
