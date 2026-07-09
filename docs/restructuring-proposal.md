@@ -2,7 +2,7 @@
 
 A proposal for reorganizing `src/` from the current type-based layout into a feature-based one, splitting the monolithic services layer, and a set of ranked improvements with an incremental migration path.
 
-> Status: proposal — no code has been moved yet. When executed, `docs/project-structure.md` must be rewritten to describe the new convention.
+> Status: **executed** on branch `PORTAMI-133-refactor-frontend` (2026-07-09). `docs/project-structure.md` describes the resulting convention. Remaining follow-ups: convert the remaining pages to TanStack Query feature by feature (felts and the offers list are done), and split the oversized pages/dialogs opportunistically (§4, item 7).
 
 ---
 
