@@ -1,5 +1,8 @@
 const BASE_URL = import.meta.env.VITE_BACKEND_URL ?? '/api';
 
+/** Every request is aborted after this timeout unless the caller passes its own signal. */
+const DEFAULT_TIMEOUT_MS = 5000;
+
 const request = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
     const headers = {
         'Content-Type': 'application/json',
@@ -7,6 +10,7 @@ const request = async <T>(url: string, options: RequestInit = {}): Promise<T> =>
     };
 
     const response = await fetch(`${BASE_URL}${url}`, {
+        signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
         ...options,
         headers,
     });
