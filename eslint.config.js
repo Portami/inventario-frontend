@@ -6,6 +6,17 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import importPlugin from 'eslint-plugin-import-x';
 import globals from 'globals';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import {createTypeScriptImportResolver} from 'eslint-import-resolver-typescript';
+
+const FEATURES = ['customers', 'felts', 'labels', 'offers', 'products', 'rolls', 'scanning', 'shopping', 'statistics', 'stocktakes', 'storage'];
+
+// A feature may import another feature only via its index.ts (public API) or types.ts.
+const featureBoundaryZones = FEATURES.map((feature) => ({
+    target: `./src/features/${feature}`,
+    from: './src/features',
+    except: [`./${feature}`, ...FEATURES.filter((other) => other !== feature).flatMap((other) => [`./${other}/index.ts`, `./${other}/types.ts`])],
+    message: 'Import other features via their index.ts (or types.ts), never deep paths.',
+}));
 
 export default [
     {
@@ -51,19 +62,35 @@ export default [
                 },
             ],
             'simple-import-sort/exports': 'error',
+            'import/no-restricted-paths': [
+                'error',
+                {
+                    zones: [
+                        {
+                            target: './src/shared',
+                            from: './src/features',
+                            message: 'shared/ must stay domain-agnostic and cannot import from features/.',
+                        },
+                        {
+                            target: './src/shared',
+                            from: './src/app',
+                            message: 'shared/ must stay domain-agnostic and cannot import from app/.',
+                        },
+                        {
+                            target: './src/features',
+                            from: './src/app',
+                            message: 'Features cannot depend on the app composition root.',
+                        },
+                        ...featureBoundaryZones,
+                    ],
+                },
+            ],
         },
         settings: {
             react: {
                 version: 'detect',
             },
-            'import/parsers': {
-                '@typescript-eslint/parser': ['.ts', '.tsx'],
-            },
-            'import/resolver': {
-                typescript: {
-                    alwaysTryTypes: true,
-                },
-            },
+            'import-x/resolver-next': [createTypeScriptImportResolver({alwaysTryTypes: true})],
         },
     },
     {
