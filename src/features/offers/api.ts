@@ -14,6 +14,9 @@ import {fetchFelts} from '@/features/felts';
 import {fetchProducts} from '@/features/products';
 import {del, get, patch, post} from '@/shared/api/http';
 
+/** Query keys for the offers feature. */
+export const offerKeys = {list: ['offers'] as const};
+
 const toDateISO = (s?: string | null): string => (s ?? new Date().toISOString()).substring(0, 10);
 
 function mapBackendOffer(raw: BackendOfferDto): OfferDto {

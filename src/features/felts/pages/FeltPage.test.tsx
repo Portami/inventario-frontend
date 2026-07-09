@@ -1,4 +1,5 @@
 import FeltPage from '@/features/felts/pages/FeltPage';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import React from 'react';
 import {MemoryRouter} from 'react-router';
@@ -37,6 +38,7 @@ vi.mock('@/features/felts/api', () => {
         },
     ];
     return {
+        feltKeys: {all: ['felts']},
         fetchFelts: vi.fn().mockResolvedValue(mockFelts),
         deleteFelt: vi.fn().mockResolvedValue(undefined),
     };
@@ -72,9 +74,11 @@ describe('FeltPage', () => {
 
     it('renders rows from backend', async () => {
         render(
-            <MemoryRouter>
-                <FeltPage />
-            </MemoryRouter>,
+            <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
+                <MemoryRouter>
+                    <FeltPage />
+                </MemoryRouter>
+            </QueryClientProvider>,
         );
 
         // Use title query to select DataGrid cells (unique) to avoid conflict with dialog text
@@ -85,9 +89,11 @@ describe('FeltPage', () => {
     it('delete flow: clicking delete opens delete dialog and calls backend delete', async () => {
         const backend = await import('@/features/felts/api');
         render(
-            <MemoryRouter>
-                <FeltPage />
-            </MemoryRouter>,
+            <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
+                <MemoryRouter>
+                    <FeltPage />
+                </MemoryRouter>
+            </QueryClientProvider>,
         );
 
         // wait for rows

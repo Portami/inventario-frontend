@@ -1,4 +1,5 @@
 import FeltReorderPage from '@/features/felts/pages/FeltReorderPage';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {fireEvent, render, screen, within} from '@testing-library/react';
 import React from 'react';
 import {vi} from 'vitest';
@@ -43,6 +44,7 @@ vi.mock('@/features/felts/api', () => {
         },
     ];
     return {
+        feltKeys: {all: ['felts']},
         fetchFelts: vi.fn().mockResolvedValue(mockFelts),
         deleteFelt: vi.fn().mockResolvedValue(undefined),
     };
@@ -74,7 +76,11 @@ describe('FeltReorderPage', () => {
     });
 
     it('shows not-reordered list and grouped supplier lists', async () => {
-        render(<FeltReorderPage />);
+        render(
+            <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
+                <FeltReorderPage />
+            </QueryClientProvider>,
+        );
 
         // The page filters felts by isLowOnSupply
         expect(await screen.findByText('Noch nicht nachbestellt (1)')).toBeInTheDocument();
@@ -90,7 +96,11 @@ describe('FeltReorderPage', () => {
     });
 
     it('opens edit dialog when clicking a row in any DataGrid', async () => {
-        render(<FeltReorderPage />);
+        render(
+            <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
+                <FeltReorderPage />
+            </QueryClientProvider>,
+        );
 
         // wait for data
         const aCell = await screen.findByTitle('A-1');

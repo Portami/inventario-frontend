@@ -1,6 +1,9 @@
 import {Batch, CreateFeltRequest, FeltDto, FeltTypeDto, Supplier} from './types';
 import {del, get, patch, post} from '@/shared/api/http';
 
+/** Query keys for the felts feature. */
+export const feltKeys = {all: ['felts'] as const};
+
 export const fetchFelts = (): Promise<FeltDto[]> => get<FeltDto[]>('/felts');
 
 export const fetchSuppliers = (): Promise<Supplier[]> => get<Supplier[]>('/felts/suppliers');

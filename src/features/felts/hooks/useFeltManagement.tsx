@@ -1,10 +1,11 @@
-import {deleteFelt, fetchFelts} from '@/features/felts/api';
+import {deleteFelt, feltKeys, fetchFelts} from '@/features/felts/api';
 import {FeltDto} from '@/features/felts/types';
 import {useToast} from '@/shared/components/ToastProvider';
 import {toErrorMessage} from '@/shared/utils/pageUtils';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {IconButton} from '@mui/material';
 import {GridColDef, GridRenderCellParams} from '@mui/x-data-grid';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo, useState} from 'react';
 
 interface UseFeltManagementReturn {
@@ -26,48 +27,46 @@ interface UseFeltManagementReturn {
 
 export const useFeltManagement = (filterFn?: (felts: FeltDto[]) => FeltDto[]): UseFeltManagementReturn => {
     const showToast = useToast();
-    const [felts, setFelts] = useState<FeltDto[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState('');
+    const queryClient = useQueryClient();
     const [selectedFelt, setSelectedFelt] = useState<FeltDto | null>(null);
     const [feltToDelete, setFeltToDelete] = useState<FeltDto | null>(null);
-    const [isDeleting, setIsDeleting] = useState(false);
+    // Overrides the query-derived error (e.g. '' after the user dismisses the banner).
+    const [errorOverride, setErrorOverride] = useState<string | null>(null);
 
-    const load = async () => {
-        try {
-            setIsLoading(true);
-            const allFelts = await fetchFelts();
-            const filtered = filterFn ? filterFn(allFelts) : allFelts;
-            setFelts(filtered);
-            setError('');
-        } catch (err) {
-            setError(toErrorMessage(err, 'Filze konnten nicht geladen werden'));
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const query = useQuery({queryKey: feltKeys.all, queryFn: fetchFelts});
 
     useEffect(() => {
-        void load();
-    }, []);
+        setErrorOverride(null);
+    }, [query.errorUpdatedAt]);
+
+    const felts = useMemo(() => {
+        const all = query.data ?? [];
+        return filterFn ? filterFn(all) : all;
+    }, [query.data, filterFn]);
+
+    const error = errorOverride ?? (query.error ? toErrorMessage(query.error, 'Filze konnten nicht geladen werden') : '');
 
     const refetch = async () => {
-        await load();
+        await queryClient.invalidateQueries({queryKey: feltKeys.all});
     };
+
+    const deleteMutation = useMutation({
+        mutationFn: (feltId: number) => deleteFelt(feltId),
+        onSuccess: async () => {
+            showToast('Filz erfolgreich gelöscht.', 'success');
+            setFeltToDelete(null);
+            await queryClient.invalidateQueries({queryKey: feltKeys.all});
+        },
+        onError: () => {
+            showToast('Löschen fehlgeschlagen. Bitte versuche es erneut.', 'error');
+        },
+    });
 
     const handleDelete = async () => {
         if (!feltToDelete) return;
-        setIsDeleting(true);
-        try {
-            await deleteFelt(feltToDelete.id);
-            showToast('Filz erfolgreich gelöscht.', 'success');
-            setFeltToDelete(null);
-            await refetch();
-        } catch {
-            showToast('Löschen fehlgeschlagen. Bitte versuche es erneut.', 'error');
-        } finally {
-            setIsDeleting(false);
-        }
+        await deleteMutation.mutateAsync(feltToDelete.id).catch(() => {
+            // Failure is reported via the toast in onError.
+        });
     };
 
     const handleSaved = () => {
@@ -118,16 +117,16 @@ export const useFeltManagement = (filterFn?: (felts: FeltDto[]) => FeltDto[]): U
 
     return {
         felts,
-        isLoading,
+        isLoading: query.isPending,
         error,
         selectedFelt,
         setSelectedFelt,
         feltToDelete,
         setFeltToDelete,
-        isDeleting,
+        isDeleting: deleteMutation.isPending,
         handleDelete,
         refetch,
-        setError,
+        setError: setErrorOverride,
         columns,
         handleSaved,
         handleCreated,
