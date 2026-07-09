@@ -1,5 +1,5 @@
-import {fmtCHF, fmtNum, lineSubtotal} from '@/pages/constants/offerConstants';
-import {LineItemDto} from '@/types/offerte';
+import {fmtCHF, fmtNum, lineSubtotal} from '@/features/offers/constants';
+import {LineItemDto} from '@/features/offers/types';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import {Box, Button, Card, Divider, InputAdornment, TextField, Typography} from '@mui/material';

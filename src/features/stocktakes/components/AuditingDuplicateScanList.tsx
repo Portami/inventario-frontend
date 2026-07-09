@@ -1,5 +1,5 @@
-import {FeltStocktakeScanDto} from '@/types/inventoryAuditing.ts';
-import {formatDateTime} from '@/utils/pageUtils.ts';
+import {FeltStocktakeScanDto} from '@/features/stocktakes/types';
+import {formatDateTime} from '@/shared/utils/pageUtils';
 import {Box, Checkbox, Typography} from '@mui/material';
 import {DataGrid, GridColDef} from '@mui/x-data-grid';
 

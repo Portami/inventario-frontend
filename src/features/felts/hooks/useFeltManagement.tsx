@@ -1,7 +1,7 @@
-import {useToast} from '@/components/ToastProvider';
-import {deleteFelt, fetchFelts} from '@/services/backend';
-import {FeltDto} from '@/types/felt';
-import {toErrorMessage} from '@/utils/pageUtils';
+import {deleteFelt, fetchFelts} from '@/features/felts/api';
+import {FeltDto} from '@/features/felts/types';
+import {useToast} from '@/shared/components/ToastProvider';
+import {toErrorMessage} from '@/shared/utils/pageUtils';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {IconButton} from '@mui/material';
 import {GridColDef, GridRenderCellParams} from '@mui/x-data-grid';

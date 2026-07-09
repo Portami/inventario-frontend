@@ -1,4 +1,4 @@
-import {ScanResult} from '@/types/scanner.ts';
+import {ScanResult} from '@/features/scanning/types';
 
 const MOCK_CODES: Record<string, ScanResult> = {
     '00001': {type: 'roll', id: '00001'},

@@ -1,6 +1,6 @@
-import {useToast} from '@/components/ToastProvider.tsx';
-import {createFelt, fetchFeltTypes, fetchSuppliers, updateFelt} from '@/services/backend.ts';
-import {FeltDto} from '@/types/felt.ts';
+import {createFelt, fetchFeltTypes, fetchSuppliers, updateFelt} from '@/features/felts/api';
+import {FeltDto} from '@/features/felts/types';
+import {useToast} from '@/shared/components/ToastProvider';
 import CloseIcon from '@mui/icons-material/Close';
 import {
     Button,

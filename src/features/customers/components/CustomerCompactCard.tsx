@@ -1,4 +1,4 @@
-import {CustomerDto} from '@/types/offerte';
+import {CustomerDto} from '../types';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';

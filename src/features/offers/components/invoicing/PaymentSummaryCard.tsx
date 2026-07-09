@@ -1,6 +1,6 @@
-import LabeledField from './LabeledField';
-import {fmtCHF, fmtDate, lineSubtotal} from '@/pages/constants/offerConstants';
-import {OfferDto} from '@/types/offerte';
+import {fmtCHF, fmtDate, lineSubtotal} from '@/features/offers/constants';
+import {OfferDto} from '@/features/offers/types';
+import LabeledField from '@/shared/components/LabeledField';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import {Box, Card, Divider, Typography} from '@mui/material';
 

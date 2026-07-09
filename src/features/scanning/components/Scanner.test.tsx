@@ -1,20 +1,20 @@
-import Scanner from '@/components/Scanner';
+import Scanner from '@/features/scanning/components/Scanner';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {BrowserRouter} from 'react-router';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 // Mock the backend service
-vi.mock('@/services/backend', () => ({
+vi.mock('@/features/scanning/api', () => ({
     lookupRollCode: vi.fn(),
 }));
 
 // Mock the scanner mock
-vi.mock('@/services/mock/scannerMock', () => ({
+vi.mock('@/features/scanning/scannerMock', () => ({
     getMockPresetCodes: vi.fn(() => ['00001', '00002', '00003']),
 }));
 
-import {lookupRollCode} from '@/services/backend';
+import {lookupRollCode} from '@/features/scanning/api';
 
 // @ts-ignore
 const mockLookupRollCode = lookupRollCode as vi.Mock;

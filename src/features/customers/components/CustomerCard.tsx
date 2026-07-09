@@ -1,5 +1,5 @@
-import LabeledField from './LabeledField';
-import {CustomerDto} from '@/types/offerte';
+import {CustomerDto} from '../types';
+import LabeledField from '@/shared/components/LabeledField';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import {Avatar, Box, Button, Card, CardContent, Typography, useTheme} from '@mui/material';

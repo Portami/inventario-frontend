@@ -1,6 +1,6 @@
-import ListPage from '@/components/ListPage';
-import Scanner from '@/components/Scanner';
-import {ScanResult} from '@/types/scanner';
+import Scanner from '@/features/scanning/components/Scanner';
+import {ScanResult} from '@/features/scanning/types';
+import ListPage from '@/shared/components/ListPage';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import {Button, Stack} from '@mui/material';
 import {useState} from 'react';

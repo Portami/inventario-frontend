@@ -1,10 +1,10 @@
-import DetailPage from '@/components/DetailPage';
-import PieceDetailCard, {labelProps, NamedOption, PieceFormState} from '@/components/pieces/PieceDetailCard';
-import CutRollDialog from '@/components/rolls/CutRollDialog';
-import {useToast} from '@/components/ToastProvider';
-import {cutRoll, deleteRoll, fetchRollDetails, fetchRolls, splitRoll, updateRoll} from '@/services/backend';
-import {CutFeltRollRequest, FeltRollDto} from '@/types/roll';
-import {toErrorMessage} from '@/utils/pageUtils';
+import {cutRoll, deleteRoll, fetchRollDetails, fetchRolls, splitRoll, updateRoll} from '@/features/rolls/api';
+import CutRollDialog from '@/features/rolls/components/CutRollDialog';
+import PieceDetailCard, {labelProps, NamedOption, PieceFormState} from '@/features/rolls/components/PieceDetailCard';
+import {CutFeltRollRequest, FeltRollDto} from '@/features/rolls/types';
+import DetailPage from '@/shared/components/DetailPage';
+import {useToast} from '@/shared/components/ToastProvider';
+import {toErrorMessage} from '@/shared/utils/pageUtils';
 import CallSplitIcon from '@mui/icons-material/CallSplit';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
 import DeleteIcon from '@mui/icons-material/Delete';

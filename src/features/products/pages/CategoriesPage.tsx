@@ -1,9 +1,9 @@
-import ListPage from '@/components/ListPage';
-import ConfirmDeleteDialog from '@/components/products/ConfirmDeleteDialog';
-import {useToast} from '@/components/ToastProvider';
-import {createProductCategory, deleteProductCategory, fetchProductCategories, patchProductCategory} from '@/services/backend';
-import {ProductCategoryDto} from '@/types/product';
-import {toErrorMessage} from '@/utils/pageUtils';
+import {createProductCategory, deleteProductCategory, fetchProductCategories, patchProductCategory} from '@/features/products/api';
+import ConfirmDeleteDialog from '@/features/products/components/ConfirmDeleteDialog';
+import {ProductCategoryDto} from '@/features/products/types';
+import ListPage from '@/shared/components/ListPage';
+import {useToast} from '@/shared/components/ToastProvider';
+import {toErrorMessage} from '@/shared/utils/pageUtils';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';

@@ -1,4 +1,4 @@
-import {fmtNum} from '@/pages/constants/offerConstants';
+import {fmtNum} from '@/features/offers/constants';
 import {Box, InputBase, Typography} from '@mui/material';
 import {useCallback, useEffect, useRef, useState} from 'react';
 

@@ -1,11 +1,15 @@
-import FeltPage from '@/pages/FeltPage';
+import FeltPage from '@/features/felts/pages/FeltPage';
 import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import React from 'react';
 import {MemoryRouter} from 'react-router';
 import {vi} from 'vitest';
 
 // Mock backend - Daten werden INSIDE der Factory erstellt, damit hoisting kein Problem ist.
-vi.mock('@/services/backend', () => {
+vi.mock('@/features/rolls', () => ({
+    fetchRolls: vi.fn().mockResolvedValue([]),
+}));
+
+vi.mock('@/features/felts/api', () => {
     const mockFelts = [
         {
             id: 1,
@@ -34,13 +38,12 @@ vi.mock('@/services/backend', () => {
     ];
     return {
         fetchFelts: vi.fn().mockResolvedValue(mockFelts),
-        fetchRolls: vi.fn().mockResolvedValue([]),
         deleteFelt: vi.fn().mockResolvedValue(undefined),
     };
 });
 
 // Mock DeleteFeltDialog to render a confirm button that calls onConfirm when clicked
-vi.mock('@/components/felts/DeleteFeltDialog', () => {
+vi.mock('@/features/felts/components/DeleteFeltDialog', () => {
     return {
         default: ({open, felt, onConfirm, onClose}: any) =>
             open ? (
@@ -80,7 +83,7 @@ describe('FeltPage', () => {
     });
 
     it('delete flow: clicking delete opens delete dialog and calls backend delete', async () => {
-        const backend = await import('@/services/backend');
+        const backend = await import('@/features/felts/api');
         render(
             <MemoryRouter>
                 <FeltPage />

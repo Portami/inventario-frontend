@@ -1,5 +1,5 @@
-import {OFFER_STATE_META} from '@/pages/constants/offerConstants';
-import {OfferState} from '@/types/offerte';
+import {OFFER_STATE_META} from '@/features/offers/constants';
+import {OfferState} from '@/features/offers/types';
 import {Chip} from '@mui/material';
 
 export default function StateChip({stateKey}: Readonly<{stateKey: OfferState}>) {

@@ -1,4 +1,4 @@
-import {CustomerDto} from '@/types/offerte';
+import {CustomerDto} from '../types';
 import CloseIcon from '@mui/icons-material/Close';
 import {Box, Button, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, Grid, IconButton, MenuItem, TextField, Typography} from '@mui/material';
 import {ChangeEvent, useEffect, useState} from 'react';

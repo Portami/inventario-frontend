@@ -1,7 +1,9 @@
-import {useToast} from '@/components/ToastProvider.tsx';
-import {createRoll, fetchBatchesByFelt, fetchStorages, updateRoll} from '@/services/backend.ts';
-import {FeltDto} from '@/types/felt.ts';
-import {FeltRollDto} from '@/types/roll.ts';
+import {createRoll, updateRoll} from '../api';
+import {fetchBatchesByFelt} from '@/features/felts';
+import {FeltDto} from '@/features/felts/types';
+import {FeltRollDto} from '@/features/rolls/types';
+import {fetchStorages} from '@/features/storage';
+import {useToast} from '@/shared/components/ToastProvider';
 import CloseIcon from '@mui/icons-material/Close';
 import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, MenuItem, TextField} from '@mui/material';
 import {ChangeEvent, useEffect, useState} from 'react';

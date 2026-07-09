@@ -67,7 +67,7 @@ export default [
         },
     },
     {
-        files: ['src/tests/**/*.ts', 'src/tests/**/*.tsx'],
+        files: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/shared/testing/**/*.ts'],
         languageOptions: {
             globals: {
                 ...globals.browser,
@@ -84,7 +84,7 @@ export default [
         },
     },
     {
-        files: ['src/components/SearchField.tsx', 'src/components/ExpandableDataGrid.tsx'],
+        files: ['src/features/products/components/SearchField.tsx', 'src/features/products/components/ExpandableDataGrid.tsx'],
         rules: {
             'no-unused-vars': 'off',
         },

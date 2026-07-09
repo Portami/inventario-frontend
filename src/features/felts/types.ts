@@ -1,4 +1,4 @@
-import {ProductId} from './product';
+import type {ProductId} from '@/features/products/types';
 
 export const COLORS = {
     Red: 'RED',
@@ -62,6 +62,14 @@ export type FeltDto = {
 };
 
 export type FeltTypeDto = {
+    id: number;
+    name: string;
+};
+export type Supplier = {
+    id: number;
+    name: string;
+};
+export type Batch = {
     id: number;
     name: string;
 };

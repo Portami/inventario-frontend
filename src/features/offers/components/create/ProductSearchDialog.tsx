@@ -1,5 +1,5 @@
-import {fmtCHF} from '@/pages/constants/offerConstants';
-import {ProductCatalogItem} from '@/types/offerte';
+import {fmtCHF} from '@/features/offers/constants';
+import {ProductCatalogItem} from '@/features/offers/types';
 import CloseIcon from '@mui/icons-material/Close';
 import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import SearchIcon from '@mui/icons-material/Search';

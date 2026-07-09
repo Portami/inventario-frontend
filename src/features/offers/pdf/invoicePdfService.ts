@@ -1,9 +1,9 @@
 import {computeTotal} from './invoiceTotal';
-import {A4, C, CONTENT_W, createA4, fitText, hRule, MM, setFont, txt} from './pdfFactory';
 import logoSvgUrl from '@/assets/logo.svg';
-import {PORTAMI} from '@/constants/companyConstants';
-import {fmtCHF, fmtDate, fmtNum, lineSubtotal, OFFER_STATE_META} from '@/pages/constants/offerConstants';
-import {LineItemDto, OfferDto, OfferState} from '@/types/offerte';
+import {fmtCHF, fmtDate, fmtNum, lineSubtotal, OFFER_STATE_META} from '@/features/offers/constants';
+import {LineItemDto, OfferDto, OfferState} from '@/features/offers/types';
+import {PORTAMI} from '@/shared/constants/companyConstants';
+import {A4, C, CONTENT_W, createA4, fitText, hRule, MM, setFont, txt} from '@/shared/pdf/pdfFactory';
 export type {InvoiceOptions} from './invoiceTotal';
 import type {InvoiceOptions} from './invoiceTotal';
 import jsPDF from 'jspdf';

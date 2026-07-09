@@ -1,7 +1,8 @@
-import {useToast} from '@/components/ToastProvider.tsx';
-import {createStocktake, fetchStorages} from '@/services/backend.ts';
-import {FeltStocktakeDto} from '@/types/inventoryAuditing.ts';
-import {toErrorMessage} from '@/utils/pageUtils.ts';
+import {createStocktake} from '../api';
+import {FeltStocktakeDto} from '@/features/stocktakes/types';
+import {fetchStorages} from '@/features/storage';
+import {useToast} from '@/shared/components/ToastProvider';
+import {toErrorMessage} from '@/shared/utils/pageUtils';
 import CloseIcon from '@mui/icons-material/Close';
 import {
     Alert,

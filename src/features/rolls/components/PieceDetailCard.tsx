@@ -1,4 +1,4 @@
-import {FeltRollDto, ScrapPieceDto} from '@/types/roll';
+import {FeltRollDto, ScrapPieceDto} from '@/features/rolls/types';
 import {Box, Card, CardContent, Divider, MenuItem, Stack, TextField, Typography} from '@mui/material';
 import {ChangeEvent} from 'react';
 

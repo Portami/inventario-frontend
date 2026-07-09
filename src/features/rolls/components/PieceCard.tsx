@@ -1,4 +1,4 @@
-import {FeltRollDto, ScrapPieceDto} from '@/types/roll';
+import {FeltRollDto, ScrapPieceDto} from '@/features/rolls/types';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {Box, Card, CardContent, Chip, IconButton, Typography} from '@mui/material';
 

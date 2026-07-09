@@ -1,7 +1,7 @@
-import {AuditingDuplicateScanList} from '@/components/inventoryAuditing/AuditingDuplicateScanList.tsx';
-import {useToast} from '@/components/ToastProvider.tsx';
-import {resolveStocktakeItem, voidStocktakeScan} from '@/services/backend.ts';
-import {FeltStocktakeItemDto, ITEM_STATE, ItemState, RESOLUTION_TYPE, RESOLUTION_TYPES_LABELS, ResolutionType} from '@/types/inventoryAuditing.ts';
+import {resolveStocktakeItem, voidStocktakeScan} from '@/features/stocktakes/api';
+import {AuditingDuplicateScanList} from '@/features/stocktakes/components/AuditingDuplicateScanList';
+import {FeltStocktakeItemDto, ITEM_STATE, ItemState, RESOLUTION_TYPE, RESOLUTION_TYPES_LABELS, ResolutionType} from '@/features/stocktakes/types';
+import {useToast} from '@/shared/components/ToastProvider';
 import CloseIcon from '@mui/icons-material/Close';
 import {Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, MenuItem, TextField} from '@mui/material';
 import {ChangeEvent, useEffect, useMemo, useState} from 'react';

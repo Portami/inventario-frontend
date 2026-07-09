@@ -1,5 +1,5 @@
-import {fmtCHF, fmtDate, lineSubtotal, VAT_RATE} from '@/pages/constants/offerConstants';
-import {OfferDto} from '@/types/offerte';
+import {fmtCHF, fmtDate, lineSubtotal, VAT_RATE} from '@/features/offers/constants';
+import {OfferDto} from '@/features/offers/types';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import {Box, Card, Divider, Typography} from '@mui/material';
 

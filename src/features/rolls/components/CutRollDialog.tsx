@@ -1,6 +1,6 @@
-import {labelProps, NamedOption} from '@/components/pieces/PieceDetailCard';
-import {fetchStorages} from '@/services/backend';
-import {CutFeltRollRequest, FeltRollDto} from '@/types/roll';
+import {labelProps, NamedOption} from '@/features/rolls/components/PieceDetailCard';
+import {CutFeltRollRequest, FeltRollDto} from '@/features/rolls/types';
+import {fetchStorages} from '@/features/storage';
 import AddIcon from '@mui/icons-material/Add';
 import ContentCutIcon from '@mui/icons-material/ContentCut';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';

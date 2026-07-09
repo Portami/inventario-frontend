@@ -1,7 +1,7 @@
-import {useHidScanner} from '@/hooks/useHidScanner';
-import {lookupRollCode} from '@/services/backend';
-import {getMockPresetCodes} from '@/services/mock/scannerMock.ts';
-import {ScanResult} from '@/types/scanner';
+import {lookupRollCode} from '@/features/scanning/api';
+import {useHidScanner} from '@/features/scanning/hooks/useHidScanner';
+import {getMockPresetCodes} from '@/features/scanning/scannerMock';
+import {ScanResult} from '@/features/scanning/types';
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import {Alert, Box, Button, Chip, CircularProgress, ListItemText, MenuItem, Modal, Paper, Select, Stack, TextField, Typography} from '@mui/material';
 import React, {useState} from 'react';

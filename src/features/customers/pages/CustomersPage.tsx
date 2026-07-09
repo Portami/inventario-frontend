@@ -1,8 +1,8 @@
-import EditCustomerDialog from '@/components/offers/EditCustomerDialog';
-import {useToast} from '@/components/ToastProvider';
-import {useOffers} from '@/hooks/useOffers';
-import {fetchCustomers, updateCustomer} from '@/services/backend';
-import {CustomerDto, CustomerWithIdDto} from '@/types/offerte';
+import {CustomerDto, CustomerWithIdDto} from '../types';
+import {fetchCustomers, updateCustomer} from '@/features/customers/api';
+import EditCustomerDialog from '@/features/customers/components/EditCustomerDialog';
+import {useOffers} from '@/features/offers';
+import {useToast} from '@/shared/components/ToastProvider';
 import FlagIcon from '@mui/icons-material/Flag';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import SearchIcon from '@mui/icons-material/Search';

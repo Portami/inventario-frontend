@@ -1,11 +1,4 @@
-import {
-    DEFAULT_LABEL_HEIGHT_MM,
-    DEFAULT_LABEL_WIDTH_MM,
-    MAX_LABEL_HEIGHT_MM,
-    MAX_LABEL_WIDTH_MM,
-    MIN_LABEL_HEIGHT_MM,
-    MIN_LABEL_WIDTH_MM,
-} from '../../pages/constants/labelConstants.ts';
+import {DEFAULT_LABEL_HEIGHT_MM, DEFAULT_LABEL_WIDTH_MM, MAX_LABEL_HEIGHT_MM, MAX_LABEL_WIDTH_MM, MIN_LABEL_HEIGHT_MM, MIN_LABEL_WIDTH_MM} from '../constants';
 import {Box, Paper, Stack, Typography, useTheme} from '@mui/material';
 
 type LabelDimensionControlsProps = {

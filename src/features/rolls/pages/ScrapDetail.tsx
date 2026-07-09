@@ -1,9 +1,10 @@
-import DetailPage from '@/components/DetailPage';
-import PieceDetailCard, {NamedOption, PieceFormState} from '@/components/pieces/PieceDetailCard';
-import {useToast} from '@/components/ToastProvider';
-import {deleteScrap, fetchScrapDetails, fetchStorages, updateScrap} from '@/services/backend';
-import {ScrapPieceDto} from '@/types/roll';
-import {toErrorMessage} from '@/utils/pageUtils';
+import {deleteScrap, fetchScrapDetails, updateScrap} from '../api';
+import PieceDetailCard, {NamedOption, PieceFormState} from '@/features/rolls/components/PieceDetailCard';
+import {ScrapPieceDto} from '@/features/rolls/types';
+import {fetchStorages} from '@/features/storage';
+import DetailPage from '@/shared/components/DetailPage';
+import {useToast} from '@/shared/components/ToastProvider';
+import {toErrorMessage} from '@/shared/utils/pageUtils';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';

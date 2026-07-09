@@ -1,7 +1,7 @@
-import StorageAuditingCard from '@/components/inventoryAuditing/StorageAuditingCard.tsx';
-import {fetchStocktakeById} from '@/services/backend.ts';
-import {FeltStocktakeDto} from '@/types/inventoryAuditing.ts';
-import {toErrorMessage} from '@/utils/pageUtils.ts';
+import {fetchStocktakeById} from '@/features/stocktakes/api';
+import StorageAuditingCard from '@/features/stocktakes/components/StorageAuditingCard';
+import {FeltStocktakeDto} from '@/features/stocktakes/types';
+import {toErrorMessage} from '@/shared/utils/pageUtils';
 import {Alert, Box, CircularProgress} from '@mui/material';
 import {useEffect, useState} from 'react';
 import {useParams} from 'react-router';

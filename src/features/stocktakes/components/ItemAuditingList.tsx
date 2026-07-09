@@ -1,6 +1,6 @@
-import {AuditingResolveDialog} from '@/components/inventoryAuditing/AuditingResolveDialog.tsx';
-import {FeltStocktakeItemDto, ITEM_STATE_LABELS, ItemState, PROBLEM_STATE_COLORS, RESOLUTION_TYPES_LABELS} from '@/types/inventoryAuditing.ts';
-import {toErrorMessage} from '@/utils/pageUtils.ts';
+import {AuditingResolveDialog} from '@/features/stocktakes/components/AuditingResolveDialog';
+import {FeltStocktakeItemDto, ITEM_STATE_LABELS, ItemState, PROBLEM_STATE_COLORS, RESOLUTION_TYPES_LABELS} from '@/features/stocktakes/types';
+import {toErrorMessage} from '@/shared/utils/pageUtils';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import {Alert, Box, CircularProgress, IconButton, SxProps} from '@mui/material';
 import {Theme} from '@mui/material/styles';

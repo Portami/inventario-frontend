@@ -1,6 +1,6 @@
-import {useToast} from '@/components/ToastProvider';
-import {createProduct, createProductCategory, createProductVariant, fetchProductCategories} from '@/services/backend';
-import {ProductCategoryDto} from '@/types/product';
+import {createProduct, createProductCategory, createProductVariant, fetchProductCategories} from '@/features/products/api';
+import {ProductCategoryDto} from '@/features/products/types';
+import {useToast} from '@/shared/components/ToastProvider';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import {

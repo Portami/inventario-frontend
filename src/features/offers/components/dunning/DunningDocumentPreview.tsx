@@ -1,6 +1,6 @@
-import {PORTAMI} from '@/constants/companyConstants';
-import {fmtCHF, fmtDate, lineSubtotal} from '@/pages/constants/offerConstants';
-import {OfferDto} from '@/types/offerte';
+import {fmtCHF, fmtDate, lineSubtotal} from '@/features/offers/constants';
+import {OfferDto} from '@/features/offers/types';
+import {PORTAMI} from '@/shared/constants/companyConstants';
 import {Box, Divider, Typography} from '@mui/material';
 
 type DunningState = 'PAYMENT_REMINDER' | 'FIRST_DUNNING_NOTICE' | 'SECOND_DUNNING_NOTICE';

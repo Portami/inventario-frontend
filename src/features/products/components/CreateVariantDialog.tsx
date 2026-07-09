@@ -1,6 +1,6 @@
-import {useToast} from '@/components/ToastProvider';
-import {createProductVariant} from '@/services/backend';
-import {ProductAttributeDto} from '@/types/product';
+import {createProductVariant} from '@/features/products/api';
+import {ProductAttributeDto} from '@/features/products/types';
+import {useToast} from '@/shared/components/ToastProvider';
 import CloseIcon from '@mui/icons-material/Close';
 import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, IconButton, TextField, Typography} from '@mui/material';
 import {ChangeEvent, useEffect, useState} from 'react';

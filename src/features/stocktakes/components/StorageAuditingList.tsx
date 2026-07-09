@@ -1,8 +1,8 @@
-import ItemAuditingList from '@/components/inventoryAuditing/ItemAuditingList.tsx';
-import ProblemStateCounts from '@/components/inventoryAuditing/ProblemStateCount.tsx';
-import {fetchStocktakeItems} from '@/services/backend.ts';
-import {FeltStocktakeItemDto, FeltStocktakeListInfoDto, ITEM_STATE, STORAGE_STATE, StorageState} from '@/types/inventoryAuditing.ts';
-import {toErrorMessage} from '@/utils/pageUtils.ts';
+import {fetchStocktakeItems} from '@/features/stocktakes/api';
+import ItemAuditingList from '@/features/stocktakes/components/ItemAuditingList';
+import ProblemStateCounts from '@/features/stocktakes/components/ProblemStateCount';
+import {FeltStocktakeItemDto, FeltStocktakeListInfoDto, ITEM_STATE, STORAGE_STATE, StorageState} from '@/features/stocktakes/types';
+import {toErrorMessage} from '@/shared/utils/pageUtils';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {Alert, Box, Button, CircularProgress, Stack, Typography} from '@mui/material';
 import {DataGrid, GridColDef} from '@mui/x-data-grid';

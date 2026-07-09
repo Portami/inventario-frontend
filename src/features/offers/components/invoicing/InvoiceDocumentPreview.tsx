@@ -1,6 +1,6 @@
-import {PORTAMI} from '@/constants/companyConstants';
-import {fmtCHF, fmtDate, fmtNum, lineSubtotal} from '@/pages/constants/offerConstants';
-import {LineItemDto, OfferDto} from '@/types/offerte';
+import {fmtCHF, fmtDate, fmtNum, lineSubtotal} from '@/features/offers/constants';
+import {LineItemDto, OfferDto} from '@/features/offers/types';
+import {PORTAMI} from '@/shared/constants/companyConstants';
 import {Box, Divider, Typography} from '@mui/material';
 
 const TEXT = {

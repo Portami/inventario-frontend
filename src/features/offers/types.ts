@@ -1,3 +1,5 @@
+import type {CustomerDto} from '@/features/customers/types';
+
 export type OfferState =
     | 'OFFER'
     | 'ORDER_CONFIRMATION'
@@ -56,24 +58,6 @@ export interface LineItemDto {
     variantId?: number;
 }
 
-/** Customer contact and address data as used within the frontend domain model. */
-export interface CustomerDto {
-    customerNumber: string;
-    name: string;
-    contactPerson: string;
-    email: string;
-    phone: string;
-    street: string;
-    zip: string;
-    city: string;
-    country: string;
-    vatNumber: string;
-}
-
-export interface CustomerWithIdDto extends CustomerDto {
-    id: string;
-}
-
 /** Full offer document returned by the detail endpoint, including all line items and state history. */
 export interface OfferDto {
     id: string;
@@ -126,19 +110,6 @@ export interface BackendCustomerDto {
     city: string | null;
     country: string | null;
     vatNumber: string | null;
-}
-
-export interface BackendFullCustomerDto {
-    id: number;
-    name: string;
-    contactPerson: string;
-    email: string;
-    phone: string;
-    street: string;
-    zip: string;
-    city: string;
-    country: string;
-    vatNumber: string;
 }
 
 export interface BackendOfferItemDto {

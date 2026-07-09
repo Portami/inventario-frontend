@@ -1,6 +1,6 @@
-import RollLabel from '@/components/rolls/RollLabel';
-import {A4_HEIGHT_MM, A4_WIDTH_MM} from '@/pages/constants/labelConstants';
-import {Product} from '@/types/product';
+import {A4_HEIGHT_MM, A4_WIDTH_MM} from '@/features/labels/constants';
+import {Product} from '@/features/products/types';
+import {RollLabel} from '@/features/rolls';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import React from 'react';

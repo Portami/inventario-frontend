@@ -1,6 +1,6 @@
-import {useToast} from '@/components/ToastProvider';
-import {fetchProductCategories, patchProduct} from '@/services/backend';
-import {ProductCategoryDto, ProductDto} from '@/types/product';
+import {fetchProductCategories, patchProduct} from '@/features/products/api';
+import {ProductCategoryDto, ProductDto} from '@/features/products/types';
+import {useToast} from '@/shared/components/ToastProvider';
 import CloseIcon from '@mui/icons-material/Close';
 import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, MenuItem, TextField} from '@mui/material';
 import {useEffect, useState} from 'react';

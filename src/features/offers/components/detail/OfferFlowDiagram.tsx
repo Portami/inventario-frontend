@@ -1,5 +1,5 @@
-import {OFFER_STATE_META, OFFER_TRANSITIONS} from '@/pages/constants/offerConstants';
-import {OfferState} from '@/types/offerte';
+import {OFFER_STATE_META, OFFER_TRANSITIONS} from '@/features/offers/constants';
+import {OfferState} from '@/features/offers/types';
 import CheckIcon from '@mui/icons-material/Check';
 import {Box, useTheme} from '@mui/material';
 import {Theme} from '@mui/material/styles';

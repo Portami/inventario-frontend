@@ -1,5 +1,6 @@
-import {generateOfferPdf} from '@/services/invoicePdfService';
-import {CustomerDto, LineItemDto, OfferDto, OfferState} from '@/types/offerte';
+import type {CustomerDto} from '@/features/customers/types';
+import {generateOfferPdf} from '@/features/offers/pdf/invoicePdfService';
+import {LineItemDto, OfferDto, OfferState} from '@/features/offers/types';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 // Hoisted mocks - vi.hoisted ensures initialization before vi.mock factories run.

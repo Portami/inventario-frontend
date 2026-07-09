@@ -1,8 +1,8 @@
+import KindChip from '../list/KindChip';
+import ReservationChip from '../reservations/ReservationChip';
 import Editable from './Editable';
-import KindChip from './KindChip';
-import ReservationChip from './ReservationChip';
-import {fmtCHF, lineSubtotal} from '@/pages/constants/offerConstants';
-import {LineItemDto} from '@/types/offerte';
+import {fmtCHF, lineSubtotal} from '@/features/offers/constants';
+import {LineItemDto} from '@/features/offers/types';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';

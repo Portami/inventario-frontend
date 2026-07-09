@@ -1,9 +1,9 @@
-import FeltReorderPage from '@/pages/FeltReorderPage';
+import FeltReorderPage from '@/features/felts/pages/FeltReorderPage';
 import {fireEvent, render, screen, within} from '@testing-library/react';
 import React from 'react';
 import {vi} from 'vitest';
 
-vi.mock('@/services/backend', () => {
+vi.mock('@/features/felts/api', () => {
     const mockFelts = [
         {
             id: 1,
@@ -48,13 +48,13 @@ vi.mock('@/services/backend', () => {
     };
 });
 
-vi.mock('@/components/felts/FeltDialog', () => {
+vi.mock('@/features/felts/components/FeltDialog', () => {
     return {
         default: ({open, felt}: any) => (open ? <div data-testid="felt-dialog">{felt?.articleNumber}</div> : null),
     };
 });
 
-vi.mock('@/components/felts/DeleteFeltDialog', () => {
+vi.mock('@/features/felts/components/DeleteFeltDialog', () => {
     return {
         default: ({open, felt, onConfirm}: any) =>
             open ? (

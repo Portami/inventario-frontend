@@ -1,9 +1,9 @@
-import StorageAuditingCard from '@/components/inventoryAuditing/StorageAuditingCard.tsx';
-import StorageAuditingList from '@/components/inventoryAuditing/StorageAuditingList.tsx';
-import {useToast} from '@/components/ToastProvider.tsx';
-import {completeStocktake, fetchStocktakeById, fetchStocktakeItems} from '@/services/backend.ts';
-import {FeltStocktakeDto, ITEM_STATE} from '@/types/inventoryAuditing.ts';
-import {formatDate, toErrorMessage} from '@/utils/pageUtils.ts';
+import {completeStocktake, fetchStocktakeById, fetchStocktakeItems} from '@/features/stocktakes/api';
+import StorageAuditingCard from '@/features/stocktakes/components/StorageAuditingCard';
+import StorageAuditingList from '@/features/stocktakes/components/StorageAuditingList';
+import {FeltStocktakeDto, ITEM_STATE} from '@/features/stocktakes/types';
+import {useToast} from '@/shared/components/ToastProvider';
+import {formatDate, toErrorMessage} from '@/shared/utils/pageUtils';
 import CheckIcon from '@mui/icons-material/Check';
 import {Alert, Box, Button, CircularProgress, Stack, Typography} from '@mui/material';
 import React, {useEffect, useState} from 'react';

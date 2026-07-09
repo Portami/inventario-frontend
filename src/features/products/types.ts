@@ -1,4 +1,4 @@
-import {Felt} from './felt';
+import type {Felt} from '@/features/felts/types';
 
 export type ProductId = number | string;
 

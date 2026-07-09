@@ -1,4 +1,4 @@
-import {FeltStocktakeDto} from '@/types/inventoryAuditing.ts';
+import {FeltStocktakeDto} from '@/features/stocktakes/types';
 import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
 
 interface DeleteInvAuditingDialogProps {

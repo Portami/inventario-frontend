@@ -1,8 +1,8 @@
 import {useFeltManagement} from '../hooks/useFeltManagement';
-import DeleteFeltDialog from '@/components/felts/DeleteFeltDialog';
-import FeltDialog from '@/components/felts/FeltDialog';
-import ListPage from '@/components/ListPage';
-import {FeltDto} from '@/types/felt';
+import DeleteFeltDialog from '@/features/felts/components/DeleteFeltDialog';
+import FeltDialog from '@/features/felts/components/FeltDialog';
+import {FeltDto} from '@/features/felts/types';
+import ListPage from '@/shared/components/ListPage';
 import AddIcon from '@mui/icons-material/Add';
 import {Box, Button, CircularProgress, Typography} from '@mui/material';
 import {DataGrid, GridRowParams} from '@mui/x-data-grid';

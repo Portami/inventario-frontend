@@ -1,5 +1,5 @@
-import {fmtCHF, fmtNum, lineSubtotal, VAT_RATE} from '@/pages/constants/offerConstants';
-import {LineItemDto} from '@/types/offerte';
+import {fmtCHF, fmtNum, lineSubtotal, VAT_RATE} from '@/features/offers/constants';
+import {LineItemDto} from '@/features/offers/types';
 import {Box, Card, CardContent, Divider, Stack, Typography, useTheme} from '@mui/material';
 
 function TotalsRow({label, value, strong, muted}: Readonly<{label: string; value: string; strong?: boolean; muted?: boolean}>) {

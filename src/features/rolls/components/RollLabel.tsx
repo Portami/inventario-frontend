@@ -1,5 +1,5 @@
-import DataMatrix from '../DataMatrix.tsx';
-import {Product} from '@/types/product.ts';
+import DataMatrix from './DataMatrix.tsx';
+import {Product} from '@/features/products/types';
 import {Box, Card, Divider, Typography, useTheme} from '@mui/material';
 
 type RollLabelProps = {

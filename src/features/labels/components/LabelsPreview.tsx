@@ -1,6 +1,6 @@
-import {A4_HEIGHT_MM, A4_WIDTH_MM, LABEL_GAP_MM, PAGE_MARGINS_MM} from '../../pages/constants/labelConstants.ts';
-import RollLabel from '@/components/rolls/RollLabel.tsx';
-import {Product} from '@/types/product.ts';
+import {A4_HEIGHT_MM, A4_WIDTH_MM, LABEL_GAP_MM, PAGE_MARGINS_MM} from '../constants';
+import {Product} from '@/features/products/types';
+import {RollLabel} from '@/features/rolls';
 import {Box, Typography, useTheme} from '@mui/material';
 
 type LabelsPreviewProps = {

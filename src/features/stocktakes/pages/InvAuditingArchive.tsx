@@ -1,7 +1,7 @@
-import ListPage from '@/components/ListPage.tsx';
-import {fetchStocktakes} from '@/services/backend.ts';
-import {FeltStocktakeDto} from '@/types/inventoryAuditing.ts';
-import {formatDate, toErrorMessage} from '@/utils/pageUtils.ts';
+import {fetchStocktakes} from '@/features/stocktakes/api';
+import {FeltStocktakeDto} from '@/features/stocktakes/types';
+import ListPage from '@/shared/components/ListPage';
+import {formatDate, toErrorMessage} from '@/shared/utils/pageUtils';
 import {DataGrid, GridColDef} from '@mui/x-data-grid';
 import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router';

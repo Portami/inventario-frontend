@@ -1,5 +1,5 @@
-import {OFFER_STATE, OFFER_STATE_META} from '@/pages/constants/offerConstants';
-import {OfferState} from '@/types/offerte';
+import {OFFER_STATE, OFFER_STATE_META} from '@/features/offers/constants';
+import {OfferState} from '@/features/offers/types';
 import {Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
 import {useState} from 'react';
 

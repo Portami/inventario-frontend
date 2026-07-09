@@ -1,10 +1,10 @@
-import DetailPage from '@/components/DetailPage.tsx';
-import ItemAuditingList from '@/components/inventoryAuditing/ItemAuditingList.tsx';
-import {useToast} from '@/components/ToastProvider.tsx';
-import {useHidScanner} from '@/hooks/useHidScanner.ts';
-import {closeStocktakeStorage, createFeltStocktakeScan, fetchStocktakeItems} from '@/services/backend.ts';
-import {FeltStocktakeItemDto, FeltStocktakeListInfoDto, ITEM_STATE, STORAGE_STATE} from '@/types/inventoryAuditing.ts';
-import {toErrorMessage} from '@/utils/pageUtils.ts';
+import {closeStocktakeStorage, createFeltStocktakeScan, fetchStocktakeItems} from '../api';
+import {useHidScanner} from '@/features/scanning';
+import ItemAuditingList from '@/features/stocktakes/components/ItemAuditingList';
+import {FeltStocktakeItemDto, FeltStocktakeListInfoDto, ITEM_STATE, STORAGE_STATE} from '@/features/stocktakes/types';
+import DetailPage from '@/shared/components/DetailPage';
+import {useToast} from '@/shared/components/ToastProvider';
+import {toErrorMessage} from '@/shared/utils/pageUtils';
 import CheckIcon from '@mui/icons-material/Check';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import {Alert, Button, Snackbar, Stack, Typography} from '@mui/material';

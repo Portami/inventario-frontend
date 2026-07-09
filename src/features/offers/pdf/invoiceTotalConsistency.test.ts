@@ -1,5 +1,5 @@
-import {computeTotal, InvoiceOptions} from '@/services/invoiceTotal';
-import {LineItemDto, OfferState} from '@/types/offerte';
+import {computeTotal, InvoiceOptions} from '@/features/offers/pdf/invoiceTotal';
+import {LineItemDto, OfferState} from '@/features/offers/types';
 import {describe, expect, it} from 'vitest';
 
 function makeLine(overrides: Partial<LineItemDto> = {}): LineItemDto {

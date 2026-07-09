@@ -1,7 +1,7 @@
-import {InvChangelogList} from '@/components/inventoryAuditing/InvChangelogList.tsx';
-import {fetchStocktakeById} from '@/services/backend.ts';
-import {FeltStocktakeDto} from '@/types/inventoryAuditing.ts';
-import {formatDate, toErrorMessage} from '@/utils/pageUtils.ts';
+import {fetchStocktakeById} from '@/features/stocktakes/api';
+import {InvChangelogList} from '@/features/stocktakes/components/InvChangelogList';
+import {FeltStocktakeDto} from '@/features/stocktakes/types';
+import {formatDate, toErrorMessage} from '@/shared/utils/pageUtils';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {Alert, Box, Button, CircularProgress, Typography} from '@mui/material';
 import React, {useEffect, useState} from 'react';

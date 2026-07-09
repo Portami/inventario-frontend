@@ -1,10 +1,10 @@
-import {DeleteInvAuditingDialog} from '@/components/inventoryAuditing/DeleteInvAuditingDialog.tsx';
-import {InventoryAuditingDialog} from '@/components/inventoryAuditing/InventoryAuditingDialog.tsx';
-import ListPage from '@/components/ListPage.tsx';
-import {useToast} from '@/components/ToastProvider.tsx';
-import {deleteStocktake, fetchStocktakes} from '@/services/backend.ts';
-import {FeltStocktakeDto} from '@/types/inventoryAuditing.ts';
-import {formatDate, toErrorMessage} from '@/utils/pageUtils.ts';
+import {deleteStocktake, fetchStocktakes} from '@/features/stocktakes/api';
+import {DeleteInvAuditingDialog} from '@/features/stocktakes/components/DeleteInvAuditingDialog';
+import {InventoryAuditingDialog} from '@/features/stocktakes/components/InventoryAuditingDialog';
+import {FeltStocktakeDto} from '@/features/stocktakes/types';
+import ListPage from '@/shared/components/ListPage';
+import {useToast} from '@/shared/components/ToastProvider';
+import {formatDate, toErrorMessage} from '@/shared/utils/pageUtils';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {Button, IconButton} from '@mui/material';

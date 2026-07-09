@@ -1,5 +1,5 @@
-import {fmtDate, RESERVATION_DAYS, RESERVATION_KIND} from '@/pages/constants/offerConstants';
-import {ReservationDto} from '@/types/offerte';
+import {fmtDate, RESERVATION_DAYS, RESERVATION_KIND} from '@/features/offers/constants';
+import {ReservationDto} from '@/features/offers/types';
 import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined';
 import LockClockOutlinedIcon from '@mui/icons-material/LockClockOutlined';
 import {Chip, Tooltip, useTheme} from '@mui/material';

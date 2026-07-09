@@ -1,4 +1,4 @@
-import {FeltStocktakeItemDto, ITEM_STATE, ITEM_STATE_LABELS, ItemState, PROBLEM_STATE_COLORS} from '@/types/inventoryAuditing.ts';
+import {FeltStocktakeItemDto, ITEM_STATE, ITEM_STATE_LABELS, ItemState, PROBLEM_STATE_COLORS} from '@/features/stocktakes/types';
 import {Box, Stack, Typography} from '@mui/material';
 
 type ProblemStateCountsProps = {

@@ -1,10 +1,10 @@
-import ConfirmDeleteDialog from '@/components/products/ConfirmDeleteDialog';
-import CreateVariantDialog from '@/components/products/CreateVariantDialog';
-import EditProductDialog from '@/components/products/EditProductDialog';
-import EditVariantDialog from '@/components/products/EditVariantDialog';
-import {useToast} from '@/components/ToastProvider';
-import {deleteProduct, deleteProductVariant, fetchProductById, patchProduct} from '@/services/backend';
-import {ProductDto, ProductVariantDto} from '@/types/product';
+import {deleteProduct, deleteProductVariant, fetchProductById, patchProduct} from '@/features/products/api';
+import ConfirmDeleteDialog from '@/features/products/components/ConfirmDeleteDialog';
+import CreateVariantDialog from '@/features/products/components/CreateVariantDialog';
+import EditProductDialog from '@/features/products/components/EditProductDialog';
+import EditVariantDialog from '@/features/products/components/EditVariantDialog';
+import {ProductDto, ProductVariantDto} from '@/features/products/types';
+import {useToast} from '@/shared/components/ToastProvider';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteIcon from '@mui/icons-material/Delete';

@@ -1,5 +1,5 @@
-import {KIND_CHIP_STYLES} from '@/pages/constants/offerConstants';
-import {LineItemKind} from '@/types/offerte';
+import {KIND_CHIP_STYLES} from '@/features/offers/constants';
+import {LineItemKind} from '@/features/offers/types';
 import {Chip} from '@mui/material';
 
 export default function KindChip({kind}: Readonly<{kind: LineItemKind}>) {

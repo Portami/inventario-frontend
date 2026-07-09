@@ -1,8 +1,7 @@
-import StatTile from '@/components/offers/StatTile';
-import ChartCard from '@/components/statistics/ChartCard';
-import {useOffers} from '@/hooks/useOffers';
-import {ALL_BACKEND_STATES, fmtCHF, OFFER_STATE_META} from '@/pages/constants/offerConstants';
-import type {OfferState, OfferSummaryDto} from '@/types/offerte';
+import {ALL_BACKEND_STATES, fmtCHF, OFFER_STATE_META, useOffers} from '@/features/offers';
+import type {OfferState, OfferSummaryDto} from '@/features/offers/types';
+import ChartCard from '@/features/statistics/components/ChartCard';
+import StatTile from '@/shared/components/StatTile';
 import {Alert, Box, CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from '@mui/material';
 import {useMemo} from 'react';
 import {Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';

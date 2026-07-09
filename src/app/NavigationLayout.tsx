@@ -1,6 +1,5 @@
 import logo from '@/assets/logo.svg';
-import {useHidScanner} from '@/hooks/useHidScanner';
-import {lookupRollCode} from '@/services/backend';
+import {lookupRollCode, useHidScanner} from '@/features/scanning';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';

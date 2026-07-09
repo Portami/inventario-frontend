@@ -1,4 +1,4 @@
-import type {LineItemDto, LineItemKind, OfferState} from '@/types/offerte';
+import type {LineItemDto, LineItemKind, OfferState} from '@/features/offers/types';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';

@@ -1,5 +1,5 @@
-import {daysFromNow, fmtCHF, fmtDate, lineSubtotal, OFFER_STATE_META} from '@/pages/constants/offerConstants';
-import {OfferDto} from '@/types/offerte';
+import {daysFromNow, fmtCHF, fmtDate, lineSubtotal, OFFER_STATE_META} from '@/features/offers/constants';
+import {OfferDto} from '@/features/offers/types';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import PictureAsPdfOutlinedIcon from '@mui/icons-material/PictureAsPdfOutlined';

@@ -1,7 +1,7 @@
-import ListPage from '@/components/ListPage.tsx';
-import {fetchStocktakeItems} from '@/services/backend.ts';
-import {FeltStocktakeItemDto, ITEM_STATE_LABELS, ItemState, PROBLEM_STATE_COLORS, RESOLUTION_TYPES_LABELS} from '@/types/inventoryAuditing.ts';
-import {toErrorMessage} from '@/utils/pageUtils.ts';
+import {fetchStocktakeItems} from '@/features/stocktakes/api';
+import {FeltStocktakeItemDto, ITEM_STATE_LABELS, ItemState, PROBLEM_STATE_COLORS, RESOLUTION_TYPES_LABELS} from '@/features/stocktakes/types';
+import ListPage from '@/shared/components/ListPage';
+import {toErrorMessage} from '@/shared/utils/pageUtils';
 import {DataGrid, GridColDef} from '@mui/x-data-grid';
 import {useEffect, useState} from 'react';
 

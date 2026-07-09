@@ -1,5 +1,5 @@
-import {fmtCHF} from '@/pages/constants/offerConstants';
-import {FeltCatalogItem} from '@/types/offerte';
+import {fmtCHF} from '@/features/offers/constants';
+import {FeltCatalogItem} from '@/features/offers/types';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import {

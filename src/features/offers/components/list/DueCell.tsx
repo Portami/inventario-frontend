@@ -1,5 +1,5 @@
-import {daysFromNow, fmtDate, OFFER_STATE} from '@/pages/constants/offerConstants';
-import {OfferState} from '@/types/offerte';
+import {daysFromNow, fmtDate, OFFER_STATE} from '@/features/offers/constants';
+import {OfferState} from '@/features/offers/types';
 import {Box, Typography} from '@mui/material';
 
 interface DueCellProps {

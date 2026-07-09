@@ -1,7 +1,6 @@
-import {fetchOffers} from '@/services/backend';
-import {cacheInvalidate} from '@/services/cache';
-import {OfferSummaryDto} from '@/types/offerte';
-import {toErrorMessage} from '@/utils/pageUtils';
+import {fetchOffers} from '@/features/offers/api';
+import {OfferSummaryDto} from '@/features/offers/types';
+import {toErrorMessage} from '@/shared/utils/pageUtils';
 import {useCallback, useEffect, useState} from 'react';
 
 /** State returned by the useOffers hook for the offers list page. */
@@ -9,11 +8,11 @@ export interface UseOffersReturn {
     offers: OfferSummaryDto[];
     loading: boolean;
     error: string;
-    /** Invalidates the cache and reloads all offers from the backend. */
+    /** Reloads all offers from the backend. */
     refetch: () => Promise<void>;
 }
 
-/** Fetches and caches the full list of offer summaries, exposing a refetch action for post-mutation updates. */
+/** Fetches the full list of offer summaries, exposing a refetch action for post-mutation updates. */
 export function useOffers(): UseOffersReturn {
     const [offers, setOffers] = useState<OfferSummaryDto[]>([]);
     const [loading, setLoading] = useState(true);
@@ -33,7 +32,6 @@ export function useOffers(): UseOffersReturn {
     }, []);
 
     const refetch = useCallback(async () => {
-        cacheInvalidate('offers');
         await load();
     }, [load]);
 

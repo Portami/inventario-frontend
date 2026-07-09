@@ -1,5 +1,5 @@
-import {lineSubtotal} from '@/pages/constants/offerConstants';
-import {LineItemDto, OfferState} from '@/types/offerte';
+import {lineSubtotal} from '@/features/offers/constants';
+import {LineItemDto, OfferState} from '@/features/offers/types';
 
 export interface InvoiceOptions {
     shippingFee?: number;

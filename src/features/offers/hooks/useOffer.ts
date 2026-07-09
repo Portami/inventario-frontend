@@ -1,5 +1,5 @@
-import {useToast} from '@/components/ToastProvider';
-import {CUT_SURCHARGE_DEFAULT, LINE_KIND, OFFER_STATE_META, RESERVATION_KIND} from '@/pages/constants/offerConstants';
+import {updateCustomer} from '@/features/customers';
+import type {CustomerDto} from '@/features/customers/types';
 import {
     addOfferLine,
     changeOfferState,
@@ -8,12 +8,13 @@ import {
     fetchOffer,
     fetchProductCatalog,
     markOfferSent,
-    updateCustomer,
     updateOfferDueDate,
-} from '@/services/backend';
-import {generateOfferPdf, InvoiceOptions} from '@/services/invoicePdfService';
-import {CustomerDto, FeltCatalogItem, LineItemDto, OfferDto, OfferState, ProductCatalogItem} from '@/types/offerte';
-import {toErrorMessage} from '@/utils/pageUtils';
+} from '@/features/offers/api';
+import {CUT_SURCHARGE_DEFAULT, LINE_KIND, OFFER_STATE_META, RESERVATION_KIND} from '@/features/offers/constants';
+import {generateOfferPdf, InvoiceOptions} from '@/features/offers/pdf/invoicePdfService';
+import {FeltCatalogItem, LineItemDto, OfferDto, OfferState, ProductCatalogItem} from '@/features/offers/types';
+import {useToast} from '@/shared/components/ToastProvider';
+import {toErrorMessage} from '@/shared/utils/pageUtils';
 import {useCallback, useEffect, useState} from 'react';
 
 function withLineReplaced(o: OfferDto | null, lineId: string, line: LineItemDto): OfferDto | null {

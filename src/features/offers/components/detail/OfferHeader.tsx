@@ -1,6 +1,6 @@
 import OfferFlowDiagram from './OfferFlowDiagram';
-import {fmtDate, OFFER_CLOSE_STATES, OFFER_STATE, OFFER_STATE_META, OFFER_TRANSITIONS} from '@/pages/constants/offerConstants';
-import {OfferDto, OfferState} from '@/types/offerte';
+import {fmtDate, OFFER_CLOSE_STATES, OFFER_STATE, OFFER_STATE_META, OFFER_TRANSITIONS} from '@/features/offers/constants';
+import {OfferDto, OfferState} from '@/features/offers/types';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
