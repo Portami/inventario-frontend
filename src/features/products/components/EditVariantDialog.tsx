@@ -2,9 +2,11 @@ import {changeInventory, patchProductVariant} from '../api';
 import {ProductAttributeDto, ProductVariantDto} from '@/features/products/types';
 import {fetchStorages} from '@/features/storage';
 import {Storage} from '@/features/storage/types';
+import FormDialog from '@/shared/components/FormDialog';
+import FormSection from '@/shared/components/FormSection';
+import FormTextField from '@/shared/components/FormTextField';
 import {useToast} from '@/shared/components/ToastProvider';
-import CloseIcon from '@mui/icons-material/Close';
-import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, IconButton, TextField, Typography} from '@mui/material';
+import {Grid} from '@mui/material';
 import {ChangeEvent, useEffect, useState} from 'react';
 
 type EditVariantDialogProps = {
@@ -15,8 +17,6 @@ type EditVariantDialogProps = {
     readonly variant: ProductVariantDto;
     readonly productAttributes: ProductAttributeDto[];
 };
-
-const labelProps = {sx: {fontWeight: 600}};
 
 export default function EditVariantDialog({open, onClose, onSaved, productId, variant, productAttributes}: EditVariantDialogProps) {
     const showToast = useToast();
@@ -104,104 +104,48 @@ export default function EditVariantDialog({open, onClose, onSaved, productId, va
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 4, pt: 3}}>
-                Variante bearbeiten
-                <IconButton onClick={onClose} size="small" aria-label="close" disabled={isSaving}>
-                    <CloseIcon />
-                </IconButton>
-            </DialogTitle>
-            <DialogContent sx={{px: 4, pb: 3}}>
-                <Grid container spacing={3} sx={{mt: 0.5}}>
-                    <Grid size={6}>
-                        <TextField
-                            label="Name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            required
-                            slotProps={{inputLabel: labelProps}}
-                        />
-                    </Grid>
-                    <Grid size={6}>
-                        <TextField
-                            label="Preis (CHF)"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
-                            type="number"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            required
-                            slotProps={{htmlInput: {min: 0, step: 0.01}, inputLabel: labelProps}}
-                        />
-                    </Grid>
+        <FormDialog open={open} onClose={onClose} title="Variante bearbeiten" onSubmit={() => void handleSave()} submitLabel="Speichern" busy={isSaving}>
+            <Grid size={6}>
+                <FormTextField label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
+            </Grid>
+            <Grid size={6}>
+                <FormTextField
+                    label="Preis (CHF)"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    type="number"
+                    required
+                    slotProps={{htmlInput: {min: 0, step: 0.01}}}
+                />
+            </Grid>
 
-                    {productAttributes.length > 0 && (
-                        <>
-                            <Grid size={12}>
-                                <Divider />
-                                <Typography variant="overline" sx={{display: 'block', mt: 2, mb: 0.5, color: 'text.secondary'}}>
-                                    Attribute
-                                </Typography>
-                            </Grid>
-                            {productAttributes.map((attr) => (
-                                <Grid size={6} key={attr.id}>
-                                    <TextField
-                                        label={attr.name}
-                                        value={attrValues[attr.id] ?? ''}
-                                        onChange={setAttr(attr.id)}
-                                        variant="outlined"
-                                        size="small"
-                                        fullWidth
-                                        slotProps={{inputLabel: labelProps}}
-                                    />
-                                </Grid>
-                            ))}
-                        </>
-                    )}
+            {productAttributes.length > 0 && (
+                <>
+                    <FormSection label="Attribute" />
+                    {productAttributes.map((attr) => (
+                        <Grid size={6} key={attr.id}>
+                            <FormTextField label={attr.name} value={attrValues[attr.id] ?? ''} onChange={setAttr(attr.id)} />
+                        </Grid>
+                    ))}
+                </>
+            )}
 
-                    {storages.length > 0 && (
-                        <>
-                            <Grid size={12}>
-                                <Divider />
-                                <Typography variant="overline" sx={{display: 'block', mt: 2, mb: 0.5, color: 'text.secondary'}}>
-                                    Bestand pro Lagerort
-                                </Typography>
-                            </Grid>
-                            {storages.map((s) => (
-                                <Grid size={6} key={s.id}>
-                                    <TextField
-                                        label={s.name}
-                                        value={quantities[s.id] ?? '0'}
-                                        onChange={setQty(s.id)}
-                                        type="number"
-                                        variant="outlined"
-                                        size="small"
-                                        fullWidth
-                                        slotProps={{htmlInput: {min: 0, step: 1}, inputLabel: labelProps}}
-                                    />
-                                </Grid>
-                            ))}
-                        </>
-                    )}
-                </Grid>
-            </DialogContent>
-            <DialogActions sx={{px: 4, pb: 3}}>
-                <Button variant="outlined" onClick={onClose} disabled={isSaving}>
-                    Abbrechen
-                </Button>
-                <Button
-                    variant="contained"
-                    onClick={() => void handleSave()}
-                    disabled={isSaving}
-                    startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : undefined}
-                >
-                    Speichern
-                </Button>
-            </DialogActions>
-        </Dialog>
+            {storages.length > 0 && (
+                <>
+                    <FormSection label="Bestand pro Lagerort" />
+                    {storages.map((s) => (
+                        <Grid size={6} key={s.id}>
+                            <FormTextField
+                                label={s.name}
+                                value={quantities[s.id] ?? '0'}
+                                onChange={setQty(s.id)}
+                                type="number"
+                                slotProps={{htmlInput: {min: 0, step: 1}}}
+                            />
+                        </Grid>
+                    ))}
+                </>
+            )}
+        </FormDialog>
     );
 }

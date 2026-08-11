@@ -1,4 +1,5 @@
 import {fetchStocktakeItems} from '@/features/stocktakes/api';
+import {auditingGridSx} from '@/features/stocktakes/components/auditingGridSx';
 import {FeltStocktakeItemDto, ITEM_STATE_LABELS, ItemState, PROBLEM_STATE_COLORS, RESOLUTION_TYPES_LABELS} from '@/features/stocktakes/types';
 import ListPage from '@/shared/components/ListPage';
 import {toErrorMessage} from '@/shared/utils/pageUtils';
@@ -103,34 +104,7 @@ export function InvChangelogList({inventoryId}: InvChangelogListProps) {
 
                     return '';
                 }}
-                sx={{
-                    '& .MuiDataGrid-row': {
-                        cursor: 'pointer',
-                    },
-                    '& .bold-cell': {
-                        fontWeight: 700,
-                    },
-                    '& .row-resolved': {
-                        backgroundColor: '#e8f5e9',
-                    },
-                    '& .row-resolved:hover': {
-                        backgroundColor: '#e8f5e9',
-                    },
-
-                    ...Object.entries(PROBLEM_STATE_COLORS).reduce(
-                        (styles, [state, colors]) => ({
-                            ...styles,
-                            [`& .row-state-${state}`]: {
-                                backgroundColor: colors.backgroundColor,
-                                color: colors.color,
-                            },
-                            [`& .row-state-${state}:hover`]: {
-                                backgroundColor: colors.backgroundColor,
-                            },
-                        }),
-                        {},
-                    ),
-                }}
+                sx={auditingGridSx}
             />
         </ListPage>
     );

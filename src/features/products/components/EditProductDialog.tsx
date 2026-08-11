@@ -1,8 +1,9 @@
 import {fetchProductCategories, patchProduct} from '@/features/products/api';
 import {ProductCategoryDto, ProductDto} from '@/features/products/types';
+import FormDialog from '@/shared/components/FormDialog';
+import FormTextField from '@/shared/components/FormTextField';
 import {useToast} from '@/shared/components/ToastProvider';
-import CloseIcon from '@mui/icons-material/Close';
-import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, MenuItem, TextField} from '@mui/material';
+import {Grid, MenuItem} from '@mui/material';
 import {useEffect, useState} from 'react';
 
 type EditProductDialogProps = {
@@ -11,8 +12,6 @@ type EditProductDialogProps = {
     readonly onSaved: () => void;
     readonly product: ProductDto;
 };
-
-const labelProps = {sx: {fontWeight: 600}};
 
 export default function EditProductDialog({open, onClose, onSaved, product}: EditProductDialogProps) {
     const showToast = useToast();
@@ -53,61 +52,26 @@ export default function EditProductDialog({open, onClose, onSaved, product}: Edi
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 4, pt: 3}}>
-                Produkt bearbeiten
-                <IconButton onClick={onClose} size="small" aria-label="close" disabled={isSaving}>
-                    <CloseIcon />
-                </IconButton>
-            </DialogTitle>
-            <DialogContent sx={{px: 4, pb: 3}}>
-                <Grid container spacing={3} sx={{mt: 0.5}}>
-                    <Grid size={12}>
-                        <TextField
-                            label="Produktname"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            required
-                            slotProps={{inputLabel: labelProps}}
-                        />
-                    </Grid>
-                    <Grid size={12}>
-                        <TextField
-                            select
-                            label="Kategorie"
-                            value={categoryId}
-                            onChange={(e) => setCategoryId(e.target.value)}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            required
-                            slotProps={{inputLabel: {...labelProps, shrink: true}, select: {displayEmpty: true}}}
-                        >
-                            {categories.map((c) => (
-                                <MenuItem key={c.id} value={String(c.id)}>
-                                    {c.name}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </Grid>
-                </Grid>
-            </DialogContent>
-            <DialogActions sx={{px: 4, pb: 3}}>
-                <Button variant="outlined" onClick={onClose} disabled={isSaving}>
-                    Abbrechen
-                </Button>
-                <Button
-                    variant="contained"
-                    onClick={() => void handleSave()}
-                    disabled={isSaving}
-                    startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : undefined}
+        <FormDialog open={open} onClose={onClose} title="Produkt bearbeiten" onSubmit={() => void handleSave()} submitLabel="Speichern" busy={isSaving}>
+            <Grid size={12}>
+                <FormTextField label="Produktname" value={name} onChange={(e) => setName(e.target.value)} required />
+            </Grid>
+            <Grid size={12}>
+                <FormTextField
+                    select
+                    label="Kategorie"
+                    value={categoryId}
+                    onChange={(e) => setCategoryId(e.target.value)}
+                    required
+                    slotProps={{inputLabel: {sx: {fontWeight: 600}, shrink: true}, select: {displayEmpty: true}}}
                 >
-                    Speichern
-                </Button>
-            </DialogActions>
-        </Dialog>
+                    {categories.map((c) => (
+                        <MenuItem key={c.id} value={String(c.id)}>
+                            {c.name}
+                        </MenuItem>
+                    ))}
+                </FormTextField>
+            </Grid>
+        </FormDialog>
     );
 }

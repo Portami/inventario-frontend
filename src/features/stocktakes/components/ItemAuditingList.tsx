@@ -1,3 +1,4 @@
+import {auditingGridSx} from '@/features/stocktakes/components/auditingGridSx';
 import {AuditingResolveDialog} from '@/features/stocktakes/components/AuditingResolveDialog';
 import {FeltStocktakeItemDto, ITEM_STATE_LABELS, ItemState, PROBLEM_STATE_COLORS, RESOLUTION_TYPES_LABELS} from '@/features/stocktakes/types';
 import {toErrorMessage} from '@/shared/utils/pageUtils';
@@ -154,34 +155,7 @@ export default function ItemAuditingList({inventoryId, items, onResolve, hideSta
 
                         return '';
                     }}
-                    sx={{
-                        '& .MuiDataGrid-row': {
-                            cursor: 'pointer',
-                        },
-                        '& .bold-cell': {
-                            fontWeight: 700,
-                        },
-                        '& .row-resolved': {
-                            backgroundColor: '#e8f5e9',
-                        },
-                        '& .row-resolved:hover': {
-                            backgroundColor: '#e8f5e9',
-                        },
-
-                        ...Object.entries(PROBLEM_STATE_COLORS).reduce(
-                            (styles, [state, colors]) => ({
-                                ...styles,
-                                [`& .row-state-${state}`]: {
-                                    backgroundColor: colors.backgroundColor,
-                                    color: colors.color,
-                                },
-                                [`& .row-state-${state}:hover`]: {
-                                    backgroundColor: colors.backgroundColor,
-                                },
-                            }),
-                            {},
-                        ),
-                    }}
+                    sx={auditingGridSx}
                 />
             )}
 

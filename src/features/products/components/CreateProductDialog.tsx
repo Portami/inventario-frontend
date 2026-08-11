@@ -1,22 +1,11 @@
 import {createProduct, createProductCategory, createProductVariant, fetchProductCategories} from '@/features/products/api';
 import {ProductCategoryDto} from '@/features/products/types';
+import FormDialog from '@/shared/components/FormDialog';
+import FormSection from '@/shared/components/FormSection';
+import FormTextField from '@/shared/components/FormTextField';
 import {useToast} from '@/shared/components/ToastProvider';
 import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
-import {
-    Button,
-    CircularProgress,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Divider,
-    Grid,
-    IconButton,
-    MenuItem,
-    TextField,
-    Typography,
-} from '@mui/material';
+import {Grid, MenuItem} from '@mui/material';
 import {useEffect, useState} from 'react';
 
 type CreateProductDialogProps = {
@@ -26,8 +15,6 @@ type CreateProductDialogProps = {
 };
 
 const NEW_CATEGORY = '__new__';
-
-const labelProps = {sx: {fontWeight: 600}};
 
 export default function CreateProductDialog({open, onClose, onSaved}: CreateProductDialogProps) {
     const showToast = useToast();
@@ -98,140 +85,75 @@ export default function CreateProductDialog({open, onClose, onSaved}: CreateProd
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 4, pt: 3}}>
-                Neues Produkt
-                <IconButton onClick={onClose} size="small" aria-label="close" disabled={isSaving}>
-                    <CloseIcon />
-                </IconButton>
-            </DialogTitle>
-            <DialogContent sx={{px: 4, pb: 3}}>
-                <Grid container spacing={3} sx={{mt: 0.5}}>
-                    <Grid size={12}>
-                        <TextField
-                            label="Produktname"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            required
-                            slotProps={{inputLabel: labelProps}}
-                        />
-                    </Grid>
-                    <Grid size={12}>
-                        <TextField
-                            select
-                            label="Kategorie"
-                            value={categoryId}
-                            onChange={(e) => setCategoryId(e.target.value)}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            required
-                            slotProps={{inputLabel: {...labelProps, shrink: true}, select: {displayEmpty: true}}}
-                        >
-                            <MenuItem value="" disabled>
-                                Kategorie wählen
-                            </MenuItem>
-                            {categories.map((c) => (
-                                <MenuItem key={c.id} value={String(c.id)}>
-                                    {c.name}
-                                </MenuItem>
-                            ))}
-                            <MenuItem value={NEW_CATEGORY} sx={{color: 'primary.main', fontWeight: 600}}>
-                                <AddIcon sx={{fontSize: '1rem', mr: 0.5}} />
-                                Neue Kategorie erstellen
-                            </MenuItem>
-                        </TextField>
-                    </Grid>
-                    {categoryId === NEW_CATEGORY && (
-                        <Grid size={12}>
-                            <TextField
-                                label="Name der neuen Kategorie"
-                                value={newCategoryName}
-                                onChange={(e) => setNewCategoryName(e.target.value)}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                required
-                                autoFocus
-                                slotProps={{inputLabel: labelProps}}
+        <FormDialog open={open} onClose={onClose} title="Neues Produkt" onSubmit={() => void handleSave()} submitLabel="Erstellen" busy={isSaving}>
+            <Grid size={12}>
+                <FormTextField label="Produktname" value={name} onChange={(e) => setName(e.target.value)} required />
+            </Grid>
+            <Grid size={12}>
+                <FormTextField
+                    select
+                    label="Kategorie"
+                    value={categoryId}
+                    onChange={(e) => setCategoryId(e.target.value)}
+                    required
+                    slotProps={{inputLabel: {sx: {fontWeight: 600}, shrink: true}, select: {displayEmpty: true}}}
+                >
+                    <MenuItem value="" disabled>
+                        Kategorie wählen
+                    </MenuItem>
+                    {categories.map((c) => (
+                        <MenuItem key={c.id} value={String(c.id)}>
+                            {c.name}
+                        </MenuItem>
+                    ))}
+                    <MenuItem value={NEW_CATEGORY} sx={{color: 'primary.main', fontWeight: 600}}>
+                        <AddIcon sx={{fontSize: '1rem', mr: 0.5}} />
+                        Neue Kategorie erstellen
+                    </MenuItem>
+                </FormTextField>
+            </Grid>
+            {categoryId === NEW_CATEGORY && (
+                <Grid size={12}>
+                    <FormTextField
+                        label="Name der neuen Kategorie"
+                        value={newCategoryName}
+                        onChange={(e) => setNewCategoryName(e.target.value)}
+                        required
+                        autoFocus
+                    />
+                </Grid>
+            )}
+
+            <FormSection label="Erste Variante" dividerSx={{mt: 1}} />
+
+            <Grid size={6}>
+                <FormTextField label="Variantenname" value={variantName} onChange={(e) => setVariantName(e.target.value)} required />
+            </Grid>
+            <Grid size={6}>
+                <FormTextField
+                    label="Preis (CHF)"
+                    value={variantPrice}
+                    onChange={(e) => setVariantPrice(e.target.value)}
+                    type="number"
+                    required
+                    slotProps={{htmlInput: {min: 0, step: 0.01}}}
+                />
+            </Grid>
+
+            {categoryFields.length > 0 && (
+                <>
+                    <FormSection label="Attribute" />
+                    {categoryFields.map((f) => (
+                        <Grid size={6} key={f.id}>
+                            <FormTextField
+                                label={f.name}
+                                value={attrValues[f.name] ?? ''}
+                                onChange={(e) => setAttrValues((prev) => ({...prev, [f.name]: e.target.value}))}
                             />
                         </Grid>
-                    )}
-
-                    <Grid size={12}>
-                        <Divider sx={{mt: 1}} />
-                        <Typography variant="overline" sx={{display: 'block', mt: 2, mb: 0.5, color: 'text.secondary'}}>
-                            Erste Variante
-                        </Typography>
-                    </Grid>
-
-                    <Grid size={6}>
-                        <TextField
-                            label="Variantenname"
-                            value={variantName}
-                            onChange={(e) => setVariantName(e.target.value)}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            required
-                            slotProps={{inputLabel: labelProps}}
-                        />
-                    </Grid>
-                    <Grid size={6}>
-                        <TextField
-                            label="Preis (CHF)"
-                            value={variantPrice}
-                            onChange={(e) => setVariantPrice(e.target.value)}
-                            type="number"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            required
-                            slotProps={{htmlInput: {min: 0, step: 0.01}, inputLabel: labelProps}}
-                        />
-                    </Grid>
-
-                    {categoryFields.length > 0 && (
-                        <>
-                            <Grid size={12}>
-                                <Divider />
-                                <Typography variant="overline" sx={{display: 'block', mt: 2, mb: 0.5, color: 'text.secondary'}}>
-                                    Attribute
-                                </Typography>
-                            </Grid>
-                            {categoryFields.map((f) => (
-                                <Grid size={6} key={f.id}>
-                                    <TextField
-                                        label={f.name}
-                                        value={attrValues[f.name] ?? ''}
-                                        onChange={(e) => setAttrValues((prev) => ({...prev, [f.name]: e.target.value}))}
-                                        variant="outlined"
-                                        size="small"
-                                        fullWidth
-                                        slotProps={{inputLabel: labelProps}}
-                                    />
-                                </Grid>
-                            ))}
-                        </>
-                    )}
-                </Grid>
-            </DialogContent>
-            <DialogActions sx={{px: 4, pb: 3}}>
-                <Button variant="outlined" onClick={onClose} disabled={isSaving}>
-                    Abbrechen
-                </Button>
-                <Button
-                    variant="contained"
-                    onClick={() => void handleSave()}
-                    disabled={isSaving}
-                    startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : undefined}
-                >
-                    Erstellen
-                </Button>
-            </DialogActions>
-        </Dialog>
+                    ))}
+                </>
+            )}
+        </FormDialog>
     );
 }
