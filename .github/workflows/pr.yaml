@@ -32,15 +32,6 @@ jobs:
     needs: get-tag
     uses: ./.github/workflows/_validate.yaml
 
-  sonar:
-    needs:
-      - get-tag
-      - validate
-    uses: ./.github/workflows/_sonar.yaml
-    secrets: inherit
-    with:
-      sonar-version: ${{ needs.get-tag.outputs.sha_short }}-SNAPSHOT
-
   build-push:
     if: ${{ contains(github.event.pull_request.labels.*.name, 'deploy') }}
     needs:

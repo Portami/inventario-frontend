@@ -1,0 +1,44 @@
+import {FeltRollDto} from '@/features/rolls/types';
+import {DataGrid, GridColDef, GridRowId, GridRowSelectionModel} from '@mui/x-data-grid';
+
+const columns: GridColDef<FeltRollDto>[] = [
+    {
+        field: 'color',
+        headerName: 'Farbe / Typ',
+        flex: 1,
+        renderCell: ({row}) => `${row.feltTypeName} – ${row.color}`,
+    },
+    {field: 'articleNumber', headerName: 'Artikelnummer', flex: 1},
+    {field: 'length', headerName: 'Länge (cm)', width: 110},
+    {field: 'width', headerName: 'Breite (cm)', width: 110},
+    {field: 'id', headerName: 'ID', width: 100, renderCell: ({value}) => <span style={{fontFamily: 'monospace'}}>{String(value)}</span>},
+];
+
+type ProductSelectionTableProps = {
+    readonly rolls: FeltRollDto[];
+    readonly selectedIds: Set<string>;
+
+    readonly onSelectionChange: (ids: Set<string>) => void;
+};
+
+export default function ProductSelectionTable({rolls, selectedIds, onSelectionChange}: ProductSelectionTableProps) {
+    const handleSelectionChange = (model: GridRowSelectionModel) => {
+        const included = model.type === 'include' ? [...model.ids] : rolls.map((r) => r.id as GridRowId).filter((id) => !model.ids.has(id));
+        onSelectionChange(new Set(included.map(String)));
+    };
+
+    return (
+        <DataGrid
+            rows={rolls}
+            columns={columns}
+            checkboxSelection
+            disableRowSelectionOnClick
+            rowSelectionModel={{type: 'include', ids: new Set<GridRowId>([...selectedIds].map(Number))}}
+            onRowSelectionModelChange={handleSelectionChange}
+            sx={{height: 500}}
+            pageSizeOptions={[10, 25, 50]}
+            initialState={{pagination: {paginationModel: {pageSize: 10}}}}
+            localeText={{noRowsLabel: 'Keine Rollen vorhanden.'}}
+        />
+    );
+}

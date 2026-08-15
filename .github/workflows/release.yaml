@@ -11,15 +11,8 @@ jobs:
   validate:
     uses: ./.github/workflows/_validate.yaml
 
-  sonar:
-    needs: validate
-    uses: ./.github/workflows/_sonar.yaml
-    secrets: inherit
-    with:
-      sonar-version: ${{ github.event.release.tag_name }}
-
   build-push:
-    needs: sonar
+    needs: validate
     permissions:
       contents: read
       packages: write
